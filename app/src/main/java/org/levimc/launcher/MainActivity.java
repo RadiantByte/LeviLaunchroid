@@ -1,7 +1,9 @@
 package org.levimc.launcher;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -12,7 +14,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 
@@ -71,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
             permissionsHandler.requestStoragePermission();
         }
 
+        setTextMinecraftVersion();
+
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         ResourcepackHandler resourcepackHandler = new ResourcepackHandler(
                 this,
@@ -120,6 +126,30 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
         runOnUiThread(() -> updateModsUI(mods));
     }
 
+    private String getMinecraftVersion() throws PackageManager.NameNotFoundException {
+        return getPackageManager().getPackageInfo("com.mojang.minecraftpe", PackageManager.GET_CONFIGURATIONS).versionName;
+    }
+
+    private void setTextMinecraftVersion() {
+        try {
+            String str = getMinecraftVersion();
+            binding.textMinecraftVersion.setText(str);
+        } catch (PackageManager.NameNotFoundException e) {
+            binding.textMinecraftVersion.setText("Null");
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("未安装Minecraft")
+                    .setMessage("请先安装Minecraft")
+                    .setPositiveButton("退出", (d, which) -> {
+                        finish();
+                    })
+                    .setCancelable(false)
+                    .create();
+
+            dialog.show();
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(this, R.color.on_surface));
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(this, R.color.on_surface));
+        }
+    }
 
     private void updateModsUI(List<Mod> mods) {
         binding.modContent.removeAllViews();
