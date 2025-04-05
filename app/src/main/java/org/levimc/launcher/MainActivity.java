@@ -1,7 +1,6 @@
 package org.levimc.launcher;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -22,6 +21,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import org.levimc.launcher.databinding.ActivityMainBinding;
 import org.levimc.launcher.minecraft.MinecraftLauncher;
+import org.levimc.launcher.mods.FileHandler;
 import org.levimc.launcher.mods.Mod;
 import org.levimc.launcher.mods.ModManager;
 import org.levimc.launcher.util.AnimationHelper;
@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
     private ThemeManager themeManager;
     private PermissionsHandler permissionsHandler;
     private ModManager modManager;
+    private FileHandler fileHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
             permissionsHandler.requestStoragePermission();
         }
 
+        fileHandler = new FileHandler(this, modManager);
+
         setTextMinecraftVersion();
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
                 binding.launchButton
         );
         resourcepackHandler.checkIntentForResourcepack();
+        handleIncomingFiles();
     }
 
     @Override
@@ -123,7 +127,10 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
 
     @Override
     public void onModsUpdated(List<Mod> mods) {
-        runOnUiThread(() -> updateModsUI(mods));
+        runOnUiThread(() ->{
+            modManager.refreshMods();
+            updateModsUI(mods);
+        });
     }
 
     private String getMinecraftVersion() throws PackageManager.NameNotFoundException {
@@ -137,9 +144,9 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
         } catch (PackageManager.NameNotFoundException e) {
             binding.textMinecraftVersion.setText("Null");
             AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle("未安装Minecraft")
-                    .setMessage("请先安装Minecraft")
-                    .setPositiveButton("退出", (d, which) -> {
+                    .setTitle(R.string.no_minecraft)
+                    .setMessage(R.string.no_install_minecraft)
+                    .setPositiveButton(R.string.exit, (d, which) -> {
                         finish();
                     })
                     .setCancelable(false)
@@ -151,6 +158,31 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
         }
     }
 
+    private void handleIncomingFiles() {
+        fileHandler.processIncomingFilesWithConfirmation(getIntent(), new FileHandler.FileOperationCallback() {
+            @Override
+            public void onSuccess(int processedFiles) {
+                if (processedFiles > 0) {
+                    UIHelper.showToast(MainActivity.this,
+                            getString(R.string.files_processed, processedFiles));
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(R.string.error)
+                        .setMessage(errorMessage)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            }
+
+            @Override
+            public void onProgressUpdate(int progress) {
+                binding.progressLoader.setProgress(progress);
+            }
+        });
+    }
     private void updateModsUI(List<Mod> mods) {
         binding.modContent.removeAllViews();
 

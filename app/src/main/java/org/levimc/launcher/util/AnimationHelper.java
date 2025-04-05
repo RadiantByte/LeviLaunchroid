@@ -13,7 +13,7 @@ public class AnimationHelper {
     public static void prepareInitialStates(ActivityMainBinding binding) {
         binding.header.setVisibility(View.INVISIBLE);
         setViewAnimationState(binding.mainCard, -50f);
-        setViewAnimationState(binding.modContent, -30f);
+        setViewAnimationState(binding.modCard, -30f);
         setViewAnimationState(binding.aboutCard, 30f);
         binding.githubIcon.setAlpha(0f);
     }
@@ -26,7 +26,7 @@ public class AnimationHelper {
     public static void runInitializationSequence(ActivityMainBinding binding) {
         binding.header.postDelayed(() -> startHeaderAnimation(binding.header), 300);
         binding.mainCard.postDelayed(() -> animateView(binding.mainCard, 600, 1.2f), 500);
-        binding.modContent.postDelayed(() -> animateView(binding.modContent, 400, 1f), 700);
+        binding.modCard.postDelayed(() -> animateView(binding.modCard, 400, 1f), 700);
         binding.aboutCard.postDelayed(() -> animateView(binding.aboutCard, 400, 1f), 800);
         binding.githubIcon.postDelayed(() -> animateGithubIcon(binding.githubIcon), 1000);
     }

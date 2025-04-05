@@ -12,21 +12,41 @@
     <!-- About -->
     <string name="about_title">☕ 关于</string>
     <string name="copyright">©2024–2025 LeviMC. 保留所有权利</string>
-    <string name="font_license">本软件使用Misans字体</string>
+    <string name="font_license">本软件使用 Misans 字体</string>
 
     <!-- Dialogs -->
     <string name="resourcepack_detected_title">检测到资源包导入</string>
-    <string name="resourcepack_detected_message">是否启动游戏？\n\n资源包：%s</string>
+    <string name="resourcepack_detected_message">是否立即启动游戏？\n\n资源包：%s</string>
     <string name="launch_now">立即启动</string>
     <string name="launch_later">稍后启动</string>
 
+    <string name="import_confirmation_title">导入模组</string>
+    <string name="import_confirmation_message">确定要导入所选的 %d 个模组文件吗？</string>
+    <string name="overwrite_file_title">文件已存在</string>
+    <string name="overwrite_file_message">文件 %s 已存在，是否覆盖？</string>
+    <string name="overwrite">覆盖</string>
+    <string name="skip">跳过</string>
+    <string name="confirm">确认</string>
+
     <!-- Permissions -->
     <string name="storage_permission_title">需要存储权限</string>
-    <string name="storage_permission_message">请允许访问mods目录以检测模组。</string>
+    <string name="storage_permission_message">授予存储权限以便访问 mods 目录，检测模组。</string>
     <string name="grant_permission">授予权限</string>
     <string name="cancel">取消</string>
 
-    <string name="language">Language</string>
+    <!-- Feedback -->
+    <string name="files_processed">成功处理 %d 个模组文件</string>
+    <string name="files_processing_error">文件处理失败：%s</string>
+    <string name="user_cancelled">用户取消导入</string>
+
+    <string name="error">错误</string>
+
+    <string name="no_install_minecraft">请先安装Minecraft</string>
+    <string name="no_minecraft">未安装Minecraft</string>
+    <string name="exit">退出</string>
+
+    <!-- Language Setting -->
+    <string name="language">语言</string>
     <string name="english">English</string>
     <string name="chinese">简体中文</string>
 </resources>

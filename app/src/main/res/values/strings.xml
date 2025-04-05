@@ -7,25 +7,48 @@
 
     <!-- Mods -->
     <string name="mods_title">🧩 Mods (%d)</string>
-    <string name="no_mods_found">No mods found</string>
+    <string name="no_mods_found">No Mods Found</string>
 
     <!-- About -->
     <string name="about_title">☕ About</string>
-    <string name="copyright">©2024–2025 LeviMC. All rights reserved</string>
-    <string name="font_license">This software uses Misans font</string>
+    <string name="copyright">©2024–2025 LeviMC. All rights reserved.</string>
+    <string name="font_license">This app uses the Misans font.</string>
 
     <!-- Dialogs -->
     <string name="resourcepack_detected_title">Resource Pack Detected</string>
-    <string name="resourcepack_detected_message">Do you want to launch the game now?\n\nResource pack: %s</string>
+    <string name="resourcepack_detected_message">Do you want to launch the game now?\n\nResource Pack: %s</string>
     <string name="launch_now">Launch Now</string>
     <string name="launch_later">Launch Later</string>
 
+    <string name="import_confirmation_title">Import Mods</string>
+    <string name="import_confirmation_message">Are you sure you want to import the selected %d mod files?</string>
+    <string name="overwrite_file_title">File Already Exists</string>
+    <string name="overwrite_file_message">The file %s already exists. Do you want to overwrite it?</string>
+    <string name="overwrite">Overwrite</string>
+    <string name="skip">Skip</string>
+    <string name="confirm">Confirm</string>
+
+
     <!-- Permissions -->
     <string name="storage_permission_title">Storage Permission Required</string>
-    <string name="storage_permission_message">Please allow access to mods directory to detect mods.</string>
+    <string name="storage_permission_message">Please grant storage permission to access mods directory and detect mods.</string>
     <string name="grant_permission">Grant Permission</string>
     <string name="cancel">Cancel</string>
 
+    <!-- Feedback -->
+    <string name="files_processed">Successfully processed %d mod files</string>
+    <string name="files_processing_error">File processing failed: %s</string>
+    <string name="user_cancelled">Import cancelled by user</string>
+
+    <string name="error">Error</string>
+
+    <string name="no_install_minecraft"></string>
+    <string name="no_minecraft">Exit</string>
+    <string name="exit">Exit</string>
+
+
+
+    <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>
     <string name="chinese">简体中文</string>

@@ -34,32 +34,37 @@ public class ResourcepackHandler {
     public void checkIntentForResourcepack() {
         Intent intent = activity.getIntent();
         Uri data = intent.getData();
-
         if (data != null) {
-            AlertDialog dialog = new AlertDialog.Builder(activity)
-                    .setTitle(activity.getString(R.string.resourcepack_detected_title))
-                    .setMessage(activity.getString(R.string.resourcepack_detected_message, data.getPath()))
-                    .setPositiveButton(activity.getString(R.string.launch_now), (d, which) -> launchMinecraft(intent))
-                    .setNegativeButton(activity.getString(R.string.launch_later), null)
-                    .create();
+            String path = data.getPath();
+            if (path != null && isMinecraftResourceFile(path)) {
+                AlertDialog dialog = new AlertDialog.Builder(activity)
+                        .setTitle(activity.getString(R.string.resourcepack_detected_title))
+                        .setMessage(activity.getString(R.string.resourcepack_detected_message, path))
+                        .setPositiveButton(activity.getString(R.string.launch_now), (d, which) -> launchMinecraft(intent))
+                        .setNegativeButton(activity.getString(R.string.launch_later), null)
+                        .create();
+                dialog.setOnShowListener(dialogInterface -> {
+                    Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                    Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
 
-            dialog.setOnShowListener(dialogInterface -> {
-                Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-
-                // 设置按钮文字颜色
-                positive.setTextColor(ContextCompat.getColor(activity, R.color.on_surface));
-                negative.setTextColor(ContextCompat.getColor(activity, R.color.on_surface));
-            });
-
-            dialog.show();
+                    positive.setTextColor(ContextCompat.getColor(activity, R.color.on_surface));
+                    negative.setTextColor(ContextCompat.getColor(activity, R.color.on_surface));
+                });
+                dialog.show();
+            }
         }
     }
 
+    private boolean isMinecraftResourceFile(String path) {
+        String lowerPath = path.toLowerCase();
+        return lowerPath.endsWith(".mcworld") ||
+                lowerPath.endsWith(".mcpack") ||
+                lowerPath.endsWith(".mcaddon") ||
+                lowerPath.endsWith(".mctemplate");
+    }
     private void launchMinecraft(Intent intent) {
         launchBtn.setEnabled(false);
         progressLoader.setVisibility(android.view.View.VISIBLE);
-
         executor.execute(() -> {
             minecraftLauncher.launch(intent);
             activity.runOnUiThread(() -> {
