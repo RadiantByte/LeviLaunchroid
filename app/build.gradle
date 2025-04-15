@@ -22,12 +22,30 @@ android {
             abiFilters "arm64-v8a"
         }
     }
+    signingConfigs {
+        release {
+            def keystoreFilePath = project.properties["RELEASE_KEYSTORE_FILE"]
+            def keystorePassword = project.properties["RELEASE_KEYSTORE_PASSWORD"]
+            def keyAlias = project.properties["RELEASE_KEY_ALIAS"]
+            def keyPassword = project.properties["RELEASE_KEY_PASSWORD"]
+
+            if (keystoreFilePath && keystorePassword && keyAlias && keyPassword && file(keystoreFilePath).exists()) {
+                storeFile file(keystoreFilePath)
+                storePassword keystorePassword
+                keyAlias keyAlias
+                keyPassword keyPassword
+            } else {
+                println "⚠️"
+            }
+        }
+    }
     buildFeatures {
         viewBinding true
     }
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release.storeFile != null ? signingConfigs.release : null
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug{
