@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ModManager {
+    private static final String TAG = "ModManager";
     private static final String CONFIG_NAME = "mods_config.json";
     private static ModManager instance;
     private final File modsDir;
@@ -45,7 +46,7 @@ public class ModManager {
 
     private void initialize() {
         if (!modsDir.exists() && !modsDir.mkdirs()) {
-            Log.e("ModManager", "Failed to create mods directory");
+            Log.e(TAG, "Failed to create mods directory");
         }
         loadConfig();
     }
@@ -70,7 +71,7 @@ public class ModManager {
         for (String fileName : existingFiles) {
             if (!configMap.containsKey(fileName)) {
                 configMap.put(fileName, true);
-                Log.d("ModManager", "发现新mod: " + fileName);
+                Log.d(TAG, "发现新mod: " + fileName);
                 added = true;
             }
         }
@@ -128,7 +129,7 @@ public class ModManager {
     private void saveConfig() {
         try {
             if (!modsDir.exists() && !modsDir.mkdirs()) {
-                Log.e("ModManager", "无法创建mods目录");
+                Log.e(TAG, "无法创建mods目录");
                 return;
             }
 
@@ -138,13 +139,13 @@ public class ModManager {
                 writer.flush();
 
                 if (tempFile.renameTo(configFile)) {
-                    Log.d("ModManager", "配置保存成功");
+                    Log.d(TAG, "配置保存成功");
                 } else {
-                    Log.e("ModManager", "文件重命名失败");
+                    Log.e(TAG, "文件重命名失败");
                 }
             }
         } catch (Exception e) {
-            Log.e("ModManager", "保存配置失败: " + e.getMessage());
+            Log.e(TAG, "保存配置失败: " + e.getMessage());
             e.printStackTrace();
         }
     }

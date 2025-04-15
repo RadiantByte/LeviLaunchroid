@@ -8,6 +8,7 @@ import android.util.Log;
 
 
 public class IntentHandler extends Activity {
+    private static final String TAG = "IntentHandler";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,10 +38,10 @@ public class IntentHandler extends Activity {
     private boolean isMcRunning(){
         try {
             Class<?> clazz = Class.forName("com.mojang.minecraftpe.Launcher", false, getClassLoader());
-            Log.d("Reflection", "Minecraft PE Launcher class exists!");
+            Log.d(TAG, "Minecraft PE Launcher class exists!");
             return true;
         } catch (ClassNotFoundException e) {
-            Log.d("Reflection", "Minecraft PE Launcher class not found.");
+            Log.d(TAG, "Minecraft PE Launcher class not found.");
             return false;
         }
     }

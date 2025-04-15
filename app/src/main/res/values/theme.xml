@@ -18,10 +18,8 @@
     </style>
 
     <style name="AppTheme.Light" parent="Base.Theme.FullScreen">
-
     </style>
 
     <style name="AppTheme.Dark" parent="Base.Theme.FullScreen">
-
     </style>
 </resources>

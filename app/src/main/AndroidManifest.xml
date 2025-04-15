@@ -24,6 +24,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.OVERLAY_WINDOW" />
 
     <queries>
         <package android:name="com.mojang.minecraftpe" />
@@ -63,7 +65,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             tools:ignore="DiscouragedApi">
             <meta-data
                 android:name="android.app.lib_name"
@@ -122,7 +124,7 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape"
-            android:theme="@android:style/Theme.DeviceDefault.NoActionBar"
+            android:theme="@style/AppFullScreenTheme"
             tools:ignore="DiscouragedApi">
             <meta-data
                 android:name="android.app.lib_name"

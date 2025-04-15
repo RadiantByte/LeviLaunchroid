@@ -3,14 +3,19 @@ package org.levimc.launcher;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.TypedValue;
+
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
+
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -18,8 +23,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
-
 import org.levimc.launcher.databinding.ActivityMainBinding;
+
+import org.levimc.launcher.logger.Logger;
 import org.levimc.launcher.minecraft.MinecraftLauncher;
 import org.levimc.launcher.mods.FileHandler;
 import org.levimc.launcher.mods.Mod;
@@ -36,7 +42,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements ModManager.OnModsUpdateListener {
-
+    private static int APP_PID = android.os.Process.myPid();
     private ActivityMainBinding binding;
     private MinecraftLauncher minecraftLauncher;
     private LanguageManager languageManager;
@@ -44,14 +50,19 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
     private PermissionsHandler permissionsHandler;
     private ModManager modManager;
     private FileHandler fileHandler;
+    public static Logger logger;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         languageManager = new LanguageManager(this);
         languageManager.applySavedLanguage();
+        logger = new Logger("LeviMC");
 
         //themeManager = new ThemeManager(this);
         //themeManager.applyTheme();
+
+        //logger.info("auto close logger when exited block.");
 
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -61,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
         minecraftLauncher = new MinecraftLauncher(this, getClassLoader());
         modManager = ModManager.getInstance(this);
         modManager.setOnModsUpdateListener(this);
+
 
         permissionsHandler = new PermissionsHandler(this, modManager);
 
@@ -90,13 +102,39 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
         );
         resourcepackHandler.checkIntentForResourcepack();
         handleIncomingFiles();
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        permissionsHandler.handlePermissionResult(requestCode);
+        permissionsHandler.handlePermissionResult(requestCode, null, null);
+        if(requestCode == 1002){
+            if(!Settings.canDrawOverlays(this)){
+                Toast.makeText(this, "请授予悬浮窗权限", Toast.LENGTH_SHORT).show();
+            } else {
+            }
+        }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        permissionsHandler.handlePermissionResult(requestCode, permissions, grantResults);
+    }
+
+    public boolean checkOverlayPermission() {
+        return Settings.canDrawOverlays(this);
+    }
+
+    public void requestOverlayPermission() {
+        if (!Settings.canDrawOverlays(this)){
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, 1002);
+        }
+    }
+
+
     @SuppressLint({"ClickableViewAccessibility", "UnsafeIntentLaunch"})
     private void initListeners() {
         binding.launchButton.setOnClickListener(v -> {
@@ -122,12 +160,27 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
 
         binding.languageButton.setOnClickListener(v -> languageManager.showLanguageMenu(v));
 
+        binding.logOverlaySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            LogOverlay logOverlay = LogOverlay.getInstance(this);
+            if (isChecked) {
+                if (checkOverlayPermission()) {
+                    logOverlay.show();
+                } else {
+                    requestOverlayPermission();
+                    buttonView.setChecked(false);
+                    Toast.makeText(this, R.string.overlays, Toast.LENGTH_LONG).show();
+                }
+            } else {
+                logOverlay.hide();
+            }
+        });
         //binding.themeSwitch.setOnCheckedChangeListener((button, checked) -> themeManager.toggleTheme(checked));
     }
 
     @Override
     public void onModsUpdated(List<Mod> mods) {
         runOnUiThread(() ->{
+
             modManager.refreshMods();
             updateModsUI(mods);
         });
@@ -241,5 +294,12 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
             tv.setTextColor(newColor);
         });
         return switchBtn;
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 }

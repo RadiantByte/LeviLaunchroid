@@ -42,11 +42,11 @@
 
     <string name="error">Error</string>
 
-    <string name="no_install_minecraft"></string>
+    <string name="no_install_minecraft">Please install Minecraft first</string>
     <string name="no_minecraft">Exit</string>
     <string name="exit">Exit</string>
 
-
+    <string name="overlays">Please grant the overlay permission</string>
 
     <!-- Language Setting -->
     <string name="language">Language</string>

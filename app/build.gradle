@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id 'org.tboox.gradle-xmake-plugin' version '1.2.2'
 }
 
 android {
@@ -16,6 +17,9 @@ android {
         ndk {
             //noinspection ChromeOsAbiSupport
             abiFilters 'arm64-v8a'
+        }
+        xmake {
+            abiFilters "arm64-v8a"
         }
     }
     buildFeatures {
@@ -37,8 +41,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     externalNativeBuild {
-        ndkBuild {
-            path "src/main/jni/Android.mk"
+        xmake{
+            path "src/main/jni/xmake.lua"
+            logLevel "verbose"
+            buildMode "release"
+
         }
     }
     ndkVersion "27.0.12077973"

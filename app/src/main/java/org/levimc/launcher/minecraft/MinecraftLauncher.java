@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import org.jetbrains.annotations.NotNull;
+import org.levimc.launcher.MainActivity;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -126,11 +129,67 @@ public class MinecraftLauncher {
     }
 
     private void injectNativeLibraries(ApplicationInfo mcInfo, Object pathList) throws ReflectiveOperationException {
-        Method addNativePath = findMethod(pathList, "addNativePath", Collection.class);
-        addNativePath.invoke(pathList, Collections.singleton(mcInfo.nativeLibraryDir));
-        updateListenerText("Linked native libs: " + mcInfo.nativeLibraryDir);
-    }
+        try {
+            final File newLibDir = new File(mcInfo.nativeLibraryDir);
 
+            Field nativeLibraryDirectoriesField = pathList.getClass().getDeclaredField("nativeLibraryDirectories");
+            nativeLibraryDirectoriesField.setAccessible(true);
+
+            Collection<File> currentDirs = (Collection<File>) nativeLibraryDirectoriesField.get(pathList);
+            if (currentDirs == null) {
+                currentDirs = new ArrayList<>();
+            }
+
+            List<File> libDirs = new ArrayList<>(currentDirs);
+
+            Iterator<File> it = libDirs.iterator();
+            while (it.hasNext()) {
+                File libDir = it.next();
+                if (newLibDir.equals(libDir)) {
+                    it.remove();
+                    break;
+                }
+            }
+            libDirs.add(0, newLibDir);
+            nativeLibraryDirectoriesField.set(pathList, libDirs);
+
+            Field nativeLibraryPathElementsField = pathList.getClass().getDeclaredField("nativeLibraryPathElements");
+            nativeLibraryPathElementsField.setAccessible(true);
+
+            Object[] elements;
+
+            if (Build.VERSION.SDK_INT >= 25) {
+                Method makePathElements = pathList.getClass().getDeclaredMethod("makePathElements", List.class);
+                makePathElements.setAccessible(true);
+
+                Field systemNativeLibDirsField = pathList.getClass().getDeclaredField("systemNativeLibraryDirectories");
+                systemNativeLibDirsField.setAccessible(true);
+                List<File> systemLibDirs = (List<File>) systemNativeLibDirsField.get(pathList);
+                if (systemLibDirs != null) {
+                    libDirs.addAll(systemLibDirs);
+                }
+
+                elements = (Object[]) makePathElements.invoke(pathList, libDirs);
+            } else {
+                Method makePathElements = pathList.getClass().getDeclaredMethod("makePathElements", List.class, File.class, List.class);
+                makePathElements.setAccessible(true);
+
+                Field systemNativeLibDirsField = pathList.getClass().getDeclaredField("systemNativeLibraryDirectories");
+                systemNativeLibDirsField.setAccessible(true);
+                List<File> systemLibDirs = (List<File>) systemNativeLibDirsField.get(pathList);
+                if (systemLibDirs != null) {
+                    libDirs.addAll(systemLibDirs);
+                }
+                ArrayList<Throwable> suppressedExceptions = new ArrayList<>();
+                elements = (Object[]) makePathElements.invoke(pathList, libDirs, null, suppressedExceptions);
+            }
+            nativeLibraryPathElementsField.set(pathList, elements);
+
+
+        } catch (NoSuchFieldException | NoSuchMethodException e) {
+            throw new ReflectiveOperationException("Unable to inject native libraries", e);
+        }
+    }
     private void launchMinecraftActivity(ApplicationInfo mcInfo, Intent sourceIntent) throws ClassNotFoundException {
         Class<?> launcherClass = classLoader.loadClass("com.mojang.minecraftpe.Launcher");
         Intent mcActivity = sourceIntent.setClass(context, launcherClass);
@@ -174,6 +233,6 @@ public class MinecraftLauncher {
     }
 
     private void updateListenerText(String message) {
-        //mainHandler.post(() -> listener.append("-> " + message + "\n"));
+        MainActivity.logger.info(message);
     }
 }
