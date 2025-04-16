@@ -1,4 +1,4 @@
-package org.levimc.launcher;
+package org.levimc.launcher.ui.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 
-public class IntentHandler extends Activity {
+public class IntentHandler extends BaseActivity {
     private static final String TAG = "IntentHandler";
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,4 +1,4 @@
-package org.levimc.launcher.mods;
+package org.levimc.launcher.core.mods;
 
 import android.app.AlertDialog;
 import android.content.*;
@@ -13,6 +13,7 @@ import android.util.Log;
 import androidx.core.content.ContextCompat;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.ui.views.MainViewModel;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.List;
 public class FileHandler {
     private static final String TAG = "FileHandler";
     private final Context context;
-    private final ModManager modManager;
+    private final MainViewModel modManager;
     private String targetPath = "games/org.levimc/mods";
 
     public interface FileOperationCallback {
@@ -30,7 +31,7 @@ public class FileHandler {
         void onProgressUpdate(int progress);
     }
 
-    public FileHandler(Context context, ModManager modManager) {
+    public FileHandler(Context context, MainViewModel modManager) {
         this.context = context;
         this.modManager = modManager;
     }

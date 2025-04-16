@@ -1,36 +1,46 @@
-package org.levimc.launcher;
+package org.levimc.launcher.ui.activities;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.OvershootInterpolator;
 
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.ViewModelProvider;
 
+import org.levimc.launcher.R;
 import org.levimc.launcher.databinding.ActivityMainBinding;
 
-import org.levimc.launcher.logger.Logger;
-import org.levimc.launcher.minecraft.MinecraftLauncher;
-import org.levimc.launcher.mods.FileHandler;
-import org.levimc.launcher.mods.Mod;
-import org.levimc.launcher.mods.ModManager;
-import org.levimc.launcher.util.AnimationHelper;
+import org.levimc.launcher.service.LogOverlay;
+import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
+import org.levimc.launcher.ui.views.MainViewModel;
+import org.levimc.launcher.ui.views.MainViewModelFactory;
+import org.levimc.launcher.util.Logger;
+import org.levimc.launcher.core.minecraft.MinecraftLauncher;
+import org.levimc.launcher.core.mods.FileHandler;
+import org.levimc.launcher.core.mods.Mod;
+import org.levimc.launcher.ui.animation.AnimationHelper;
 import org.levimc.launcher.util.LanguageManager;
 import org.levimc.launcher.util.PermissionsHandler;
 import org.levimc.launcher.util.ResourcepackHandler;
@@ -41,16 +51,20 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity implements ModManager.OnModsUpdateListener {
-    private static int APP_PID = android.os.Process.myPid();
+public class MainActivity extends BaseActivity  {
+
+    static {
+        System.loadLibrary("leviutils");
+    }
+
     private ActivityMainBinding binding;
     private MinecraftLauncher minecraftLauncher;
     private LanguageManager languageManager;
     private ThemeManager themeManager;
     private PermissionsHandler permissionsHandler;
-    private ModManager modManager;
     private FileHandler fileHandler;
     public static Logger logger;
+    private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,14 +81,16 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        viewModel = new ViewModelProvider(
+                this,
+                new MainViewModelFactory(getApplication())
+        ).get(MainViewModel.class);
+        viewModel.getModsLiveData().observe(this, this::updateModsUI);
+
         UIHelper.setTransparentNavigationBar(this);
 
         minecraftLauncher = new MinecraftLauncher(this, getClassLoader());
-        modManager = ModManager.getInstance(this);
-        modManager.setOnModsUpdateListener(this);
-
-
-        permissionsHandler = new PermissionsHandler(this, modManager);
 
         initListeners();
         AnimationHelper.prepareInitialStates(binding);
@@ -82,13 +98,27 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
 
        // binding.themeSwitch.setChecked(themeManager.isDarkMode());
 
-        if (permissionsHandler.hasStoragePermission()) {
-            modManager.refreshMods();
-        } else {
-            permissionsHandler.requestStoragePermission();
-        }
+        permissionsHandler = new PermissionsHandler(this);
 
-        fileHandler = new FileHandler(this, modManager);
+        permissionsHandler.requestPermission(PermissionsHandler.PermissionType.STORAGE, new PermissionsHandler.PermissionResultCallback() {
+            @Override
+            public void onPermissionGranted(PermissionsHandler.PermissionType type) {
+                if (type == PermissionsHandler.PermissionType.STORAGE) {
+                    viewModel.refreshMods();
+                }
+            }
+            @Override
+            public void onPermissionDenied(PermissionsHandler.PermissionType type, boolean permanentlyDenied) {
+                if (type == PermissionsHandler.PermissionType.STORAGE) {
+                    Toast.makeText(MainActivity.this, R.string.storage_permission_not_granted, Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        });
+
+        viewModel.refreshMods();
+
+        fileHandler = new FileHandler(this, viewModel);
 
         setTextMinecraftVersion();
 
@@ -102,38 +132,23 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
         );
         resourcepackHandler.checkIntentForResourcepack();
         handleIncomingFiles();
+        observeViewModel();
+    }
 
+    private void observeViewModel() {
+        viewModel.getModsLiveData().observe(this, this::updateModsUI);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        permissionsHandler.handlePermissionResult(requestCode, null, null);
-        if(requestCode == 1002){
-            if(!Settings.canDrawOverlays(this)){
-                Toast.makeText(this, "请授予悬浮窗权限", Toast.LENGTH_SHORT).show();
-            } else {
-            }
-        }
+        permissionsHandler.onActivityResult(requestCode, resultCode, data);
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        permissionsHandler.handlePermissionResult(requestCode, permissions, grantResults);
+        permissionsHandler.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
-    public boolean checkOverlayPermission() {
-        return Settings.canDrawOverlays(this);
-    }
-
-    public void requestOverlayPermission() {
-        if (!Settings.canDrawOverlays(this)){
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
-            startActivityForResult(intent, 1002);
-        }
-    }
-
 
     @SuppressLint({"ClickableViewAccessibility", "UnsafeIntentLaunch"})
     private void initListeners() {
@@ -163,13 +178,19 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
         binding.logOverlaySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             LogOverlay logOverlay = LogOverlay.getInstance(this);
             if (isChecked) {
-                if (checkOverlayPermission()) {
-                    logOverlay.show();
-                } else {
-                    requestOverlayPermission();
-                    buttonView.setChecked(false);
-                    Toast.makeText(this, R.string.overlays, Toast.LENGTH_LONG).show();
-                }
+                permissionsHandler.requestPermission(PermissionsHandler.PermissionType.OVERLAY, new PermissionsHandler.PermissionResultCallback() {
+                    @Override
+                    public void onPermissionGranted(PermissionsHandler.PermissionType type) {
+                        if (type == PermissionsHandler.PermissionType.OVERLAY) {
+                            LogOverlay.getInstance(MainActivity.this).show();
+                        }
+                    }
+                    @Override
+                    public void onPermissionDenied(PermissionsHandler.PermissionType type, boolean permanentlyDenied) {
+                        Toast.makeText(MainActivity.this, R.string.overlay_permission_not_granted, Toast.LENGTH_SHORT).show();
+                        binding.logOverlaySwitch.setChecked(false);
+                    }
+                });
             } else {
                 logOverlay.hide();
             }
@@ -177,13 +198,8 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
         //binding.themeSwitch.setOnCheckedChangeListener((button, checked) -> themeManager.toggleTheme(checked));
     }
 
-    @Override
-    public void onModsUpdated(List<Mod> mods) {
-        runOnUiThread(() ->{
-
-            modManager.refreshMods();
-            updateModsUI(mods);
-        });
+    private void onVersionSelected(String version) {
+        Toast.makeText(this, "已选择版本：" + version, Toast.LENGTH_SHORT).show();
     }
 
     private String getMinecraftVersion() throws PackageManager.NameNotFoundException {
@@ -195,19 +211,12 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
             String str = getMinecraftVersion();
             binding.textMinecraftVersion.setText(str);
         } catch (PackageManager.NameNotFoundException e) {
-            binding.textMinecraftVersion.setText("Null");
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle(R.string.no_minecraft)
-                    .setMessage(R.string.no_install_minecraft)
-                    .setPositiveButton(R.string.exit, (d, which) -> {
+            new CustomAlertDialog(this)
+                    .setTitleText(getString(R.string.no_minecraft))
+                    .setMessage(getString(R.string.no_install_minecraft))
+                    .setPositiveButton(getString(R.string.exit), (v) -> {
                         finish();
-                    })
-                    .setCancelable(false)
-                    .create();
-
-            dialog.show();
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(this, R.color.on_surface));
-            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(this, R.color.on_surface));
+                    }).show();
         }
     }
 
@@ -238,68 +247,39 @@ public class MainActivity extends AppCompatActivity implements ModManager.OnMods
     }
     private void updateModsUI(List<Mod> mods) {
         binding.modContent.removeAllViews();
-
-        //title.setText(getString(R.string.mods_title, mods.size()));
-        String formattedTitle = getString(R.string.mods_title, mods.size());
-        binding.modsTitleText.setText(formattedTitle);
-
-        if (mods.isEmpty()) {
-            binding.modContent.addView(binding.noModsText);
-            binding.noModsText.setVisibility(View.VISIBLE);
+        if (mods == null || mods.isEmpty()) {
+            TextView tv = new TextView(this);
+            tv.setText("No Mods Found");
+            binding.modContent.addView(tv);
             return;
         }
-
-        binding.noModsText.setVisibility(View.GONE);
-        for (Mod mod : mods)
+        String formattedTitle = getString(R.string.mods_title, mods.size());
+        binding.modsTitleText.setText(formattedTitle);
+        for (Mod mod : mods) {
             binding.modContent.addView(createModView(mod));
+        }
     }
 
-    @SuppressLint("SetTextI18n")
     private View createModView(Mod mod) {
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.HORIZONTAL);
-        //layout.setPadding(0, 0, 0, 0);
+        LayoutInflater inflater = LayoutInflater.from(this);
 
-        TextView tv = new TextView(this);
-        tv.setText("· " + mod.getDisplayName());
-        tv.setTextSize(16);
+        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.item_mod, null);
+        TextView name = view.findViewById(R.id.mod_name);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch switchBtn = view.findViewById(R.id.mod_switch);
 
-        int color = mod.isEnabled() ? ResourcesCompat.getColor(getResources(), R.color.on_background, null)
-                : ResourcesCompat.getColor(getResources(), R.color.on_surface, null);
-        tv.setTextColor(color);
-        tv.setTypeface(ResourcesCompat.getFont(this, R.font.misans));
-        tv.setLayoutParams(new LinearLayout.LayoutParams(
-                0,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                1
-        ));
-
-        Switch switchBtn = getSwitchBtn(mod, tv);
-
-        layout.addView(tv);
-        layout.addView(switchBtn);
-        return layout;
-    }
-
-    @NonNull
-    private Switch  getSwitchBtn(Mod mod, TextView tv) {
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        Switch  switchBtn = new Switch (this);
+        name.setText(mod.getDisplayName());
         switchBtn.setChecked(mod.isEnabled());
-        switchBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            mod.setEnabled(isChecked);
-            modManager.setModEnabled(mod.getFileName(), isChecked);
-            int newColor = isChecked ? ResourcesCompat.getColor(getResources(), R.color.on_background, null)
-                    : ResourcesCompat.getColor(getResources(), R.color.on_surface, null);
-            tv.setTextColor(newColor);
+
+        switchBtn.setOnCheckedChangeListener((btn, isChecked) -> {
+            viewModel.setModEnabled(mod.getFileName(), isChecked);
         });
-        return switchBtn;
+
+        return view;
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
     }
 }

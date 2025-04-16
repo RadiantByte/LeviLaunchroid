@@ -1,4 +1,4 @@
-package org.levimc.launcher.minecraft;
+package org.levimc.launcher.core.minecraft;
 
 
 import android.annotation.SuppressLint;
@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import org.jetbrains.annotations.NotNull;
-import org.levimc.launcher.MainActivity;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -24,7 +23,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -233,6 +231,6 @@ public class MinecraftLauncher {
     }
 
     private void updateListenerText(String message) {
-        MainActivity.logger.info(message);
+        //MainActivity.logger.info(message);
     }
 }

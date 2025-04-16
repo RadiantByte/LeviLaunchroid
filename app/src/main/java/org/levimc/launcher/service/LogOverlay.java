@@ -1,26 +1,18 @@
-package org.levimc.launcher;
+package org.levimc.launcher.service;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
-import android.graphics.Point;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageButton;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
-import androidx.cardview.widget.CardView;
-
-import org.levimc.launcher.gui.GIViewWrapper;
-import org.levimc.launcher.gui.NativeMethods;
+import org.levimc.launcher.service.imgui.GIViewWrapper;
+import org.levimc.launcher.service.imgui.NativeMethods;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -108,8 +100,8 @@ public class LogOverlay {
             params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         }
 
-        params.gravity = Gravity.LEFT | Gravity.TOP; // 左上
-        params.format = PixelFormat.RGBA_8888; // 设置为透明状态
+        params.gravity = Gravity.LEFT | Gravity.TOP;
+        params.format = PixelFormat.RGBA_8888;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;

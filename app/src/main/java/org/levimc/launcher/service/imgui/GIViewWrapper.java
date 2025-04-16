@@ -1,4 +1,4 @@
-package org.levimc.launcher.gui;
+package org.levimc.launcher.service.imgui;
 
 import android.content.Context;
 import android.graphics.PixelFormat;

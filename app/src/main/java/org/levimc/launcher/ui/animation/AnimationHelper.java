@@ -1,4 +1,4 @@
-package org.levimc.launcher.util;
+package org.levimc.launcher.ui.animation;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;

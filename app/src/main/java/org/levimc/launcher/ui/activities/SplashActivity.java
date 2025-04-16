@@ -1,4 +1,4 @@
-package org.levimc.launcher;
+package org.levimc.launcher.ui.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -14,8 +14,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.levimc.launcher.R;
+
 @SuppressLint("CustomSplashScreen")
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
     ImageView imgLeaf;
     TextView tvAppName;
@@ -34,7 +36,7 @@ public class SplashActivity extends AppCompatActivity {
         startAppNameAnimation();
 
         tvAppName.postDelayed(() -> {
-            Intent newIntent = new Intent(this,MainActivity.class);
+            Intent newIntent = new Intent(this, MainActivity.class);
             startActivity(newIntent);
             finish();
         }, 2000);

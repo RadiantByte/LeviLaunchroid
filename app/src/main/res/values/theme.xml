@@ -15,11 +15,11 @@
 
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+
     </style>
 
-    <style name="AppTheme.Light" parent="Base.Theme.FullScreen">
-    </style>
-
-    <style name="AppTheme.Dark" parent="Base.Theme.FullScreen">
-    </style>
 </resources>

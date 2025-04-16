@@ -32,7 +32,7 @@
     <!-- Permissions -->
     <string name="storage_permission_title">Storage Permission Required</string>
     <string name="storage_permission_message">Please grant storage permission to access mods directory and detect mods.</string>
-    <string name="grant_permission">Grant Permission</string>
+    <string name="grant_permission">Grant</string>
     <string name="cancel">Cancel</string>
 
     <!-- Feedback -->
@@ -46,8 +46,9 @@
     <string name="no_minecraft">Exit</string>
     <string name="exit">Exit</string>
 
-    <string name="overlays">Please grant the overlay permission</string>
-
+    <string name="overlay_permission_message">Please grant the overlay permission</string>
+    <string name="overlay_permission_not_granted">Overlay permission not granted</string>
+    <string name="storage_permission_not_granted">Storage permission not granted</string>
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

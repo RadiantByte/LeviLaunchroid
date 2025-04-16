@@ -10,7 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import org.levimc.launcher.R;
-import org.levimc.launcher.minecraft.MinecraftLauncher;
+import org.levimc.launcher.core.minecraft.MinecraftLauncher;
 
 import java.util.concurrent.ExecutorService;
 

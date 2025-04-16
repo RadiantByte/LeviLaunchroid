@@ -1,13 +1,7 @@
-package org.levimc.launcher.logger;
+package org.levimc.launcher.util;
 
 public class Logger implements AutoCloseable {
-
     private long nativeLoggerPtr;
-
-    static {
-        System.loadLibrary("leviutils");
-    }
-
     public Logger(String loggerName){
         nativeLoggerPtr = nativeCreateLogger(loggerName);
     }

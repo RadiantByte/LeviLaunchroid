@@ -1,4 +1,4 @@
-package org.levimc.launcher.mods;
+package org.levimc.launcher.core.mods;
 
 public class Mod {
     private final String fileName;
@@ -9,13 +9,10 @@ public class Mod {
         this.enabled = enabled;
     }
 
-    public String getFileName() {
-        return fileName;
-    }
+    public String getFileName() { return fileName; }
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
     public String getDisplayName() {
         return fileName.replace(".so", "");
     }
-
-    public boolean isEnabled() { return enabled; }
-    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 }

@@ -39,7 +39,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true" >
 
-        <activity android:name="org.levimc.launcher.SplashActivity"
+        <activity android:name="org.levimc.launcher.ui.activities.SplashActivity"
             android:exported="true"
             android:screenOrientation="sensorLandscape"
 
@@ -51,14 +51,13 @@
         </activity>
 
         <activity
-            android:name="org.levimc.launcher.MainActivity"
+            android:name="org.levimc.launcher.ui.activities.MainActivity"
             android:exported="true"
             android:screenOrientation="sensorLandscape"
-
             tools:ignore="DiscouragedApi" />
 
         <activity
-            android:name=".IntentHandler"
+            android:name=".ui.activities.IntentHandler"
             android:alwaysRetainTaskState="true"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:excludeFromRecents="false"

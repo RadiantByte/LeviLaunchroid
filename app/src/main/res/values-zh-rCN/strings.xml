@@ -45,7 +45,9 @@
     <string name="no_minecraft">未安装Minecraft</string>
     <string name="exit">退出</string>
 
-    <string name="overlays">请授予悬浮窗权限</string>
+    <string name="overlay_permission_message">请授予悬浮窗权限</string>
+    <string name="overlay_permission_not_granted">未授予悬浮窗权限</string>
+    <string name="storage_permission_not_granted">未授予存储权限</string>
 
     <!-- Language Setting -->
     <string name="language">语言</string>
