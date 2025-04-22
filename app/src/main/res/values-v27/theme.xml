@@ -8,6 +8,8 @@
                 <item name="colorOnSecondary">@color/on_secondary</item>
                 <item name="colorSurface">@color/surface</item>
                 <item name="colorOnSurface">@color/on_surface</item>
+                <item name="colorTertiary">@color/tertiary</item>
+                <item name="colorOnTertiary">@color/on_tertiary</item>
                 <item name="android:colorBackground">@color/background</item>
                 <item name="colorOnBackground">@color/on_background</item>
                 <item name="colorOutline">@color/outline</item>

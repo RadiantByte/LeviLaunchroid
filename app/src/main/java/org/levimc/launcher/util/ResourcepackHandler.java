@@ -11,6 +11,8 @@ import androidx.core.content.ContextCompat;
 
 import org.levimc.launcher.R;
 import org.levimc.launcher.core.minecraft.MinecraftLauncher;
+import org.levimc.launcher.core.versions.GameVersion;
+import org.levimc.launcher.core.versions.VersionManager;
 
 import java.util.concurrent.ExecutorService;
 
@@ -66,7 +68,10 @@ public class ResourcepackHandler {
         launchBtn.setEnabled(false);
         progressLoader.setVisibility(android.view.View.VISIBLE);
         executor.execute(() -> {
-            minecraftLauncher.launch(intent);
+            VersionManager versionManager = VersionManager.get(activity);
+            GameVersion currentVersion = versionManager.getSelectedVersion();
+
+            minecraftLauncher.launch(intent, currentVersion);
             activity.runOnUiThread(() -> {
                 progressLoader.setVisibility(android.view.View.GONE);
                 launchBtn.setEnabled(true);

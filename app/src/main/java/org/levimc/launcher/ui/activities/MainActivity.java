@@ -1,47 +1,39 @@
 package org.levimc.launcher.ui.activities;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
 
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.OvershootInterpolator;
 
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.core.versions.GameVersion;
+import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.databinding.ActivityMainBinding;
 
 import org.levimc.launcher.service.LogOverlay;
-import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
+import org.levimc.launcher.ui.dialogs.GameVersionSelectDialog;
+import org.levimc.launcher.ui.dialogs.gameversionselect.BigGroup;
+import org.levimc.launcher.ui.dialogs.gameversionselect.VersionUtil;
 import org.levimc.launcher.ui.views.MainViewModel;
 import org.levimc.launcher.ui.views.MainViewModelFactory;
-import org.levimc.launcher.util.Logger;
+import org.levimc.launcher.util.ApkImportManager;
 import org.levimc.launcher.core.minecraft.MinecraftLauncher;
 import org.levimc.launcher.core.mods.FileHandler;
 import org.levimc.launcher.core.mods.Mod;
 import org.levimc.launcher.ui.animation.AnimationHelper;
 import org.levimc.launcher.util.LanguageManager;
+import org.levimc.launcher.util.Logger;
 import org.levimc.launcher.util.PermissionsHandler;
 import org.levimc.launcher.util.ResourcepackHandler;
 import org.levimc.launcher.util.ThemeManager;
@@ -57,26 +49,29 @@ public class MainActivity extends BaseActivity  {
         System.loadLibrary("leviutils");
     }
 
+
     private ActivityMainBinding binding;
     private MinecraftLauncher minecraftLauncher;
     private LanguageManager languageManager;
     private ThemeManager themeManager;
     private PermissionsHandler permissionsHandler;
     private FileHandler fileHandler;
-    public static Logger logger;
+    private ApkImportManager apkImportManager;
     private MainViewModel viewModel;
+    private VersionManager versionManager;
+    private GameVersion currentVersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         languageManager = new LanguageManager(this);
         languageManager.applySavedLanguage();
-        logger = new Logger("LeviMC");
-
+        apkImportManager = new ApkImportManager(this, viewModel);
         //themeManager = new ThemeManager(this);
         //themeManager.applyTheme();
 
-        //logger.info("auto close logger when exited block.");
+        versionManager = VersionManager.get(this);
+        currentVersion = versionManager.getSelectedVersion();
 
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -116,9 +111,7 @@ public class MainActivity extends BaseActivity  {
             }
         });
 
-        viewModel.refreshMods();
-
-        fileHandler = new FileHandler(this, viewModel);
+        fileHandler = new FileHandler(this, viewModel, versionManager);
 
         setTextMinecraftVersion();
 
@@ -132,23 +125,24 @@ public class MainActivity extends BaseActivity  {
         );
         resourcepackHandler.checkIntentForResourcepack();
         handleIncomingFiles();
-        observeViewModel();
+        viewModel.setCurrentVersion(currentVersion);
     }
-
-    private void observeViewModel() {
-        viewModel.getModsLiveData().observe(this, this::updateModsUI);
-    }
-
+    
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         permissionsHandler.onActivityResult(requestCode, resultCode, data);
+        apkImportManager.handleActivityResult(requestCode, resultCode, data);
+
     }
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permissionsHandler.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
 
     @SuppressLint({"ClickableViewAccessibility", "UnsafeIntentLaunch"})
     private void initListeners() {
@@ -156,7 +150,8 @@ public class MainActivity extends BaseActivity  {
             binding.launchButton.setEnabled(false);
             binding.progressLoader.setVisibility(View.VISIBLE);
             new Thread(() -> {
-                minecraftLauncher.launch(getIntent());
+                new MinecraftLauncher(this, getClassLoader())
+                        .launch(getIntent(), versionManager.getSelectedVersion());
                 runOnUiThread(() -> {
                     binding.progressLoader.setVisibility(View.GONE);
                     binding.launchButton.setEnabled(true);
@@ -195,29 +190,44 @@ public class MainActivity extends BaseActivity  {
                 logOverlay.hide();
             }
         });
+
+        binding.selectVersionButton.setOnClickListener(v -> {
+            versionManager.loadAllVersions();
+
+            List<GameVersion> installedList = versionManager.getInstalledVersions();
+            List<GameVersion> customList = versionManager.getCustomVersions();
+
+            List<BigGroup> bigGroups = VersionUtil.buildBigGroups(installedList, customList);
+
+            GameVersionSelectDialog dialog = new GameVersionSelectDialog(this, bigGroups);
+            dialog.setOnVersionSelectListener(version -> {
+                currentVersion = version;
+                versionManager.selectVersion(version);
+                viewModel.setCurrentVersion(version);
+                setTextMinecraftVersion();
+            });
+            dialog.show();
+        });
+
+        binding.importApkButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/vnd.android.package-archive");
+            startActivityForResult(intent, 1004);
+        });
+
         //binding.themeSwitch.setOnCheckedChangeListener((button, checked) -> themeManager.toggleTheme(checked));
     }
 
-    private void onVersionSelected(String version) {
-        Toast.makeText(this, "已选择版本：" + version, Toast.LENGTH_SHORT).show();
-    }
-
-    private String getMinecraftVersion() throws PackageManager.NameNotFoundException {
-        return getPackageManager().getPackageInfo("com.mojang.minecraftpe", PackageManager.GET_CONFIGURATIONS).versionName;
-    }
-
     private void setTextMinecraftVersion() {
-        try {
-            String str = getMinecraftVersion();
-            binding.textMinecraftVersion.setText(str);
-        } catch (PackageManager.NameNotFoundException e) {
-            new CustomAlertDialog(this)
-                    .setTitleText(getString(R.string.no_minecraft))
-                    .setMessage(getString(R.string.no_install_minecraft))
-                    .setPositiveButton(getString(R.string.exit), (v) -> {
-                        finish();
-                    }).show();
+        GameVersion ver = currentVersion;
+        if (ver == null) {
+            binding.textMinecraftVersion.setText(
+                    getString(R.string.not_found_version)
+            );
+            return;
         }
+        binding.textMinecraftVersion.setText(ver.displayName);
     }
 
     private void handleIncomingFiles() {
@@ -273,7 +283,6 @@ public class MainActivity extends BaseActivity  {
         switchBtn.setOnCheckedChangeListener((btn, isChecked) -> {
             viewModel.setModEnabled(mod.getFileName(), isChecked);
         });
-
         return view;
     }
 

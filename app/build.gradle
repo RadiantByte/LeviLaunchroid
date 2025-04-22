@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation libs.apk.parser
     implementation libs.appcompat
     implementation libs.constraintlayout
     implementation libs.material

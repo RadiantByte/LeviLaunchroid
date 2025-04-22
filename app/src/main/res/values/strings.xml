@@ -28,6 +28,8 @@
     <string name="skip">Skip</string>
     <string name="confirm">Confirm</string>
 
+    <string name="installed_packages">Installed Packages</string>
+    <string name="local_custom">Local Custom</string>
 
     <!-- Permissions -->
     <string name="storage_permission_title">Storage Permission Required</string>
@@ -49,6 +51,18 @@
     <string name="overlay_permission_message">Please grant the overlay permission</string>
     <string name="overlay_permission_not_granted">Overlay permission not granted</string>
     <string name="storage_permission_not_granted">Storage permission not granted</string>
+
+    <string name="import_apk">Import APK</string>
+    <string name="install_done">Install finished, version: %1$s</string>
+
+    <string name="illegal_apk_title">Illegal APK</string>
+    <string name="not_mc_apk">Not a Minecraft APK</string>
+
+    <string name="not_found_version">No version found</string>
+
+    <string name="installing_title">Installing...</string>
+    <string name="installing_message">Please wait, installing Minecraft</string>
+
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

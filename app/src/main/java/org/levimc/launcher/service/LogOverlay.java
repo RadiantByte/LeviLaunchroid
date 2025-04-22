@@ -131,7 +131,6 @@ public class LogOverlay {
                 winMrg.removeView(touchView);
             }
         } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

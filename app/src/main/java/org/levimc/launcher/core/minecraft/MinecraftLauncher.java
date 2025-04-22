@@ -1,6 +1,5 @@
 package org.levimc.launcher.core.minecraft;
 
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import org.jetbrains.annotations.NotNull;
+import org.levimc.launcher.core.versions.GameVersion;
+import org.levimc.launcher.util.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,26 +36,87 @@ public class MinecraftLauncher {
     private final ClassLoader classLoader;
     public static final String MC_PACKAGE_NAME = "com.mojang.minecraftpe";
     private static final String LAUNCHER_DEX_NAME = "launcher.dex";
+    public native void nativeSetModPath(String modsDir, String configPath);
+    public static String abiToSystemLibDir(String abi) {
+        if ("arm64-v8a".equals(abi)) return "arm64";
+        if ("armeabi-v7a".equals(abi)) return "arm";
+        return abi;
+    }
+    void copyDirectoryRecursively(File src, File dst) throws IOException {
+        if (!dst.exists()) dst.mkdirs();
+        for (File f : src.listFiles()) {
+            File destF = new File(dst, f.getName());
+            if (f.isDirectory()) copyDirectoryRecursively(f, destF);
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Files.copy(f.toPath(), destF.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+        }
+    }
 
+    public ApplicationInfo createFakeApplicationInfo(File versionDir, String packageName) throws IOException {
+        ApplicationInfo fakeInfo = new ApplicationInfo();
+        File apkFile = new File(versionDir, "base.apk");
+        fakeInfo.sourceDir = apkFile.getAbsolutePath();
+        fakeInfo.publicSourceDir = fakeInfo.sourceDir;
+
+        String systemAbi = abiToSystemLibDir(Build.SUPPORTED_ABIS[0]);
+        File srcLibDir = new File(versionDir, "lib/" + systemAbi);
+        File dstLibDir = new File(context.getCacheDir(), "mc_libs/" + systemAbi);
+        copyDirectoryRecursively(srcLibDir, dstLibDir);
+
+        fakeInfo.nativeLibraryDir = dstLibDir.getAbsolutePath();
+
+        fakeInfo.packageName = packageName;
+        fakeInfo.dataDir = versionDir.getAbsolutePath();
+
+        File splitsFolder = new File(versionDir, "splits");
+        if (splitsFolder.exists() && splitsFolder.isDirectory()) {
+            File[] splits = splitsFolder.listFiles();
+            if (splits != null) {
+                ArrayList<String> splitPathList = new ArrayList<>();
+                for (File f : splits) {
+                    if (f.isFile() && f.getName().endsWith(".apk")) {
+                        splitPathList.add(f.getAbsolutePath());
+                    }
+                }
+                if (!splitPathList.isEmpty()) {
+                    fakeInfo.splitSourceDirs = splitPathList.toArray(new String[0]);
+                }
+            }
+        }
+        return fakeInfo;
+    }
 
     public MinecraftLauncher(Context context, ClassLoader classLoader) {
         this.context = context;
         this.classLoader = classLoader;
     }
 
-    public void launch(Intent sourceIntent) {
+    public void launch(Intent sourceIntent, GameVersion version) {
         try {
-            File dexCacheDir = createCacheDexDir();
-            cleanCacheDirectory(dexCacheDir);
-
-            ApplicationInfo mcInfo = getApplicationInfo(MC_PACKAGE_NAME);
-            Object pathList = getPathList(classLoader);
-
-            processDexFiles(mcInfo, dexCacheDir, pathList);
-            injectNativeLibraries(mcInfo, pathList);
-
-            launchMinecraftActivity(mcInfo,sourceIntent);
-        } catch (Exception e) {
+            if (version == null) return;
+            ApplicationInfo mcInfo = version.isInstalled ?
+                    getApplicationInfo(version.packageName) :
+                    createFakeApplicationInfo(version.versionDir, MC_PACKAGE_NAME);
+            if (version.isInstalled) {
+                File dexCacheDir = createCacheDexDir();
+                cleanCacheDirectory(dexCacheDir);
+                Object pathList = getPathList(classLoader);
+                processDexFiles(mcInfo, dexCacheDir, pathList);
+                injectNativeLibraries(mcInfo, pathList);
+                launchMinecraftActivity(mcInfo, sourceIntent);
+            } else {
+                File dexCacheDir = createCacheDexDir();
+                cleanCacheDirectory(dexCacheDir);
+                Object pathList = getPathList(classLoader);
+                processDexFiles(mcInfo, dexCacheDir, pathList);
+                injectNativeLibraries(mcInfo, pathList);
+                Logger.get().info(version.modsDir.getAbsolutePath());
+                nativeSetModPath(version.modsDir.getAbsolutePath(),version.modsDir.getAbsolutePath() + "/mods_config.json");
+                launchMinecraftActivity(mcInfo, sourceIntent);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -106,7 +169,7 @@ public class MinecraftLauncher {
         addDexFileToPathList(launcherDexFile, addDexPathMethod, pathList);
 
         try (ZipFile mcApkZip = new ZipFile(mcInfo.sourceDir)) {
-            for (int i = 2; i >= 0; i--) {
+            for (int i = 10; i >= 0; i--) {
                 String dexName = "classes" + (i == 0 ? "" : i) + ".dex";
                 ZipEntry dexEntry = mcApkZip.getEntry(dexName);
                 if (dexEntry != null) {
@@ -129,6 +192,7 @@ public class MinecraftLauncher {
     private void injectNativeLibraries(ApplicationInfo mcInfo, Object pathList) throws ReflectiveOperationException {
         try {
             final File newLibDir = new File(mcInfo.nativeLibraryDir);
+            Logger.get().info(newLibDir.getAbsolutePath());
 
             Field nativeLibraryDirectoriesField = pathList.getClass().getDeclaredField("nativeLibraryDirectories");
             nativeLibraryDirectoriesField.setAccessible(true);
@@ -188,9 +252,16 @@ public class MinecraftLauncher {
             throw new ReflectiveOperationException("Unable to inject native libraries", e);
         }
     }
-    private void launchMinecraftActivity(ApplicationInfo mcInfo, Intent sourceIntent) throws ClassNotFoundException {
-        Class<?> launcherClass = classLoader.loadClass("com.mojang.minecraftpe.Launcher");
-        Intent mcActivity = sourceIntent.setClass(context, launcherClass);
+
+    private void launchMinecraftActivity(ApplicationInfo mcInfo, Intent sourceIntent) {
+        new Thread(() -> {
+            Class<?> launcherClass = null;
+            try {
+                launcherClass = classLoader.loadClass("com.mojang.minecraftpe.Launcher");
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            Intent mcActivity = sourceIntent.setClass(context, launcherClass);
         mcActivity.putExtra("MC_SRC", mcInfo.sourceDir);
         if (mcInfo.splitSourceDirs != null) {
             mcActivity.putExtra("MC_SPLIT_SRC", new ArrayList<>(Arrays.asList(mcInfo.splitSourceDirs)));
@@ -203,6 +274,7 @@ public class MinecraftLauncher {
             mcActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(mcActivity);
         }
+        }).start();
     }
 
     private void copyAssetToFile(String assetName, @NotNull File destFile) throws IOException {
@@ -231,6 +303,6 @@ public class MinecraftLauncher {
     }
 
     private void updateListenerText(String message) {
-        //MainActivity.logger.info(message);
+        Logger.get().info(message);
     }
 }

@@ -28,6 +28,9 @@
     <string name="skip">跳过</string>
     <string name="confirm">确认</string>
 
+    <string name="installed_packages">已安装包</string>
+    <string name="local_custom">本地自定义</string>
+
     <!-- Permissions -->
     <string name="storage_permission_title">需要存储权限</string>
     <string name="storage_permission_message">授予存储权限以便访问 mods 目录，检测模组。</string>
@@ -49,6 +52,16 @@
     <string name="overlay_permission_not_granted">未授予悬浮窗权限</string>
     <string name="storage_permission_not_granted">未授予存储权限</string>
 
+    <string name="import_apk">导入APK</string>
+    <string name="install_done">安装完成，版本：%1$s</string>
+
+    <string name="illegal_apk_title">非法APK</string>
+    <string name="not_mc_apk">不是Minecraft APK</string>
+
+    <string name="not_found_version">未发现版本</string>
+
+    <string name="installing_title">正在安装中…</string>
+    <string name="installing_message">请稍候，正在安装MC中</string>
     <!-- Language Setting -->
     <string name="language">语言</string>
     <string name="english">English</string>

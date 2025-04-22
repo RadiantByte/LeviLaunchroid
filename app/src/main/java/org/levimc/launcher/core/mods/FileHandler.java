@@ -13,6 +13,8 @@ import android.util.Log;
 import androidx.core.content.ContextCompat;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.core.versions.GameVersion;
+import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.ui.views.MainViewModel;
 
 import java.io.*;
@@ -31,9 +33,10 @@ public class FileHandler {
         void onProgressUpdate(int progress);
     }
 
-    public FileHandler(Context context, MainViewModel modManager) {
+    public FileHandler(Context context, MainViewModel modManager, VersionManager version) {
         this.context = context;
         this.modManager = modManager;
+        this.targetPath = new File(version.getSelectedVersion().modsDir, "mods").getAbsolutePath();
     }
 
     public FileHandler setCustomTargetPath(String path) {

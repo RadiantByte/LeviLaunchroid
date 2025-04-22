@@ -9,11 +9,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import org.levimc.launcher.R;
-import org.levimc.launcher.core.mods.ModManager;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 
 public class PermissionsHandler {
@@ -54,6 +52,10 @@ public class PermissionsHandler {
 
     public void requestPermission(PermissionType type, PermissionResultCallback callback) {
         this.callback = callback;
+        if (hasPermission(type)) {
+            if (callback != null) callback.onPermissionGranted(type);
+            return;
+        }
         switch (type) {
             case STORAGE:
                 requestStoragePermission();

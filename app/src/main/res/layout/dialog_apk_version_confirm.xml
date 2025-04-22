@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_rounded_card"
+    android:orientation="vertical"
+    android:minWidth="360dp"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="版本信息"
+        android:textColor="#4CAF50"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/edit_version_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:padding="10dp"
+        android:textColor="#4CAF50"
+        android:textSize="16sp"
+        android:singleLine="true"
+        android:inputType="text" />
+
+    <TextView
+        android:id="@+id/text_version_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="不符合命名规则或已存在！"
+        android:textColor="#F44336"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:layout_marginTop="4dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="取消" />
+
+        <Button
+            android:id="@+id/btn_install"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="安装"
+            android:enabled="false"
+            android:layout_marginStart="20dp" />
+    </LinearLayout>
+
+</LinearLayout>
