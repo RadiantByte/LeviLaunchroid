@@ -26,7 +26,7 @@ public class IntentHandler extends BaseActivity {
         if (isMcRunning()) {
             newIntent.setClassName(this, "com.mojang.minecraftpe.Launcher");
         } else {
-            newIntent.setClassName(this, "org.levimc.launcher.MainActivity");
+            newIntent.setClassName(this, "org.levimc.launcher.ui.activities.MainActivity");
         }
 
         startActivity(newIntent);

@@ -35,6 +35,8 @@ public class ApkInstaller {
         void onError(String errorMessage);
     }
 
+    private static final String APK_FILE_NAME = "base.apk.levi";
+
     private final Context context;
     private final ExecutorService executor;
     private final InstallCallback callback;
@@ -97,28 +99,41 @@ public class ApkInstaller {
                          ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is))) {
                         ZipEntry entry;
                         while ((entry = zis.getNextEntry()) != null) {
-                            File outFile = new File(baseDir, entry.getName());
+                            String outputName;
                             if (entry.isDirectory()) {
-                                outFile.mkdirs();
+                                outputName = entry.getName();
+                                File outDir = new File(baseDir, outputName);
+                                outDir.mkdirs();
+                                zis.closeEntry();
+                                continue;
                             } else {
-                                File parent = outFile.getParentFile();
-                                if (!parent.exists()) parent.mkdirs();
-                                try (FileOutputStream fos = new FileOutputStream(outFile)) {
-                                    byte[] buffer = new byte[8192];
-                                    int len;
-                                    while ((len = zis.read(buffer)) != -1) {
-                                        fos.write(buffer, 0, len);
-                                    }
+                                // base.apk特判
+                                if (entry.getName().equals("base.apk")) {
+                                    outputName = APK_FILE_NAME;
+                                } else {
+                                    outputName = entry.getName();
                                 }
-                                if (entry.getName().endsWith(".apk")) {
-                                    if (entry.getName().endsWith("base.apk")) {
-                                        try (InputStream is2 = new FileInputStream(outFile);
-                                             ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(is2))) {
-                                            unzipLibsToSystemAbi(baseDir, zis2);
-                                        }
-                                    }
-                                    foundApk = true;
+                            }
+                            File outFile = new File(baseDir, outputName);
+                            File parent = outFile.getParentFile();
+                            if (!parent.exists()) parent.mkdirs();
+                            try (FileOutputStream fos = new FileOutputStream(outFile)) {
+                                byte[] buffer = new byte[8192];
+                                int len;
+                                while ((len = zis.read(buffer)) != -1) {
+                                    fos.write(buffer, 0, len);
                                 }
+                            }
+
+                            if (outputName.equals(APK_FILE_NAME)) {
+                                // base.apk.levi，立即解libs
+                                try (InputStream is2 = new FileInputStream(outFile);
+                                     ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(is2))) {
+                                    unzipLibsToSystemAbi(baseDir, zis2);
+                                }
+                                foundApk = true;
+                            } else if (outputName.endsWith(".apk")) {
+                                foundApk = true;
                             }
                             zis.closeEntry();
                         }
@@ -128,7 +143,7 @@ public class ApkInstaller {
                         return;
                     }
                 } else {
-                    File dstApkFile = new File(baseDir, "base.apk");
+                    File dstApkFile = new File(baseDir, APK_FILE_NAME);
                     try (InputStream is = context.getContentResolver().openInputStream(apkOrApksUri);
                          OutputStream os = new FileOutputStream(dstApkFile)) {
                         if (is == null) {
@@ -141,9 +156,9 @@ public class ApkInstaller {
                             os.write(buffer, 0, len);
                         }
                     }
-                    try (InputStream is = context.getContentResolver().openInputStream(apkOrApksUri);
-                         ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is))) {
-                        unzipLibsToSystemAbi(baseDir, zis);
+                    try (InputStream is2 = new FileInputStream(dstApkFile);
+                         ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(is2))) {
+                        unzipLibsToSystemAbi(baseDir, zis2);
                     }
                     new File(baseDir, "oat").mkdirs();
                 }

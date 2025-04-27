@@ -16,6 +16,7 @@ import org.levimc.launcher.R;
 import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.ui.views.MainViewModel;
+import org.levimc.launcher.util.Logger;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class FileHandler {
     private static final String TAG = "FileHandler";
     private final Context context;
     private final MainViewModel modManager;
-    private String targetPath = "games/org.levimc/mods";
+    private String targetPath;
 
     public interface FileOperationCallback {
         void onSuccess(int processedFiles);
@@ -36,7 +37,8 @@ public class FileHandler {
     public FileHandler(Context context, MainViewModel modManager, VersionManager version) {
         this.context = context;
         this.modManager = modManager;
-        this.targetPath = new File(version.getSelectedVersion().modsDir, "mods").getAbsolutePath();
+        this.targetPath = version.getSelectedVersion().modsDir.getAbsolutePath();
+        Logger.get().info( "ModsDir: " + targetPath);
     }
 
     public FileHandler setCustomTargetPath(String path) {
@@ -73,7 +75,7 @@ public class FileHandler {
                 String fileName = resolveFileName(uri);
                 if (fileName == null || !fileName.endsWith(".so")) continue;
 
-                File targetDir = new File(Environment.getExternalStorageDirectory(), targetPath);
+                File targetDir = new File(targetPath);
                 if (!createDirectoryIfNeeded(targetDir)) continue;
 
                 File destinationFile = new File(targetDir, fileName);

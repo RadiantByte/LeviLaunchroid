@@ -55,7 +55,7 @@ public class MinecraftLauncher {
 
     public ApplicationInfo createFakeApplicationInfo(File versionDir, String packageName) throws IOException {
         ApplicationInfo fakeInfo = new ApplicationInfo();
-        File apkFile = new File(versionDir, "base.apk");
+        File apkFile = new File(versionDir, "base.apk.levi");
         fakeInfo.sourceDir = apkFile.getAbsolutePath();
         fakeInfo.publicSourceDir = fakeInfo.sourceDir;
 
@@ -75,7 +75,7 @@ public class MinecraftLauncher {
             if (splits != null) {
                 ArrayList<String> splitPathList = new ArrayList<>();
                 for (File f : splits) {
-                    if (f.isFile() && f.getName().endsWith(".apk")) {
+                    if (f.isFile() && f.getName().endsWith(".apk.levi")) {
                         splitPathList.add(f.getAbsolutePath());
                     }
                 }
@@ -94,6 +94,7 @@ public class MinecraftLauncher {
 
     public void launch(Intent sourceIntent, GameVersion version) {
         try {
+
             if (version == null) return;
             ApplicationInfo mcInfo = version.isInstalled ?
                     getApplicationInfo(version.packageName) :

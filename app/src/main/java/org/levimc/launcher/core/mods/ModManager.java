@@ -69,13 +69,31 @@ public class ModManager {
         if (currentVersion == null || modsDir == null) return new ArrayList<>();
         File[] files = modsDir.listFiles((dir, name) -> name.endsWith(".so"));
         List<Mod> mods = new ArrayList<>();
+        boolean changed = false;
         if (files != null) {
             for (File file : files) {
                 String fileName = file.getName();
+                if (!configMap.containsKey(fileName)) {
+                    configMap.put(fileName, true);
+                    changed = true;
+                }
                 boolean enabled = Boolean.TRUE.equals(configMap.getOrDefault(fileName, true));
                 mods.add(new Mod(fileName, enabled));
             }
         }
+        List<String> toRemove = new ArrayList<>();
+        for (String key : configMap.keySet()) {
+            boolean found = false;
+            if (files != null) for (File file : files) {
+                if (file.getName().equals(key)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) toRemove.add(key);
+        }
+        for (String rm : toRemove) configMap.remove(rm);
+        if (changed || !toRemove.isEmpty()) saveConfig();
         return mods;
     }
 

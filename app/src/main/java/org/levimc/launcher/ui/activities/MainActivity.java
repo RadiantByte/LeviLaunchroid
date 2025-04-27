@@ -4,11 +4,16 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +27,9 @@ import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.databinding.ActivityMainBinding;
 
 import org.levimc.launcher.service.LogOverlay;
+import org.levimc.launcher.settings.FeatureSettings;
 import org.levimc.launcher.ui.dialogs.GameVersionSelectDialog;
+import org.levimc.launcher.ui.dialogs.SettingsDialog;
 import org.levimc.launcher.ui.dialogs.gameversionselect.BigGroup;
 import org.levimc.launcher.ui.dialogs.gameversionselect.VersionUtil;
 import org.levimc.launcher.ui.views.MainViewModel;
@@ -215,8 +222,25 @@ public class MainActivity extends BaseActivity  {
             intent.setType("application/vnd.android.package-archive");
             startActivityForResult(intent, 1004);
         });
+        
+        FeatureSettings.init(getApplicationContext());
 
+        binding.settingsButton.setOnClickListener(v -> showSettingsDialog());
         //binding.themeSwitch.setOnCheckedChangeListener((button, checked) -> themeManager.toggleTheme(checked));
+    }
+
+    private void showSettingsDialog() {
+        FeatureSettings fs = FeatureSettings.getInstance();
+
+        SettingsDialog dlg = new SettingsDialog(this);
+
+        Switch swEnable = dlg.addSwitchItem("启用Debug Log", fs.isDebugLogDialogEnabled());
+        swEnable.setOnCheckedChangeListener((btn, checked) -> fs.setDebugLogDialogEnabled(checked));
+
+        dlg.setOnCancelListener((View.OnClickListener) v -> dlg.dismiss());
+        dlg.setOnConfirmListener(v -> dlg.dismiss());
+
+        dlg.show();
     }
 
     private void setTextMinecraftVersion() {
