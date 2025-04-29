@@ -94,28 +94,17 @@ public class MinecraftLauncher {
 
     public void launch(Intent sourceIntent, GameVersion version) {
         try {
-
             if (version == null) return;
             ApplicationInfo mcInfo = version.isInstalled ?
                     getApplicationInfo(version.packageName) :
                     createFakeApplicationInfo(version.versionDir, MC_PACKAGE_NAME);
-            if (version.isInstalled) {
                 File dexCacheDir = createCacheDexDir();
                 cleanCacheDirectory(dexCacheDir);
                 Object pathList = getPathList(classLoader);
                 processDexFiles(mcInfo, dexCacheDir, pathList);
                 injectNativeLibraries(mcInfo, pathList);
-                launchMinecraftActivity(mcInfo, sourceIntent);
-            } else {
-                File dexCacheDir = createCacheDexDir();
-                cleanCacheDirectory(dexCacheDir);
-                Object pathList = getPathList(classLoader);
-                processDexFiles(mcInfo, dexCacheDir, pathList);
-                injectNativeLibraries(mcInfo, pathList);
-                Logger.get().info(version.modsDir.getAbsolutePath());
                 nativeSetModPath(version.modsDir.getAbsolutePath(),version.modsDir.getAbsolutePath() + "/mods_config.json");
                 launchMinecraftActivity(mcInfo, sourceIntent);
-            }
         } catch(Exception e) {
             e.printStackTrace();
         }

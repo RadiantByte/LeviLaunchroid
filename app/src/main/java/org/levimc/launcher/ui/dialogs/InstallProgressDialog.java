@@ -37,6 +37,4 @@ public class InstallProgressDialog extends Dialog {
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
     }
-
-
 }

@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat;
 import org.levimc.launcher.R;
 import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.core.versions.VersionManager;
+import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.views.MainViewModel;
 import org.levimc.launcher.util.Logger;
 
@@ -49,21 +50,18 @@ public class FileHandler {
     public void processIncomingFilesWithConfirmation(Intent intent, FileOperationCallback callback) {
         List<Uri> fileUris = extractFileUris(intent);
         if (fileUris.isEmpty()) {
-
             return;
         }
 
-        AlertDialog dialog =  new AlertDialog.Builder(context)
-                .setTitle(R.string.overwrite_file_title)
+        new CustomAlertDialog(context)
+                .setTitleText(context.getString(R.string.overwrite_file_title))
                 .setMessage(context.getString(R.string.import_confirmation_message, fileUris.size()))
-                .setPositiveButton((context.getString(R.string.confirm)), (d, which) -> handleFilesWithOverwriteCheck(fileUris, callback))
-                .setNegativeButton(context.getString(R.string.cancel), (d, which) -> {
+                .setPositiveButton((context.getString(R.string.confirm)), (d) -> handleFilesWithOverwriteCheck(fileUris, callback))
+                .setNegativeButton(context.getString(R.string.cancel), (d) -> {
                     if (callback != null) callback.onError(context.getString(R.string.user_cancelled));
                 })
-                .create();
-        dialog.show();
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.on_surface));
-        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(context, R.color.on_surface));
+                .show();
+
     }
 
     private void handleFilesWithOverwriteCheck(List<Uri> fileUris, FileOperationCallback callback) {
@@ -85,28 +83,23 @@ public class FileHandler {
                     final boolean[] decisionMade = new boolean[]{false};
 
                     mainHandler.post(() ->{
-                        AlertDialog dialog = new AlertDialog.Builder(context)
-                            .setTitle(context.getString(R.string.overwrite_file_title))
-                            .setMessage(context.getString(R.string.overwrite_file_message, fileName))
-                            .setCancelable(false)
-                            .setPositiveButton(context.getString(R.string.overwrite), (dlg, which) -> {
-                                userChoice[0] = true;
-                                decisionMade[0] = true;
-                                synchronized (this) {
-                                    this.notify();
-                                }
-                            })
-                            .setNegativeButton(context.getString(R.string.skip), (dlg, which) -> {
-                                userChoice[0] = false;
-                                decisionMade[0] = true;
-                                synchronized (this) {
-                                    this.notify();
-                                }
-                            })
-                            .show();
-                        dialog.show();
-                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(ContextCompat.getColor(context, R.color.on_surface));
-                        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(ContextCompat.getColor(context, R.color.on_surface));
+                        new CustomAlertDialog(context)
+                                .setTitleText(context.getString(R.string.overwrite_file_title))
+                                .setMessage(context.getString(R.string.overwrite_file_message, fileName))
+                                .setPositiveButton(context.getString(R.string.overwrite), (dlg) -> {
+                                    userChoice[0] = true;
+                                    decisionMade[0] = true;
+                                    synchronized (this) {
+                                        this.notify();
+                                    }
+                                })
+                                .setNegativeButton(context.getString(R.string.skip), (dlg) -> {
+                                    userChoice[0] = false;
+                                    decisionMade[0] = true;
+                                    synchronized (this) {
+                                        this.notify();
+                                    }
+                                }) .show();
                     });
 
 

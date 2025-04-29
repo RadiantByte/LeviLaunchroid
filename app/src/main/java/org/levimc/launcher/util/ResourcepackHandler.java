@@ -13,6 +13,7 @@ import org.levimc.launcher.R;
 import org.levimc.launcher.core.minecraft.MinecraftLauncher;
 import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.core.versions.VersionManager;
+import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 
 import java.util.concurrent.ExecutorService;
 
@@ -39,20 +40,12 @@ public class ResourcepackHandler {
         if (data != null) {
             String path = data.getPath();
             if (path != null && isMinecraftResourceFile(path)) {
-                AlertDialog dialog = new AlertDialog.Builder(activity)
-                        .setTitle(activity.getString(R.string.resourcepack_detected_title))
+                new CustomAlertDialog(activity)
+                        .setTitleText(activity.getString(R.string.resourcepack_detected_title))
                         .setMessage(activity.getString(R.string.resourcepack_detected_message, path))
-                        .setPositiveButton(activity.getString(R.string.launch_now), (d, which) -> launchMinecraft(intent))
+                        .setPositiveButton(activity.getString(R.string.launch_now), (d) -> launchMinecraft(intent))
                         .setNegativeButton(activity.getString(R.string.launch_later), null)
-                        .create();
-                dialog.setOnShowListener(dialogInterface -> {
-                    Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                    Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-
-                    positive.setTextColor(ContextCompat.getColor(activity, R.color.on_surface));
-                    negative.setTextColor(ContextCompat.getColor(activity, R.color.on_surface));
-                });
-                dialog.show();
+                        .show();
             }
         }
     }

@@ -60,9 +60,11 @@
 
     <string name="not_found_version">No version found</string>
 
-    <string name="installing_title">Installing...</string>
+    <string name="installing_title">Installing…</string>
     <string name="installing_message">Please wait, installing Minecraft</string>
 
+    <string name="enable_debug_log">Enable Debug Log</string>
+    
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

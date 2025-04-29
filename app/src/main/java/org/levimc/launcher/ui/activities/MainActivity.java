@@ -100,7 +100,8 @@ public class MainActivity extends BaseActivity  {
 
        // binding.themeSwitch.setChecked(themeManager.isDarkMode());
 
-        permissionsHandler = new PermissionsHandler(this);
+        permissionsHandler = PermissionsHandler.getInstance();
+        permissionsHandler.setActivity(this);
 
         permissionsHandler.requestPermission(PermissionsHandler.PermissionType.STORAGE, new PermissionsHandler.PermissionResultCallback() {
             @Override
@@ -133,6 +134,13 @@ public class MainActivity extends BaseActivity  {
         resourcepackHandler.checkIntentForResourcepack();
         handleIncomingFiles();
         viewModel.setCurrentVersion(currentVersion);
+        initSettings();
+    }
+
+    private void initSettings() {
+        if (FeatureSettings.getInstance().isDebugLogDialogEnabled()) {
+            LogOverlay.getInstance(this).show();
+        }
     }
     
     @Override
@@ -143,13 +151,11 @@ public class MainActivity extends BaseActivity  {
 
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permissionsHandler.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
 
     @SuppressLint({"ClickableViewAccessibility", "UnsafeIntentLaunch"})
     private void initListeners() {
@@ -176,28 +182,7 @@ public class MainActivity extends BaseActivity  {
         });
 
         binding.languageButton.setOnClickListener(v -> languageManager.showLanguageMenu(v));
-
-        binding.logOverlaySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            LogOverlay logOverlay = LogOverlay.getInstance(this);
-            if (isChecked) {
-                permissionsHandler.requestPermission(PermissionsHandler.PermissionType.OVERLAY, new PermissionsHandler.PermissionResultCallback() {
-                    @Override
-                    public void onPermissionGranted(PermissionsHandler.PermissionType type) {
-                        if (type == PermissionsHandler.PermissionType.OVERLAY) {
-                            LogOverlay.getInstance(MainActivity.this).show();
-                        }
-                    }
-                    @Override
-                    public void onPermissionDenied(PermissionsHandler.PermissionType type, boolean permanentlyDenied) {
-                        Toast.makeText(MainActivity.this, R.string.overlay_permission_not_granted, Toast.LENGTH_SHORT).show();
-                        binding.logOverlaySwitch.setChecked(false);
-                    }
-                });
-            } else {
-                logOverlay.hide();
-            }
-        });
-
+        
         binding.selectVersionButton.setOnClickListener(v -> {
             versionManager.loadAllVersions();
 
@@ -222,7 +207,7 @@ public class MainActivity extends BaseActivity  {
             intent.setType("application/vnd.android.package-archive");
             startActivityForResult(intent, 1004);
         });
-        
+
         FeatureSettings.init(getApplicationContext());
 
         binding.settingsButton.setOnClickListener(v -> showSettingsDialog());
@@ -231,10 +216,8 @@ public class MainActivity extends BaseActivity  {
 
     private void showSettingsDialog() {
         FeatureSettings fs = FeatureSettings.getInstance();
-
         SettingsDialog dlg = new SettingsDialog(this);
-
-        Switch swEnable = dlg.addSwitchItem("启用Debug Log", fs.isDebugLogDialogEnabled());
+        Switch swEnable = dlg.addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled());
         swEnable.setOnCheckedChangeListener((btn, checked) -> fs.setDebugLogDialogEnabled(checked));
 
         dlg.setOnCancelListener((View.OnClickListener) v -> dlg.dismiss());

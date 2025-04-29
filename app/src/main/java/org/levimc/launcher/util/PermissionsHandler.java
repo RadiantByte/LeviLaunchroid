@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
-
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import org.levimc.launcher.R;
@@ -16,8 +15,8 @@ import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 
 public class PermissionsHandler {
 
-    public static final int REQUEST_STORAGE      = 1001;
-    public static final int REQUEST_OVERLAY      = 1002;
+    public static final int REQUEST_STORAGE = 1001;
+    public static final int REQUEST_OVERLAY = 1002;
 
     public interface PermissionResultCallback {
         void onPermissionGranted(PermissionType type);
@@ -28,14 +27,29 @@ public class PermissionsHandler {
         STORAGE, OVERLAY
     }
 
-    private final Activity activity;
+    private static volatile PermissionsHandler instance;
+    private Activity activity;
     private PermissionResultCallback callback;
 
-    public PermissionsHandler(Activity activity) {
+    private PermissionsHandler() {}
+
+    public static PermissionsHandler getInstance() {
+        if (instance == null) {
+            synchronized (PermissionsHandler.class) {
+                if (instance == null) {
+                    instance = new PermissionsHandler();
+                }
+            }
+        }
+        return instance;
+    }
+
+    public void setActivity(Activity activity) {
         this.activity = activity;
     }
 
     public boolean hasPermission(PermissionType type) {
+        if (activity == null) return false;
         switch (type) {
             case STORAGE:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -52,6 +66,7 @@ public class PermissionsHandler {
 
     public void requestPermission(PermissionType type, PermissionResultCallback callback) {
         this.callback = callback;
+        if (activity == null) throw new IllegalStateException("Activity not set. Call setActivity() first.");
         if (hasPermission(type)) {
             if (callback != null) callback.onPermissionGranted(type);
             return;
@@ -90,21 +105,21 @@ public class PermissionsHandler {
     private void requestOverlayPermission() {
         if (!hasPermission(PermissionType.OVERLAY)) {
             if (!Settings.canDrawOverlays(activity)) {
-            new CustomAlertDialog(activity)
-                    .setTitleText(activity.getString(R.string.overlay_permission_message))
-                    .setNegativeButton(activity.getString(R.string.cancel), (v) -> {
-                        if (callback != null) {
-                            callback.onPermissionDenied(PermissionType.OVERLAY, false);
-                        }
-                    })
-                    .setPositiveButton(activity.getString(R.string.grant_permission), (v) -> {
-                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + activity.getPackageName()));
-                        activity.startActivityForResult(intent, REQUEST_OVERLAY);
-                    })
-                    .show();
-        } else {
-            if (callback != null) callback.onPermissionGranted(PermissionType.OVERLAY);
-        }
+                new CustomAlertDialog(activity)
+                        .setTitleText(activity.getString(R.string.overlay_permission_message))
+                        .setNegativeButton(activity.getString(R.string.cancel), (v) -> {
+                            if (callback != null) {
+                                callback.onPermissionDenied(PermissionType.OVERLAY, false);
+                            }
+                        })
+                        .setPositiveButton(activity.getString(R.string.grant_permission), (v) -> {
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + activity.getPackageName()));
+                            activity.startActivityForResult(intent, REQUEST_OVERLAY);
+                        })
+                        .show();
+            } else {
+                if (callback != null) callback.onPermissionGranted(PermissionType.OVERLAY);
+            }
         }
     }
 

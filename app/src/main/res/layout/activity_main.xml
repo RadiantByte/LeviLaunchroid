@@ -54,19 +54,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginHorizontal="5dp">
-        
-            <Switch
-                android:id="@+id/log_overlay_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:theme="@style/Widget.AppCompat.CompoundButton.Switch"
-                android:checked="false"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Debug Log"
-                android:layout_gravity="center_vertical"
-                android:paddingStart="1dp" />
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
