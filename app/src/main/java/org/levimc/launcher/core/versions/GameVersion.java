@@ -6,14 +6,18 @@ import android.os.Parcelable;
 import java.io.File;
 
 public class GameVersion implements Parcelable {
+    public String directoryName;
     public String versionCode;
     public String displayName;
+    public String uuid;
     public File versionDir;
     public boolean isInstalled;
     public String packageName;
     public final File modsDir;
 
-    public GameVersion(String displayName, String versionCode, File versionDir, boolean isOfficial, String packageName) {
+    public GameVersion(String directoryName,String displayName, String versionCode,String uuid, File versionDir, boolean isOfficial, String packageName) {
+        this.directoryName = directoryName;
+        this.uuid = uuid;
         this.displayName = displayName;
         this.versionCode = versionCode;
         this.versionDir = versionDir;
@@ -23,8 +27,10 @@ public class GameVersion implements Parcelable {
     }
 
     protected GameVersion(Parcel in) {
+        directoryName = in.readString();
         displayName = in.readString();
         versionCode = in.readString();
+        uuid = in.readString();
         String versionDirPath = in.readString();
         versionDir = versionDirPath == null ? null : new File(versionDirPath);
         isInstalled = in.readByte() != 0;
@@ -35,8 +41,10 @@ public class GameVersion implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(directoryName);
         dest.writeString(displayName);
         dest.writeString(versionCode);
+        dest.writeString(uuid);
         dest.writeString(versionDir == null ? null : versionDir.getAbsolutePath());
         dest.writeByte((byte) (isInstalled ? 1 : 0));
         dest.writeString(packageName);

@@ -56,7 +56,7 @@ public class ApkInstaller {
         }
     }
 
-    private void unzipLibsToSystemAbi(File baseDir, ZipInputStream zis) throws IOException {
+    private void unzipLibsToSystemAbi(File libBaseDir, ZipInputStream zis) throws IOException {
         ZipEntry entry;
         while ((entry = zis.getNextEntry()) != null) {
             String name = entry.getName();
@@ -65,8 +65,8 @@ public class ApkInstaller {
                 if(parts.length < 3) continue;
                 String abi = parts[1];
                 String systemAbi = abiToSystemLibDir(abi);
-                String newName = "lib/" + systemAbi + "/" + parts[2];
-                File outFile = new File(baseDir, newName);
+                String soName = parts[2];
+                File outFile = new File(libBaseDir, systemAbi + "/" + soName);
                 File parent = outFile.getParentFile();
                 if (!parent.exists()) parent.mkdirs();
                 try (FileOutputStream fos = new FileOutputStream(outFile)) {
@@ -84,14 +84,13 @@ public class ApkInstaller {
     public void install(final Uri apkOrApksUri, final String dirName) {
         executor.submit(() -> {
             try {
+                String uuid = UUID.randomUUID().toString();
                 String versionName = extractVersionName(apkOrApksUri);
-
+                File libTargetDir = new File(context.getDataDir(), "minecraft/" + uuid + "/lib");
                 File baseDir = new File(Environment.getExternalStorageDirectory(), "games/org.levimc/minecraft/" + dirName);
                 if (!baseDir.exists() && !baseDir.mkdirs()) {
-                    postError("无法创建目录: " + baseDir.getAbsolutePath());
                     return;
                 }
-
                 String fileName = getFileName(apkOrApksUri);
                 if (fileName != null && fileName.toLowerCase().endsWith(".apks")) {
                     boolean foundApk = false;
@@ -107,7 +106,6 @@ public class ApkInstaller {
                                 zis.closeEntry();
                                 continue;
                             } else {
-                                // base.apk特判
                                 if (entry.getName().equals("base.apk")) {
                                     outputName = APK_FILE_NAME;
                                 } else {
@@ -126,10 +124,9 @@ public class ApkInstaller {
                             }
 
                             if (outputName.equals(APK_FILE_NAME)) {
-                                // base.apk.levi，立即解libs
                                 try (InputStream is2 = new FileInputStream(outFile);
                                      ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(is2))) {
-                                    unzipLibsToSystemAbi(baseDir, zis2);
+                                    unzipLibsToSystemAbi(libTargetDir, zis2);
                                 }
                                 foundApk = true;
                             } else if (outputName.endsWith(".apk")) {
@@ -139,7 +136,7 @@ public class ApkInstaller {
                         }
                     }
                     if (!foundApk) {
-                        postError("apks文件中找不到任何apk");
+                        postError("apks no apk");
                         return;
                     }
                 } else {
@@ -147,7 +144,7 @@ public class ApkInstaller {
                     try (InputStream is = context.getContentResolver().openInputStream(apkOrApksUri);
                          OutputStream os = new FileOutputStream(dstApkFile)) {
                         if (is == null) {
-                            postError("打开apk失败");
+                            postError("open apk failed");
                             return;
                         }
                         byte[] buffer = new byte[8192];
@@ -158,14 +155,14 @@ public class ApkInstaller {
                     }
                     try (InputStream is2 = new FileInputStream(dstApkFile);
                          ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(is2))) {
-                        unzipLibsToSystemAbi(baseDir, zis2);
+                        unzipLibsToSystemAbi(libTargetDir, zis2);
                     }
-                    new File(baseDir, "oat").mkdirs();
+
                 }
 
                 JSONObject json = new JSONObject();
                 json.put("name", dirName);
-                json.put("uuid", UUID.randomUUID().toString());
+                json.put("uuid", uuid);
                 json.put("version", versionName);
 
                 File versionJson = new File(baseDir, "version.json");
@@ -174,7 +171,6 @@ public class ApkInstaller {
                 }
                 postSuccess(versionName);
             } catch (Exception e) {
-                postError("安装失败：" + e.getMessage());
             }
         });
     }

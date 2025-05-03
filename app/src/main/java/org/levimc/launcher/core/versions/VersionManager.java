@@ -52,8 +52,10 @@ public class VersionManager {
                 );
                 if (!versionDir.exists()) versionDir.mkdirs();
                 GameVersion gv = new GameVersion(
+                        "",
                         pi.applicationInfo.loadLabel(pm) + " ("+pi.versionName+")",
                         pi.versionName,
+                        "",
                         versionDir,
                         true,
                         pi.packageName
@@ -81,7 +83,8 @@ public class VersionManager {
                         JSONObject obj = new JSONObject(json);
                         String versionName = obj.optString("versionName", dir.getName());
                         String versionCode = obj.optString("version", "");
-                        GameVersion gv = new GameVersion(versionName + " ("+versionCode+")", versionCode, dir, false, null);
+                        String uuid = obj.optString("uuid", "");
+                        GameVersion gv = new GameVersion(dir.getName(),versionName + " ("+versionCode+")", versionCode, uuid,dir, false, null);
                         customVersions.add(gv);
                     } catch (Exception e) {}
                 }

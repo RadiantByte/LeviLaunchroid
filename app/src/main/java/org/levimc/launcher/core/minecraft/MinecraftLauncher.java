@@ -53,23 +53,21 @@ public class MinecraftLauncher {
         }
     }
 
-    public ApplicationInfo createFakeApplicationInfo(File versionDir, String packageName) throws IOException {
+    public ApplicationInfo createFakeApplicationInfo(GameVersion version, String packageName)  {
         ApplicationInfo fakeInfo = new ApplicationInfo();
-        File apkFile = new File(versionDir, "base.apk.levi");
+        File apkFile = new File(version.versionDir, "base.apk.levi");
         fakeInfo.sourceDir = apkFile.getAbsolutePath();
         fakeInfo.publicSourceDir = fakeInfo.sourceDir;
-
         String systemAbi = abiToSystemLibDir(Build.SUPPORTED_ABIS[0]);
-        File srcLibDir = new File(versionDir, "lib/" + systemAbi);
-        File dstLibDir = new File(context.getCacheDir(), "mc_libs/" + systemAbi);
-        copyDirectoryRecursively(srcLibDir, dstLibDir);
+
+        File dstLibDir = new File(context.getDataDir(), "minecraft/" + version.uuid + "/lib/"+ systemAbi);
 
         fakeInfo.nativeLibraryDir = dstLibDir.getAbsolutePath();
 
         fakeInfo.packageName = packageName;
-        fakeInfo.dataDir = versionDir.getAbsolutePath();
+        fakeInfo.dataDir = version.versionDir.getAbsolutePath();
 
-        File splitsFolder = new File(versionDir, "splits");
+        File splitsFolder = new File(version.versionDir, "splits");
         if (splitsFolder.exists() && splitsFolder.isDirectory()) {
             File[] splits = splitsFolder.listFiles();
             if (splits != null) {
@@ -97,7 +95,7 @@ public class MinecraftLauncher {
             if (version == null) return;
             ApplicationInfo mcInfo = version.isInstalled ?
                     getApplicationInfo(version.packageName) :
-                    createFakeApplicationInfo(version.versionDir, MC_PACKAGE_NAME);
+                    createFakeApplicationInfo(version, MC_PACKAGE_NAME);
             File dexCacheDir = createCacheDexDir();
             cleanCacheDirectory(dexCacheDir);
             Object pathList = getPathList(classLoader);
@@ -246,8 +244,7 @@ public class MinecraftLauncher {
     private void launchMinecraftActivity(ApplicationInfo mcInfo, Intent sourceIntent) {
         new Thread(() -> {
             try {
-                // Add compatibility flag for older Android versions
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) { // S is Android 12
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                     sourceIntent.putExtra("DISABLE_SPLASH_SCREEN", true);
                 }
 
