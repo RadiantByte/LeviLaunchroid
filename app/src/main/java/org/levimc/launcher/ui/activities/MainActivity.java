@@ -126,6 +126,12 @@ public class MainActivity extends BaseActivity {
 
         handleIncomingFiles();
         initSettings();
+
+        new GithubReleaseUpdater(
+                this,
+                "LiteLDev",
+                "LeviLaunchroid"
+        ).checkUpdateOnLaunch();
     }
 
     private void initSettings() {

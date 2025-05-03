@@ -74,6 +74,18 @@
     <string name="check_update">Check for updates</string>
     <string name="version_prefix">Version: </string>
 
+
+    <string name="new_version_found">New version found: %1$s</string>
+    <string name="update_question">Do you want to download and install the latest version?</string>
+    <string name="download_update">Download Update</string>
+    <string name="ignore_this_version">Ignore this version</string>
+    <string name="update_progress">Download progress: %1$d%%</string>
+    <string name="update_failed">Download failed: %1$s</string>
+    <string name="install_failed">Unable to install update: %1$s</string>
+    <string name="already_latest_version">Already latest version (%1$s)</string>
+    <string name="version_ignored">This version has been ignored</string>
+    <string name="downloading_update">Downloading update...</string>
+
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

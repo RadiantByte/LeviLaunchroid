@@ -74,6 +74,17 @@
     <string name="unknown_sources_permission_title">安装权限</string>
     <string name="unknown_sources_permission_message">请授予安装未知来源应用的权限，否则无法完成应用更新/安装。点击“授权”前往系统设置开启后返回本应用继续操作。</string>
 
+    <string name="new_version_found">发现新版本：%1$s</string>
+    <string name="update_question">是否下载并安装最新版本？</string>
+    <string name="download_update">下载更新</string>
+    <string name="ignore_this_version">忽略此版本</string>
+    <string name="update_progress">下载进度: %1$d%%</string>
+    <string name="update_failed">下载失败: %1$s</string>
+    <string name="install_failed">无法安装更新: %1$s</string>
+    <string name="already_latest_version">已是最新版本 (%1$s)</string>
+    <string name="version_ignored">此版本已被忽略</string>
+    <string name="downloading_update">正在下载更新...</string>
+
     <!-- Language Setting -->
     <string name="language">语言</string>
     <string name="english">English</string>

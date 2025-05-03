@@ -1,15 +1,12 @@
 package org.levimc.launcher.util;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.icu.text.UnicodeSetIterator;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.provider.Settings;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
@@ -33,6 +30,7 @@ import okhttp3.Response;
 public class GithubReleaseUpdater {
     private static final String GITHUB_LATEST_API = "https://api.github.com/repos/%s/%s/releases/latest";
     private static final String APK_ASSET_KEYWORD = ".apk";
+    private static final String PREF_IGNORED_VERSION = "update_ignored_version";
     private final Activity activity;
     private final String owner;
     private final String repo;
@@ -91,9 +89,53 @@ public class GithubReleaseUpdater {
                     String localVersion = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
                     if (compareVersion(latestVersion, localVersion) > 0) {
                         showUpdateDialog(latestVersion, downloadUrl);
-                    }else {
+                    } else {
                         activity.runOnUiThread(() ->
-                                Toast.makeText(activity, "已是最新版本 (" + localVersion + ")", Toast.LENGTH_SHORT).show());
+                                Toast.makeText(activity, activity.getString(R.string.already_latest_version, localVersion), Toast.LENGTH_SHORT).show());
+                    }
+                } catch (Exception e) {
+                    Logger.get().error("Parse error: " + e.getMessage());
+                }
+            }
+        });
+    }
+
+    public void checkUpdateOnLaunch() {
+        String url = String.format(GITHUB_LATEST_API, owner, repo);
+        Request request = new Request.Builder().url(url).build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Logger.get().error("Request failed: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                try {
+                    String body = response.body().string();
+                    JSONObject json = new JSONObject(body);
+                    String latestVersion = json.getString("tag_name");
+                    JSONArray assets = json.getJSONArray("assets");
+                    String downloadUrl = null;
+                    for (int i = 0; i < assets.length(); i++) {
+                        JSONObject asset = assets.getJSONObject(i);
+                        String name = asset.getString("name");
+                        if (name.endsWith(APK_ASSET_KEYWORD)) {
+                            downloadUrl = asset.getString("browser_download_url");
+                            break;
+                        }
+                    }
+                    if (downloadUrl == null) {
+                        Logger.get().error("No APK asset found in release.");
+                        return;
+                    }
+                    String localVersion = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
+                    SharedPreferences prefs = activity.getSharedPreferences("no_update_version", Context.MODE_PRIVATE);
+                    String ignoredVersion = prefs.getString(PREF_IGNORED_VERSION, "");
+
+                    if (compareVersion(latestVersion, localVersion) > 0
+                            && !ignoredVersion.equals(latestVersion)) {
+                        showUpdateDialogWithIgnore(latestVersion, downloadUrl);
                     }
                 } catch (Exception e) {
                     Logger.get().error("Parse error: " + e.getMessage());
@@ -105,22 +147,40 @@ public class GithubReleaseUpdater {
     private void showUpdateDialog(String version, String url) {
         activity.runOnUiThread(() -> {
             CustomAlertDialog dialog = new CustomAlertDialog(activity);
-            dialog.setTitleText("发现新版本：" + version);
-            dialog.setMessage("是否下载并安装最新版本？");
-            dialog.setPositiveButton("下载更新", (d) -> downloadApk(url));
-            dialog.setNegativeButton("取消", null);
+            dialog.setTitleText(activity.getString(R.string.new_version_found, version));
+            dialog.setMessage(activity.getString(R.string.update_question));
+            dialog.setPositiveButton(activity.getString(R.string.download_update), (d) -> downloadApk(url));
+            dialog.setNegativeButton(activity.getString(R.string.cancel), null);
             dialog.show();
         });
     }
 
+    private void showUpdateDialogWithIgnore(String version, String url) {
+        activity.runOnUiThread(() -> {
+            CustomAlertDialog dialog = new CustomAlertDialog(activity);
+            dialog.setTitleText(activity.getString(R.string.new_version_found, version));
+            dialog.setMessage(activity.getString(R.string.update_question));
+            dialog.setPositiveButton(activity.getString(R.string.download_update), (d) -> downloadApk(url));
+            dialog.setNegativeButton(activity.getString(R.string.cancel), null);
+            dialog.setNeutralButton(activity.getString(R.string.ignore_this_version), (d) -> ignoreThisVersion(version));
+            dialog.show();
+        });
+    }
+
+    private void ignoreThisVersion(String version) {
+        SharedPreferences prefs = activity.getSharedPreferences("no_update_version", Context.MODE_PRIVATE);
+        prefs.edit().putString(PREF_IGNORED_VERSION, version).apply();
+        activity.runOnUiThread(() -> Toast.makeText(activity, activity.getString(R.string.version_ignored), Toast.LENGTH_SHORT).show());
+    }
+
     private void downloadApk(String url) {
-        activity.runOnUiThread(() -> Toast.makeText(activity, "正在下载更新...", Toast.LENGTH_SHORT).show());
+        activity.runOnUiThread(() -> Toast.makeText(activity, activity.getString(R.string.downloading_update), Toast.LENGTH_SHORT).show());
         Request request = new Request.Builder().url(url).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 activity.runOnUiThread(() ->
-                        Toast.makeText(activity, "下载失败: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        Toast.makeText(activity, activity.getString(R.string.update_failed, e.getMessage()), Toast.LENGTH_LONG).show());
             }
 
             @Override
@@ -145,7 +205,7 @@ public class GithubReleaseUpdater {
                         if (now - lastToastTime > 500 && total > 0) {
                             int percent = (int) (downloaded * 100 / total);
                             activity.runOnUiThread(() ->
-                                    Toast.makeText(activity, "下载进度: " + percent + "%", Toast.LENGTH_SHORT).show());
+                                    Toast.makeText(activity, activity.getString(R.string.update_progress, percent), Toast.LENGTH_SHORT).show());
                             lastToastTime = now;
                         }
                     }
@@ -153,7 +213,7 @@ public class GithubReleaseUpdater {
                     installApk(apkFile);
                 } catch (Exception e) {
                     activity.runOnUiThread(() ->
-                            Toast.makeText(activity, "下载失败: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                            Toast.makeText(activity, activity.getString(R.string.update_failed, e.getMessage()), Toast.LENGTH_LONG).show());
                 } finally {
                     try { if (is != null) is.close(); } catch (Exception ignored) {}
                     try { if (fos != null) fos.close(); } catch (Exception ignored) {}
@@ -173,7 +233,7 @@ public class GithubReleaseUpdater {
                                 Intent intent = new Intent(Intent.ACTION_VIEW);
                                 Uri apkUri;
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                    apkUri = androidx.core.content.FileProvider.getUriForFile(
+                                    apkUri = FileProvider.getUriForFile(
                                             activity,
                                             activity.getPackageName() + ".fileprovider",
                                             apkFile
@@ -186,7 +246,7 @@ public class GithubReleaseUpdater {
                                 intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
                                 activity.startActivity(intent);
                             } catch (Exception e) {
-                                Toast.makeText(activity, "无法安装更新: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(activity, activity.getString(R.string.install_failed, e.getMessage()), Toast.LENGTH_LONG).show();
                             }
                         });
                     }

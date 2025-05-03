@@ -4,7 +4,7 @@
     android:background="@drawable/bg_rounded_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minWidth="280dp">
+    android:minWidth="450dp">
 
     <TextView
         android:id="@+id/tv_title"
@@ -20,30 +20,43 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:layout_marginTop="28dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+<LinearLayout
+    android:orientation="horizontal"
+    android:gravity="end"
+    android:layout_marginTop="28dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/btn_negative"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="80dp"
-            android:textSize="16sp"/>
+    <Button
+        android:id="@+id/btn_negative"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:minWidth="80dp"
+        android:textSize="16sp"/>
 
-        <View
-            android:id="@+id/btn_spacing"
-            android:layout_width="12dp"
-            android:layout_height="0dp" />
+    <View
+        android:id="@+id/btn_spacing_neg_neu"
+        android:layout_width="12dp"
+        android:layout_height="0dp" />
 
-        <Button
-            android:id="@+id/btn_positive"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:minWidth="80dp"
-            android:textSize="16sp" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/btn_neutral"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:minWidth="80dp"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/btn_spacing_neu_pos"
+        android:layout_width="12dp"
+        android:layout_height="0dp" />
+
+    <Button
+        android:id="@+id/btn_positive"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:minWidth="80dp"
+        android:textSize="16sp" />
+</LinearLayout>
 </LinearLayout>
