@@ -1,18 +1,13 @@
 package org.levimc.launcher.ui.dialogs;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.*;
-
 import org.levimc.launcher.R;
 
 import java.util.ArrayList;
@@ -20,178 +15,103 @@ import java.util.List;
 
 public class SettingsDialog extends Dialog {
 
-    private LinearLayout rootLayout;
-
-    private List<View> customItems = new ArrayList<>();
-
-    private Button btnCancel, btnConfirm;
-
-    private View.OnClickListener onCancelListener, onConfirmListener;
+    private LinearLayout settingsItemsContainer;
+    private final List<Runnable> itemAddQueue = new ArrayList<>();
 
     public SettingsDialog(Context context) {
         super(context);
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        rootLayout = new LinearLayout(getContext());
-        rootLayout.setOrientation(LinearLayout.VERTICAL);
-        int pad = dp(24);
-        rootLayout.setPadding(pad, pad, pad, pad);
-        rootLayout.setBackground(getContext().getDrawable(R.drawable.bg_rounded_card));
-        rootLayout.setMinimumWidth(dp(320));
-        rootLayout.setMinimumHeight(dp(320));
-
-        LinearLayout topLayout = new LinearLayout(getContext());
-        topLayout.setOrientation(LinearLayout.HORIZONTAL);
-        topLayout.setGravity(Gravity.CENTER_VERTICAL);
-
-        ImageView icon = new ImageView(getContext());
-        icon.setImageResource(R.drawable.ic_settings);
-        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(28), dp(28));
-        icon.setLayoutParams(iconParams);
-
-        LinearLayout titleDescLayout = new LinearLayout(getContext());
-        titleDescLayout.setOrientation(LinearLayout.VERTICAL);
-        titleDescLayout.setPadding(dp(12), 0, 0, 0);
-
-        TextView title = new TextView(getContext());
-        title.setText("设置");
-        title.setTextSize(20);
-        title.setTypeface(Typeface.DEFAULT_BOLD);
-
-        TextView desc = new TextView(getContext());
-        desc.setText("您的启动器设置");
-        desc.setTextSize(14);
-        desc.setTextColor(0xFF888888);
-
-        titleDescLayout.addView(title);
-        titleDescLayout.addView(desc);
-
-        topLayout.addView(icon);
-        topLayout.addView(titleDescLayout);
-
-        rootLayout.addView(topLayout);
-        addSpace(rootLayout, dp(12));
-
-        for (View v : customItems) {
-            rootLayout.addView(v);
+        if (getWindow() != null) {
+            getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        Window window = getWindow();
-        if (window != null) {
-            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-        setContentView(rootLayout);
+        setContentView(R.layout.dialog_settings);
+        settingsItemsContainer = findViewById(R.id.settings_items);
+
+        for (Runnable r : itemAddQueue) r.run();
+        itemAddQueue.clear();
     }
 
-    private void addSpace(ViewGroup parent, int h) {
-        Space s = new Space(getContext());
-        s.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, h));
-        parent.addView(s);
-    }
-
-    private int dp(int v) {
-        float scale = getContext().getResources().getDisplayMetrics().density;
-        return (int) (v * scale + 0.5f);
-    }
-
-
-    public Switch addSwitchItem(String label, boolean defChecked) {
-        LinearLayout ll = new LinearLayout(getContext());
-        ll.setOrientation(LinearLayout.HORIZONTAL);
-        ll.setGravity(android.view.Gravity.CENTER_VERTICAL);
-        ll.setPadding(0, 0, 0, dp(8));
-        TextView tv = new TextView(getContext());
-        tv.setText(label);
-        tv.setTextSize(16);
-        LinearLayout.LayoutParams tvParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        tv.setLayoutParams(tvParams);
-
-        Switch sw = new Switch(getContext());
-        sw.setChecked(defChecked);
-
-        ll.addView(tv);
-        ll.addView(sw);
-        customItems.add(ll);
-        return sw;
+    public void addSwitchItem(String label, boolean defChecked, CompoundButton.OnCheckedChangeListener listener) {
+        int switchId = View.generateViewId();
+        Runnable action = () -> {
+            View ll = LayoutInflater.from(getContext()).inflate(R.layout.item_settings_switch, settingsItemsContainer, false);
+            ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
+            Switch sw = ll.findViewById(R.id.switch_value);
+            sw.setId(switchId);
+            sw.setChecked(defChecked);
+            if (listener != null) sw.setOnCheckedChangeListener(listener);
+            settingsItemsContainer.addView(ll);
+        };
+        if (settingsItemsContainer == null) itemAddQueue.add(action);
+        else action.run();
     }
 
     public Spinner addSpinnerItem(String label, String[] options, int defaultIdx) {
-        LinearLayout ll = new LinearLayout(getContext());
-        ll.setOrientation(LinearLayout.HORIZONTAL);
-        ll.setGravity(android.view.Gravity.CENTER_VERTICAL);
-        ll.setPadding(0, dp(8), 0, 0);
-        TextView tv = new TextView(getContext());
-        tv.setText(label);
-        tv.setTextSize(16);
-        LinearLayout.LayoutParams tvParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        tv.setLayoutParams(tvParams);
-
-        Spinner spinner = new Spinner(getContext());
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, options);
-        spinner.setAdapter(adapter);
-        spinner.setSelection(defaultIdx);
-
-        ll.addView(tv);
-        ll.addView(spinner);
-        customItems.add(ll);
-        return spinner;
+        final Context ctx = getContext();
+        final Spinner[] out = new Spinner[1];
+        Runnable action = () -> {
+            View ll = LayoutInflater.from(ctx).inflate(R.layout.item_settings_spinner, settingsItemsContainer, false);
+            ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
+            Spinner spinner = ll.findViewById(R.id.spinner_value);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(ctx, android.R.layout.simple_spinner_dropdown_item, options);
+            spinner.setAdapter(adapter);
+            spinner.setSelection(defaultIdx);
+            settingsItemsContainer.addView(ll);
+            out[0] = spinner;
+        };
+        if (settingsItemsContainer == null) {
+            itemAddQueue.add(action);
+            return null;
+        } else {
+            action.run();
+            return out[0];
+        }
     }
 
     public EditText addEditItem(String label, String hint) {
-        LinearLayout ll = new LinearLayout(getContext());
-        ll.setOrientation(LinearLayout.HORIZONTAL);
-        ll.setGravity(android.view.Gravity.CENTER_VERTICAL);
-        ll.setPadding(0, dp(16), 0, 0);
-
-        TextView tv = new TextView(getContext());
-        tv.setText(label);
-        tv.setTextSize(16);
-        LinearLayout.LayoutParams tvParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        tv.setLayoutParams(tvParams);
-
-        EditText et = new EditText(getContext());
-        et.setHint(hint);
-        LinearLayout.LayoutParams etParams = new LinearLayout.LayoutParams(dp(160), ViewGroup.LayoutParams.WRAP_CONTENT);
-        et.setLayoutParams(etParams);
-
-        ll.addView(tv);
-        ll.addView(et);
-        customItems.add(ll);
-        return et;
+        final Context ctx = getContext();
+        final EditText[] out = new EditText[1];
+        Runnable action = () -> {
+            View ll = LayoutInflater.from(ctx).inflate(R.layout.item_settings_edittext, settingsItemsContainer, false);
+            ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
+            EditText et = ll.findViewById(R.id.edit_value);
+            et.setHint(hint);
+            settingsItemsContainer.addView(ll);
+            out[0] = et;
+        };
+        if (settingsItemsContainer == null) {
+            itemAddQueue.add(action);
+            return null;
+        } else {
+            action.run();
+            return out[0];
+        }
     }
 
-    public Button addActionButton(String label, View.OnClickListener listener) {
-        LinearLayout ll = new LinearLayout(getContext());
-        ll.setOrientation(LinearLayout.HORIZONTAL);
-        ll.setGravity(android.view.Gravity.CENTER_VERTICAL);
-        ll.setPadding(0, dp(16), 0, 0);
-
-        TextView tv = new TextView(getContext());
-        tv.setText(label);
-        tv.setTextSize(16);
-        LinearLayout.LayoutParams tvParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        tv.setLayoutParams(tvParams);
-
-        Button btn = new Button(getContext());
-        btn.setText("执行");
-        btn.setOnClickListener(listener);
-
-        ll.addView(tv);
-        ll.addView(btn);
-        customItems.add(ll);
-        return btn;
-    }
-
-    public void setOnCancelListener(View.OnClickListener listener) {
-        this.onCancelListener = listener;
-    }
-
-    public void setOnConfirmListener(View.OnClickListener listener) {
-        this.onConfirmListener = listener;
+    public Button addActionButton(String label, String buttonText, View.OnClickListener listener) {
+        final Context ctx = getContext();
+        final Button[] out = new Button[1];
+        Runnable action = () -> {
+            View ll = LayoutInflater.from(ctx).inflate(R.layout.item_settings_button, settingsItemsContainer, false);
+            ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
+            Button btn = ll.findViewById(R.id.btn_action);
+            btn.setText(buttonText);
+            btn.setOnClickListener(listener);
+            settingsItemsContainer.addView(ll);
+            out[0] = btn;
+        };
+        if (settingsItemsContainer == null) {
+            itemAddQueue.add(action);
+            return null;
+        } else {
+            action.run();
+            return out[0];
+        }
     }
 }

@@ -64,7 +64,16 @@
     <string name="installing_message">Please wait, installing Minecraft</string>
 
     <string name="enable_debug_log">Enable Debug Log</string>
-    
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_desc">Your launcher settings</string>
+
+    <string name="unknown_sources_permission_title">Install Permission</string>
+    <string name="unknown_sources_permission_message">To install or update this app, please grant permission to install unknown apps. Click "Grant" to open system settings, enable the permission for this app, and return to continue.</string>
+
+    <string name="check_update">Check for updates</string>
+    <string name="version_prefix">Version: </string>
+
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

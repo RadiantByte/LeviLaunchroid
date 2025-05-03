@@ -31,7 +31,8 @@
     <string name="installed_packages">已安装包</string>
     <string name="local_custom">本地自定义</string>
 
-    <string name="enable_debug_log">启用Debug Log</string>
+    <string name="check_update">检查更新</string>
+    <string name="version_prefix">版本号：</string>
 
     <!-- Permissions -->
     <string name="storage_permission_title">需要存储权限</string>
@@ -64,6 +65,15 @@
 
     <string name="installing_title">正在安装中…</string>
     <string name="installing_message">请稍候，正在安装MC中</string>
+
+    <string name="enable_debug_log">启用Debug Log</string>
+
+    <string name="settings_title">设置</string>
+    <string name="settings_desc">您的启动器设置</string>
+
+    <string name="unknown_sources_permission_title">安装权限</string>
+    <string name="unknown_sources_permission_message">请授予安装未知来源应用的权限，否则无法完成应用更新/安装。点击“授权”前往系统设置开启后返回本应用继续操作。</string>
+
     <!-- Language Setting -->
     <string name="language">语言</string>
     <string name="english">English</string>

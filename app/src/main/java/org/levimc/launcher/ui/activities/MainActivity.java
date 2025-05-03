@@ -2,6 +2,7 @@ package org.levimc.launcher.ui.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import org.levimc.launcher.core.minecraft.MinecraftLauncher;
 import org.levimc.launcher.core.mods.FileHandler;
 import org.levimc.launcher.core.mods.Mod;
 import org.levimc.launcher.ui.animation.AnimationHelper;
+import org.levimc.launcher.util.GithubReleaseUpdater;
 import org.levimc.launcher.util.LanguageManager;
 import org.levimc.launcher.util.PermissionsHandler;
 import org.levimc.launcher.util.ResourcepackHandler;
@@ -201,19 +203,29 @@ public class MainActivity extends BaseActivity {
 
         FeatureSettings.init(getApplicationContext());
 
-        binding.settingsButton.setOnClickListener(v -> showSettingsDialog());
+        binding.settingsButton.setOnClickListener(v -> {
+            try {
+                showSettingsDialog();
+            } catch (PackageManager.NameNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-    private void showSettingsDialog() {
+    private void showSettingsDialog() throws PackageManager.NameNotFoundException {
         FeatureSettings fs = FeatureSettings.getInstance();
         SettingsDialog dlg = new SettingsDialog(this);
-        Switch swEnable = dlg.addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled());
-        swEnable.setOnCheckedChangeListener((btn, checked) -> fs.setDebugLogDialogEnabled(checked));
-        dlg.setOnCancelListener((View.OnClickListener) v -> dlg.dismiss());
-        dlg.setOnConfirmListener(v -> dlg.dismiss());
+        dlg.addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled(), (btn, check) -> {fs.setDebugLogDialogEnabled(check);});
+        String localVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        dlg.addActionButton("版本号："+ localVersion,"检查更新", v -> {
+            new GithubReleaseUpdater(
+                    this,
+                    "LiteLDev",
+                    "LeviLaunchroid"
+            ).checkUpdate();
+        });
         dlg.show();
     }
-
     private void setTextMinecraftVersion() {
         if (binding == null) return;
         String display = currentVersion != null ? currentVersion.displayName : getString(R.string.not_found_version);
@@ -249,27 +261,35 @@ public class MainActivity extends BaseActivity {
 
     private void updateModsUI(List<Mod> mods) {
         if (binding == null) return;
+
         binding.modContent.removeAllViews();
-        if (mods == null || mods.isEmpty()) {
+
+        int modCount = (mods != null) ? mods.size() : 0;
+        String formattedTitle = getString(R.string.mods_title, modCount);
+        binding.modsTitleText.setText(formattedTitle);
+
+        if (modCount == 0) {
             TextView tv = new TextView(this);
             tv.setText(R.string.no_mods_found);
             binding.modContent.addView(tv);
             return;
         }
-        String formattedTitle = getString(R.string.mods_title, mods.size());
-        binding.modsTitleText.setText(formattedTitle);
+
         for (Mod mod : mods) {
             View modView = createModView(mod);
-            if (modView != null) binding.modContent.addView(modView);
+            if (modView != null) {
+                binding.modContent.addView(modView);
+            }
         }
     }
+
 
     private View createModView(Mod mod) {
         if (mod == null) return null;
         LayoutInflater inflater = LayoutInflater.from(this);
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.item_mod, null);
         TextView name = view.findViewById(R.id.mod_name);
-        Switch switchBtn = view.findViewById(R.id.mod_switch);
+        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch switchBtn = view.findViewById(R.id.mod_switch);
         if (name != null) name.setText(mod.getDisplayName());
         if (switchBtn != null) {
             switchBtn.setChecked(mod.isEnabled());
