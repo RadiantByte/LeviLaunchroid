@@ -9,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import org.jetbrains.annotations.NotNull;
+import org.levimc.launcher.core.mods.ModManager;
+import org.levimc.launcher.core.mods.ModNativeLoader;
 import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.util.Logger;
 
@@ -36,21 +38,10 @@ public class MinecraftLauncher {
     private final ClassLoader classLoader;
     public static final String MC_PACKAGE_NAME = "com.mojang.minecraftpe";
     private static final String LAUNCHER_DEX_NAME = "launcher.dex";
-    public native void nativeSetModPath(String modsDir, String configPath);
     public static String abiToSystemLibDir(String abi) {
         if ("arm64-v8a".equals(abi)) return "arm64";
         if ("armeabi-v7a".equals(abi)) return "arm";
         return abi;
-    }
-    void copyDirectoryRecursively(File src, File dst) throws IOException {
-        if (!dst.exists()) dst.mkdirs();
-        for (File f : src.listFiles()) {
-            File destF = new File(dst, f.getName());
-            if (f.isDirectory()) copyDirectoryRecursively(f, destF);
-            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Files.copy(f.toPath(), destF.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
-        }
     }
 
     public ApplicationInfo createFakeApplicationInfo(GameVersion version, String packageName)  {
@@ -101,7 +92,6 @@ public class MinecraftLauncher {
             Object pathList = getPathList(classLoader);
             processDexFiles(mcInfo, dexCacheDir, pathList);
             injectNativeLibraries(mcInfo, pathList);
-            nativeSetModPath(version.modsDir.getAbsolutePath(),version.modsDir.getAbsolutePath() + "/mods_config.json");
             launchMinecraftActivity(mcInfo, sourceIntent);
         } catch(Exception e) {
             e.printStackTrace();
@@ -249,21 +239,41 @@ public class MinecraftLauncher {
                 }
 
                 Class<?> launcherClass = classLoader.loadClass("com.mojang.minecraftpe.Launcher");
-                Intent mcActivity = sourceIntent.setClass(context, launcherClass);
-                mcActivity.putExtra("MC_SRC", mcInfo.sourceDir);
+                sourceIntent.setClass(context, launcherClass);
+                sourceIntent.putExtra("MC_SRC", mcInfo.sourceDir);
                 if (mcInfo.splitSourceDirs != null) {
-                    mcActivity.putExtra("MC_SPLIT_SRC", new ArrayList<>(Arrays.asList(mcInfo.splitSourceDirs)));
+                    sourceIntent.putExtra("MC_SPLIT_SRC", new ArrayList<>(Arrays.asList(mcInfo.splitSourceDirs)));
                 }
 
-                if (context instanceof Activity) {
-                    context.startActivity(mcActivity);
-                    ((Activity) context).finish();
-                } else {
-                    mcActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(mcActivity);
+                try {
+                    System.loadLibrary("c++_shared");
+                    System.loadLibrary("fmod");
+                    System.loadLibrary("minecraftpe");
+                } catch (UnsatisfiedLinkError e) {
+                    Logger.get().error("Error loading native libraries: " + e.getMessage());
+                    throw e;
                 }
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
+
+                try {
+                    ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
+                } catch (Exception e) {
+                    Logger.get().error("Error loading so mods: " + e.getMessage());
+                }
+
+                sourceIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                if (context instanceof Activity) {
+                    Activity activity = (Activity) context;
+                    activity.runOnUiThread(() -> {
+                        activity.finish();
+                        context.startActivity(sourceIntent);
+                    });
+                } else {
+                    context.startActivity(sourceIntent);
+                }
+
+            } catch (Exception e) {
+                Logger.get().error("Failed to launch Minecraft activity: " + e.getMessage(), e);
             }
         }).start();
     }

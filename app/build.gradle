@@ -25,6 +25,9 @@ android {
     buildFeatures {
         viewBinding true
     }
+    buildFeatures {
+        prefab true
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -42,10 +45,14 @@ android {
     }
     externalNativeBuild {
         xmake{
-            path "src/main/jni/xmake.lua"
+            path "src/main/cpp/leviutils/xmake.lua"
             logLevel "verbose"
             buildMode "release"
-
+        }
+        xmake{
+            path "src/main/cpp/preloader/xmake.lua"
+            logLevel "verbose"
+            buildMode "release"
         }
     }
     ndkVersion "27.0.12077973"
@@ -59,6 +66,7 @@ dependencies {
     implementation libs.material
     implementation libs.gson
     implementation libs.okhttp3.okhttp
+    implementation libs.shadowhook
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

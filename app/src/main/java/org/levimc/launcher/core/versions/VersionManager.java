@@ -27,6 +27,12 @@ public class VersionManager {
         return instance;
     }
 
+    public static String getSelectedModsDir(Context ctx) {
+        GameVersion v = get(ctx).getSelectedVersion();
+        if (v == null || v.modsDir == null) return null;
+        return v.modsDir.getAbsolutePath();
+    }
+
     private VersionManager(Context ctx) {
         this.context = ctx;
         this.prefs = ctx.getSharedPreferences("version_manager", Context.MODE_PRIVATE);

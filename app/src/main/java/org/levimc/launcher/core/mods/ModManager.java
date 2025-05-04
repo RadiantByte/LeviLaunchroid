@@ -65,6 +65,10 @@ public class ModManager {
         postModChanged();
     }
 
+    public GameVersion getCurrentVersion() {
+        return currentVersion;
+    }
+
     public List<Mod> getMods() {
         if (currentVersion == null || modsDir == null) return new ArrayList<>();
         File[] files = modsDir.listFiles((dir, name) -> name.endsWith(".so"));
