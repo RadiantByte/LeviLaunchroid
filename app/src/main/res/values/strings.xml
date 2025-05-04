@@ -84,7 +84,7 @@
     <string name="install_failed">Unable to install update: %1$s</string>
     <string name="already_latest_version">Already latest version (%1$s)</string>
     <string name="version_ignored">This version has been ignored</string>
-    <string name="downloading_update">Downloading update...</string>
+    <string name="downloading_update">Downloading update…</string>
 
     <!-- Language Setting -->
     <string name="language">Language</string>

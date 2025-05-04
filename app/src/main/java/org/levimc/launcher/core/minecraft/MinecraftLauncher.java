@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.levimc.launcher.core.mods.ModManager;
 import org.levimc.launcher.core.mods.ModNativeLoader;
 import org.levimc.launcher.core.versions.GameVersion;
+import org.levimc.launcher.ui.dialogs.LoadingDialog;
 import org.levimc.launcher.util.Logger;
 
 import java.io.BufferedInputStream;
@@ -23,7 +24,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -83,6 +83,8 @@ public class MinecraftLauncher {
 
     public void launch(Intent sourceIntent, GameVersion version) {
         try {
+            ((Activity)context).runOnUiThread(this::showLoading);
+
             if (version == null) return;
             ApplicationInfo mcInfo = version.isInstalled ?
                     getApplicationInfo(version.packageName) :
@@ -231,9 +233,14 @@ public class MinecraftLauncher {
         }
     }
 
+    public void showLoading() {
+        new LoadingDialog(context).show();
+    }
+
     private void launchMinecraftActivity(ApplicationInfo mcInfo, Intent sourceIntent) {
         new Thread(() -> {
             try {
+
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                     sourceIntent.putExtra("DISABLE_SPLASH_SCREEN", true);
                 }
@@ -265,6 +272,7 @@ public class MinecraftLauncher {
                 if (context instanceof Activity) {
                     Activity activity = (Activity) context;
                     activity.runOnUiThread(() -> {
+                       // hideLoading();
                         activity.finish();
                         context.startActivity(sourceIntent);
                     });

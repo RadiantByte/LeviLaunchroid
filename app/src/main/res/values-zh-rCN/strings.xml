@@ -83,7 +83,7 @@
     <string name="install_failed">无法安装更新: %1$s</string>
     <string name="already_latest_version">已是最新版本 (%1$s)</string>
     <string name="version_ignored">此版本已被忽略</string>
-    <string name="downloading_update">正在下载更新...</string>
+    <string name="downloading_update">正在下载更新…</string>
 
     <!-- Language Setting -->
     <string name="language">语言</string>
