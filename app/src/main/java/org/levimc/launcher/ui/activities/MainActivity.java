@@ -223,13 +223,17 @@ public class MainActivity extends BaseActivity {
         SettingsDialog dlg = new SettingsDialog(this);
         dlg.addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled(), (btn, check) -> {fs.setDebugLogDialogEnabled(check);});
         String localVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        dlg.addActionButton("版本号："+ localVersion,"检查更新", v -> {
-            new GithubReleaseUpdater(
-                    this,
-                    "LiteLDev",
-                    "LeviLaunchroid"
-            ).checkUpdate();
-        });
+        dlg.addActionButton(
+                getString(R.string.version_prefix) + localVersion,
+                getString(R.string.check_update),
+                v -> {
+                    new GithubReleaseUpdater(
+                            this,
+                            "LiteLDev",
+                            "LeviLaunchroid"
+                    ).checkUpdate();
+                }
+        );
         dlg.show();
     }
     private void setTextMinecraftVersion() {
