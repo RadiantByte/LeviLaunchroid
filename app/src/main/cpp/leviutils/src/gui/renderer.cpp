@@ -114,8 +114,9 @@ struct LogWindow::Impl {
 
         if (filter.IsActive() && !filter.PassFilter(lineStart, lineEnd))
           continue;
-
+        ImGui::PushTextWrapPos(0.0f);
         textAnsiUnformatted({lineStart, lineEnd});
+        ImGui::PopTextWrapPos();
       }
     }
     clipper.End();

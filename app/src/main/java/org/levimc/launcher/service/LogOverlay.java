@@ -93,11 +93,12 @@ public class LogOverlay {
         params.flags = WindowManager.LayoutParams.FLAG_FULLSCREEN |
                 WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS |
                 WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION |
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
 
         if (isDrawLayout)
         {
-            params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+            params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         }
 
         params.gravity = Gravity.LEFT | Gravity.TOP;
