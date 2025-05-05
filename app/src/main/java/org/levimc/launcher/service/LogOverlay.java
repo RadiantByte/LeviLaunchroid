@@ -70,7 +70,8 @@ public class LogOverlay {
                     touchParams.width = Integer.parseInt(rect[2]);
                     touchParams.height = Integer.parseInt(rect[3]);
                     winMrg.updateViewLayout(touchView, touchParams);
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
 
                 handler.postDelayed(this, 20);
             }
@@ -78,15 +79,12 @@ public class LogOverlay {
         startLogging();
     }
 
-    private static WindowManager.LayoutParams GetLayoutParams(boolean isDrawLayout)
-    {
+    private static WindowManager.LayoutParams GetLayoutParams(boolean isDrawLayout) {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else
-        {
+        } else {
             params.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
         }
 
@@ -96,8 +94,7 @@ public class LogOverlay {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
 
-        if (isDrawLayout)
-        {
+        if (isDrawLayout) {
             params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         }
 
@@ -119,8 +116,8 @@ public class LogOverlay {
         NativeMethods.SetOpen(true);
         if (touchView.getParent() == null) {
             WindowManager.LayoutParams touchParams = GetLayoutParams(false);
-            winMrg.addView(touchView,touchParams);
-            winMrg.addView(drawView,GetLayoutParams(true));
+            winMrg.addView(touchView, touchParams);
+            winMrg.addView(drawView, GetLayoutParams(true));
         }
     }
 

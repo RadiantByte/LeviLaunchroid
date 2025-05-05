@@ -8,12 +8,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
@@ -26,6 +26,7 @@ public class ApkVersionConfirmDialog extends DialogFragment {
 
     public interface Callback {
         void onInstallClicked(String versionName);
+
         void onCancelled();
     }
 
@@ -72,8 +73,14 @@ public class ApkVersionConfirmDialog extends DialogFragment {
             public void afterTextChanged(Editable s) {
                 validateVersionName(s.toString());
             }
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
         });
 
         btnCancel.setOnClickListener(v -> {

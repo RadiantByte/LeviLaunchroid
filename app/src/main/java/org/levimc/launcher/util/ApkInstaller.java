@@ -19,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
@@ -31,7 +30,9 @@ public class ApkInstaller {
 
     public interface InstallCallback {
         void onProgress(int progress);
+
         void onSuccess(String versionName);
+
         void onError(String errorMessage);
     }
 
@@ -45,40 +46,6 @@ public class ApkInstaller {
         this.context = context;
         this.executor = executor;
         this.callback = callback;
-    }
-
-    public static String abiToSystemLibDir(String abi){
-        if(abi == null) return "unknown";
-        switch (abi) {
-            case "armeabi-v7a": return "arm";
-            case "arm64-v8a": return "arm64";
-            default: return abi;
-        }
-    }
-
-    private void unzipLibsToSystemAbi(File libBaseDir, ZipInputStream zis) throws IOException {
-        ZipEntry entry;
-        while ((entry = zis.getNextEntry()) != null) {
-            String name = entry.getName();
-            if (name.startsWith("lib/") && !entry.isDirectory()) {
-                String[] parts = name.split("/");
-                if(parts.length < 3) continue;
-                String abi = parts[1];
-                String systemAbi = abiToSystemLibDir(abi);
-                String soName = parts[2];
-                File outFile = new File(libBaseDir, systemAbi + "/" + soName);
-                File parent = outFile.getParentFile();
-                if (!parent.exists()) parent.mkdirs();
-                try (FileOutputStream fos = new FileOutputStream(outFile)) {
-                    byte[] buffer = new byte[8192];
-                    int len;
-                    while ((len = zis.read(buffer)) != -1) {
-                        fos.write(buffer, 0, len);
-                    }
-                }
-            }
-            zis.closeEntry();
-        }
     }
 
     public void install(final Uri apkOrApksUri, final String dirName) {
@@ -126,7 +93,7 @@ public class ApkInstaller {
                             if (outputName.equals(APK_FILE_NAME)) {
                                 try (InputStream is2 = new FileInputStream(outFile);
                                      ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(is2))) {
-                                    unzipLibsToSystemAbi(libTargetDir, zis2);
+                                    ApkUtils.unzipLibsToSystemAbi(libTargetDir, zis2);
                                 }
                                 foundApk = true;
                             } else if (outputName.endsWith(".apk")) {
@@ -155,9 +122,8 @@ public class ApkInstaller {
                     }
                     try (InputStream is2 = new FileInputStream(dstApkFile);
                          ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(is2))) {
-                        unzipLibsToSystemAbi(libTargetDir, zis2);
+                        ApkUtils.unzipLibsToSystemAbi(libTargetDir, zis2);
                     }
-
                 }
 
                 JSONObject json = new JSONObject();
@@ -243,8 +209,14 @@ public class ApkInstaller {
                 }
             }
         } finally {
-            if (is != null) try { is.close(); } catch (Throwable ignored) {}
-            if (os != null) try { os.close(); } catch (Throwable ignored) {}
+            if (is != null) try {
+                is.close();
+            } catch (Throwable ignored) {
+            }
+            if (os != null) try {
+                os.close();
+            } catch (Throwable ignored) {
+            }
             tempFile.delete();
         }
         return "unknown_version";

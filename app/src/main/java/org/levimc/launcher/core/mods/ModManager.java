@@ -12,7 +12,6 @@ import org.levimc.launcher.core.versions.GameVersion;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,14 +123,16 @@ public class ModManager {
         try (FileReader reader = new FileReader(configFile)) {
             Map<String, Boolean> map = gson.fromJson(reader, Map.class);
             if (map != null) configMap.putAll(map);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     private void saveConfig() {
         if (configFile == null) return;
         try (FileWriter writer = new FileWriter(configFile)) {
             gson.toJson(configMap, writer);
-        } catch (Exception ignored) { }
+        } catch (Exception ignored) {
+        }
     }
 
     private synchronized void initFileObserver() {
@@ -147,7 +148,10 @@ public class ModManager {
 
     private void stopFileObserver() {
         if (modDirObserver != null) {
-            try { modDirObserver.stopWatching(); } catch (Exception ignored) {}
+            try {
+                modDirObserver.stopWatching();
+            } catch (Exception ignored) {
+            }
             modDirObserver = null;
         }
     }

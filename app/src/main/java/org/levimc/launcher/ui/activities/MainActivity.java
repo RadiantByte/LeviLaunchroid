@@ -17,11 +17,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.core.minecraft.MinecraftLauncher;
+import org.levimc.launcher.core.mods.FileHandler;
+import org.levimc.launcher.core.mods.Mod;
 import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.databinding.ActivityMainBinding;
 import org.levimc.launcher.service.LogOverlay;
 import org.levimc.launcher.settings.FeatureSettings;
+import org.levimc.launcher.ui.animation.AnimationHelper;
 import org.levimc.launcher.ui.dialogs.GameVersionSelectDialog;
 import org.levimc.launcher.ui.dialogs.SettingsDialog;
 import org.levimc.launcher.ui.dialogs.gameversionselect.BigGroup;
@@ -29,15 +33,10 @@ import org.levimc.launcher.ui.dialogs.gameversionselect.VersionUtil;
 import org.levimc.launcher.ui.views.MainViewModel;
 import org.levimc.launcher.ui.views.MainViewModelFactory;
 import org.levimc.launcher.util.ApkImportManager;
-import org.levimc.launcher.core.minecraft.MinecraftLauncher;
-import org.levimc.launcher.core.mods.FileHandler;
-import org.levimc.launcher.core.mods.Mod;
-import org.levimc.launcher.ui.animation.AnimationHelper;
 import org.levimc.launcher.util.GithubReleaseUpdater;
 import org.levimc.launcher.util.LanguageManager;
 import org.levimc.launcher.util.PermissionsHandler;
 import org.levimc.launcher.util.ResourcepackHandler;
-import org.levimc.launcher.util.ThemeManager;
 import org.levimc.launcher.util.UIHelper;
 
 import java.util.List;
@@ -97,6 +96,7 @@ public class MainActivity extends BaseActivity {
                     viewModel.refreshMods();
                 }
             }
+
             @Override
             public void onPermissionDenied(PermissionsHandler.PermissionType type, boolean permanentlyDenied) {
                 if (type == PermissionsHandler.PermissionType.STORAGE) {
@@ -132,6 +132,12 @@ public class MainActivity extends BaseActivity {
                 "LiteLDev",
                 "LeviLaunchroid"
         ).checkUpdateOnLaunch();
+
+        VersionManager.get(this).getCustomVersions().forEach(version -> {
+            if (version.needsRepair) {
+                VersionManager.attemptRepairLibs(this, version);
+            }
+        });
     }
 
     private void initSettings() {
@@ -144,8 +150,10 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (permissionsHandler != null) permissionsHandler.onActivityResult(requestCode, resultCode, data);
-        if (apkImportManager != null) apkImportManager.handleActivityResult(requestCode, resultCode, data);
+        if (permissionsHandler != null)
+            permissionsHandler.onActivityResult(requestCode, resultCode, data);
+        if (apkImportManager != null)
+            apkImportManager.handleActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -221,7 +229,9 @@ public class MainActivity extends BaseActivity {
     private void showSettingsDialog() throws PackageManager.NameNotFoundException {
         FeatureSettings fs = FeatureSettings.getInstance();
         SettingsDialog dlg = new SettingsDialog(this);
-        dlg.addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled(), (btn, check) -> {fs.setDebugLogDialogEnabled(check);});
+        dlg.addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled(), (btn, check) -> {
+            fs.setDebugLogDialogEnabled(check);
+        });
         String localVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         dlg.addActionButton(
                 getString(R.string.version_prefix) + localVersion,
@@ -236,7 +246,8 @@ public class MainActivity extends BaseActivity {
         );
         dlg.show();
     }
-    private void setTextMinecraftVersion() {
+
+    public void setTextMinecraftVersion() {
         if (binding == null) return;
         String display = currentVersion != null ? currentVersion.displayName : getString(R.string.not_found_version);
         if (!TextUtils.isEmpty(display)) {
@@ -253,6 +264,7 @@ public class MainActivity extends BaseActivity {
                     UIHelper.showToast(MainActivity.this, getString(R.string.files_processed, processedFiles));
                 }
             }
+
             @Override
             public void onError(String errorMessage) {
                 if (TextUtils.isEmpty(errorMessage)) return;
@@ -262,6 +274,7 @@ public class MainActivity extends BaseActivity {
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
             }
+
             @Override
             public void onProgressUpdate(int progress) {
                 if (binding != null) binding.progressLoader.setProgress(progress);

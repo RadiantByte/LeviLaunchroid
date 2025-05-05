@@ -5,7 +5,6 @@ import android.widget.Toast;
 
 import org.levimc.launcher.R;
 import org.levimc.launcher.service.LogOverlay;
-import org.levimc.launcher.ui.activities.MainActivity;
 import org.levimc.launcher.util.PermissionsHandler;
 
 public class FeatureSettings {
@@ -47,6 +46,7 @@ public class FeatureSettings {
                         LogOverlay.getInstance(appContext).show();
                     }
                 }
+
                 @Override
                 public void onPermissionDenied(PermissionsHandler.PermissionType type, boolean permanentlyDenied) {
                     Toast.makeText(appContext, R.string.overlay_permission_not_granted, Toast.LENGTH_SHORT).show();
@@ -59,8 +59,8 @@ public class FeatureSettings {
     }
 
     private void autoSave() {
-        if (appContext  != null) {
-            SettingsStorage.save(appContext , this);
+        if (appContext != null) {
+            SettingsStorage.save(appContext, this);
         }
     }
 }

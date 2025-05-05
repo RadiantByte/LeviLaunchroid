@@ -1,7 +1,8 @@
 package org.levimc.launcher.core.mods;
 
-import android.app.AlertDialog;
-import android.content.*;
+import android.content.ClipData;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
@@ -10,16 +11,17 @@ import android.os.Looper;
 import android.provider.OpenableColumns;
 import android.util.Log;
 
-import androidx.core.content.ContextCompat;
-
 import org.levimc.launcher.R;
 import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.views.MainViewModel;
-import org.levimc.launcher.util.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +33,9 @@ public class FileHandler {
 
     public interface FileOperationCallback {
         void onSuccess(int processedFiles);
+
         void onError(String errorMessage);
+
         void onProgressUpdate(int progress);
     }
 
@@ -66,7 +70,8 @@ public class FileHandler {
                 .setMessage(context.getString(R.string.import_confirmation_message, fileUris.size()))
                 .setPositiveButton((context.getString(R.string.confirm)), (d) -> handleFilesWithOverwriteCheck(fileUris, callback))
                 .setNegativeButton(context.getString(R.string.cancel), (d) -> {
-                    if (callback != null) callback.onError(context.getString(R.string.user_cancelled));
+                    if (callback != null)
+                        callback.onError(context.getString(R.string.user_cancelled));
                 })
                 .show();
 
@@ -90,7 +95,7 @@ public class FileHandler {
                     final boolean[] userChoice = new boolean[1];
                     final boolean[] decisionMade = new boolean[]{false};
 
-                    mainHandler.post(() ->{
+                    mainHandler.post(() -> {
                         new CustomAlertDialog(context)
                                 .setTitleText(context.getString(R.string.overwrite_file_title))
                                 .setMessage(context.getString(R.string.overwrite_file_message, fileName))
@@ -107,7 +112,7 @@ public class FileHandler {
                                     synchronized (this) {
                                         this.notify();
                                     }
-                                }) .show();
+                                }).show();
                     });
 
 

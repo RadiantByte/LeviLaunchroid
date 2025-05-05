@@ -4,10 +4,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Window;
-import org.levimc.launcher.R;
-
 import android.view.View;
+import android.view.Window;
+
+import org.levimc.launcher.R;
 
 public class LoadingDialog extends Dialog {
     public LoadingDialog(Context context) {

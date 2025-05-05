@@ -6,7 +6,9 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.view.View;
 import android.widget.PopupMenu;
+
 import org.levimc.launcher.R;
+
 import java.util.Locale;
 
 public class LanguageManager {

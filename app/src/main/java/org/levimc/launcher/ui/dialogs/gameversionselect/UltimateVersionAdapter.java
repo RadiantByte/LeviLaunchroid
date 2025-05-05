@@ -44,7 +44,8 @@ public class UltimateVersionAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    @Override public int getItemViewType(int position) {
+    @Override
+    public int getItemViewType(int position) {
         Object item = flatItems.get(position);
         if (item instanceof Integer) return TYPE_BIG_GROUP;
         if (item instanceof String) return TYPE_VER_GROUP;
@@ -52,7 +53,8 @@ public class UltimateVersionAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     @NonNull
-    @Override public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == TYPE_BIG_GROUP) {
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_version_big_group, parent, false);
             return new BigGroupVH(v);
@@ -65,40 +67,54 @@ public class UltimateVersionAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    @Override public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Object item = flatItems.get(position);
         int viewType = getItemViewType(position);
         if (viewType == TYPE_BIG_GROUP) {
-            int resId = (int)item;
-            ((BigGroupVH)holder).title.setText(context.getString(resId));
+            int resId = (int) item;
+            ((BigGroupVH) holder).title.setText(context.getString(resId));
         } else if (viewType == TYPE_VER_GROUP) {
-            ((VerGroupVH)holder).title.setText((String)item);
+            ((VerGroupVH) holder).title.setText((String) item);
         } else {
-            GameVersion gv = (GameVersion)item;
-            ((ItemVH)holder).bind(gv, listener);
+            GameVersion gv = (GameVersion) item;
+            ((ItemVH) holder).bind(gv, listener);
         }
     }
 
-    @Override public int getItemCount() { return flatItems.size(); }
+    @Override
+    public int getItemCount() {
+        return flatItems.size();
+    }
 
     static class BigGroupVH extends RecyclerView.ViewHolder {
         TextView title;
-        BigGroupVH(View v) { super(v); title = v.findViewById(R.id.tv_big_group_title); }
+
+        BigGroupVH(View v) {
+            super(v);
+            title = v.findViewById(R.id.tv_big_group_title);
+        }
     }
 
     static class VerGroupVH extends RecyclerView.ViewHolder {
         TextView title;
-        VerGroupVH(View v) { super(v); title = v.findViewById(R.id.tv_version_code_group);}
+
+        VerGroupVH(View v) {
+            super(v);
+            title = v.findViewById(R.id.tv_version_code_group);
+        }
     }
 
     static class ItemVH extends RecyclerView.ViewHolder {
         TextView tv;
         LinearLayout parentLayout;
+
         ItemVH(View v) {
             super(v);
             tv = v.findViewById(R.id.tv_version_name_item);
             parentLayout = v.findViewById(R.id.linear_parent);
         }
+
         public void bind(GameVersion v, OnVersionSelectListener listener) {
             StringBuilder sb = new StringBuilder();
             sb.append(v.displayName).append(" [").append(v.versionCode).append("]");

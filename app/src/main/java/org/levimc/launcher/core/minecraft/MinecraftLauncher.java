@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.levimc.launcher.core.mods.ModManager;
 import org.levimc.launcher.core.mods.ModNativeLoader;
 import org.levimc.launcher.core.versions.GameVersion;
+import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.ui.dialogs.LoadingDialog;
 import org.levimc.launcher.util.Logger;
 
@@ -38,20 +39,21 @@ public class MinecraftLauncher {
     private final ClassLoader classLoader;
     public static final String MC_PACKAGE_NAME = "com.mojang.minecraftpe";
     private static final String LAUNCHER_DEX_NAME = "launcher.dex";
+
     public static String abiToSystemLibDir(String abi) {
         if ("arm64-v8a".equals(abi)) return "arm64";
         if ("armeabi-v7a".equals(abi)) return "arm";
         return abi;
     }
 
-    public ApplicationInfo createFakeApplicationInfo(GameVersion version, String packageName)  {
+    public ApplicationInfo createFakeApplicationInfo(GameVersion version, String packageName) {
         ApplicationInfo fakeInfo = new ApplicationInfo();
         File apkFile = new File(version.versionDir, "base.apk.levi");
         fakeInfo.sourceDir = apkFile.getAbsolutePath();
         fakeInfo.publicSourceDir = fakeInfo.sourceDir;
         String systemAbi = abiToSystemLibDir(Build.SUPPORTED_ABIS[0]);
 
-        File dstLibDir = new File(context.getDataDir(), "minecraft/" + version.uuid + "/lib/"+ systemAbi);
+        File dstLibDir = new File(context.getDataDir(), "minecraft/" + version.uuid + "/lib/" + systemAbi);
 
         fakeInfo.nativeLibraryDir = dstLibDir.getAbsolutePath();
 
@@ -83,8 +85,12 @@ public class MinecraftLauncher {
 
     public void launch(Intent sourceIntent, GameVersion version) {
         try {
-            ((Activity)context).runOnUiThread(this::showLoading);
+            if (version.needsRepair) {
+                ((Activity) context).runOnUiThread(() -> VersionManager.attemptRepairLibs(((Activity) context), version));
+                return;
+            }
 
+            ((Activity) context).runOnUiThread(this::showLoading);
             if (version == null) return;
             ApplicationInfo mcInfo = version.isInstalled ?
                     getApplicationInfo(version.packageName) :
@@ -95,7 +101,7 @@ public class MinecraftLauncher {
             processDexFiles(mcInfo, dexCacheDir, pathList);
             injectNativeLibraries(mcInfo, pathList);
             launchMinecraftActivity(mcInfo, sourceIntent);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -272,7 +278,7 @@ public class MinecraftLauncher {
                 if (context instanceof Activity) {
                     Activity activity = (Activity) context;
                     activity.runOnUiThread(() -> {
-                       // hideLoading();
+                        // hideLoading();
                         activity.finish();
                         context.startActivity(sourceIntent);
                     });

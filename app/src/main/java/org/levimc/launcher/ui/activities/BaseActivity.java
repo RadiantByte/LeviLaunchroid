@@ -1,6 +1,7 @@
 package org.levimc.launcher.ui.activities;
 
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 

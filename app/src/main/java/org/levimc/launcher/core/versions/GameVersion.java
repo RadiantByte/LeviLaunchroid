@@ -13,9 +13,10 @@ public class GameVersion implements Parcelable {
     public File versionDir;
     public boolean isInstalled;
     public String packageName;
+    public boolean needsRepair;
     public final File modsDir;
 
-    public GameVersion(String directoryName,String displayName, String versionCode,String uuid, File versionDir, boolean isOfficial, String packageName) {
+    public GameVersion(String directoryName, String displayName, String versionCode, String uuid, File versionDir, boolean isOfficial, String packageName) {
         this.directoryName = directoryName;
         this.uuid = uuid;
         this.displayName = displayName;
@@ -23,6 +24,7 @@ public class GameVersion implements Parcelable {
         this.versionDir = versionDir;
         this.isInstalled = isOfficial;
         this.packageName = packageName;
+        this.needsRepair = false;
         this.modsDir = versionDir == null ? null : new File(versionDir, "mods");
     }
 
@@ -35,6 +37,7 @@ public class GameVersion implements Parcelable {
         versionDir = versionDirPath == null ? null : new File(versionDirPath);
         isInstalled = in.readByte() != 0;
         packageName = in.readString();
+        needsRepair = in.readByte() != 0;
         String modsDirPath = in.readString();
         modsDir = modsDirPath == null ? null : new File(modsDirPath);
     }
@@ -48,6 +51,7 @@ public class GameVersion implements Parcelable {
         dest.writeString(versionDir == null ? null : versionDir.getAbsolutePath());
         dest.writeByte((byte) (isInstalled ? 1 : 0));
         dest.writeString(packageName);
+        dest.writeByte((byte) (needsRepair ? 1 : 0));
         dest.writeString(modsDir == null ? null : modsDir.getAbsolutePath());
     }
 

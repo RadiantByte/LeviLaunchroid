@@ -6,9 +6,6 @@ import android.net.Uri;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
-
 import org.levimc.launcher.R;
 import org.levimc.launcher.core.minecraft.MinecraftLauncher;
 import org.levimc.launcher.core.versions.GameVersion;
@@ -57,6 +54,7 @@ public class ResourcepackHandler {
                 lowerPath.endsWith(".mcaddon") ||
                 lowerPath.endsWith(".mctemplate");
     }
+
     private void launchMinecraft(Intent intent) {
         launchBtn.setEnabled(false);
         progressLoader.setVisibility(android.view.View.VISIBLE);

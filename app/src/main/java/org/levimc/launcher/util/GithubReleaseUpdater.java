@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.net.Uri;
 import android.os.Build;
 import android.widget.Toast;
@@ -215,8 +214,14 @@ public class GithubReleaseUpdater {
                     activity.runOnUiThread(() ->
                             Toast.makeText(activity, activity.getString(R.string.update_failed, e.getMessage()), Toast.LENGTH_LONG).show());
                 } finally {
-                    try { if (is != null) is.close(); } catch (Exception ignored) {}
-                    try { if (fos != null) fos.close(); } catch (Exception ignored) {}
+                    try {
+                        if (is != null) is.close();
+                    } catch (Exception ignored) {
+                    }
+                    try {
+                        if (fos != null) fos.close();
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         });

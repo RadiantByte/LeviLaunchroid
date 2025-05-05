@@ -9,11 +9,10 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class GIViewWrapper extends GLSurfaceView implements GLSurfaceView.Renderer {
 
-    public GIViewWrapper(Context ctx)
-    {
+    public GIViewWrapper(Context ctx) {
         super(ctx);
         setEGLContextClientVersion(3);
-        setEGLConfigChooser(8,8,8,8,16,0);
+        setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
         setZOrderOnTop(true);
         setRenderer(this);
@@ -31,7 +30,7 @@ public class GIViewWrapper extends GLSurfaceView implements GLSurfaceView.Render
 
     @Override
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
-        NativeMethods.onSurfaceChanged(width,height);
+        NativeMethods.onSurfaceChanged(width, height);
     }
 
     @Override

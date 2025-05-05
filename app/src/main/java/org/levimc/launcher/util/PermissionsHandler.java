@@ -24,6 +24,7 @@ public class PermissionsHandler {
 
     public interface PermissionResultCallback {
         void onPermissionGranted(PermissionType type);
+
         void onPermissionDenied(PermissionType type, boolean permanentlyDenied);
     }
 
@@ -35,7 +36,8 @@ public class PermissionsHandler {
     private Activity activity;
     private PermissionResultCallback callback;
 
-    private PermissionsHandler() {}
+    private PermissionsHandler() {
+    }
 
     public static PermissionsHandler getInstance() {
         if (instance == null) {
@@ -110,7 +112,8 @@ public class PermissionsHandler {
                                 activity.startActivityForResult(intent, REQUEST_STORAGE);
                             })
                             .setNegativeButton(activity.getString(R.string.cancel), (v) -> {
-                                if (callback != null) callback.onPermissionDenied(PermissionType.STORAGE, false);
+                                if (callback != null)
+                                    callback.onPermissionDenied(PermissionType.STORAGE, false);
                             })
                             .show();
                 });
@@ -129,7 +132,8 @@ public class PermissionsHandler {
                     new CustomAlertDialog(activity)
                             .setTitleText(activity.getString(R.string.overlay_permission_message))
                             .setNegativeButton(activity.getString(R.string.cancel), (v) -> {
-                                if (callback != null) callback.onPermissionDenied(PermissionType.OVERLAY, false);
+                                if (callback != null)
+                                    callback.onPermissionDenied(PermissionType.OVERLAY, false);
                             })
                             .setPositiveButton(activity.getString(R.string.grant_permission), (v) -> {
                                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + activity.getPackageName()));
@@ -156,7 +160,8 @@ public class PermissionsHandler {
                                 activity.startActivityForResult(intent, REQUEST_UNKNOWN_APP_SOURCES);
                             })
                             .setNegativeButton(activity.getString(R.string.cancel), (v) -> {
-                                if (callback != null) callback.onPermissionDenied(PermissionType.UNKNOWN_SOURCES, false);
+                                if (callback != null)
+                                    callback.onPermissionDenied(PermissionType.UNKNOWN_SOURCES, false);
                             })
                             .show();
                 });
@@ -178,7 +183,8 @@ public class PermissionsHandler {
                     deniedPermanently = false;
                 }
                 runOnUiThread(() -> {
-                    if (callback != null) callback.onPermissionDenied(PermissionType.STORAGE, deniedPermanently);
+                    if (callback != null)
+                        callback.onPermissionDenied(PermissionType.STORAGE, deniedPermanently);
                 });
             }
         }
@@ -192,7 +198,8 @@ public class PermissionsHandler {
                 });
             } else {
                 runOnUiThread(() -> {
-                    if (callback != null) callback.onPermissionDenied(PermissionType.STORAGE, false);
+                    if (callback != null)
+                        callback.onPermissionDenied(PermissionType.STORAGE, false);
                 });
             }
         } else if (requestCode == REQUEST_OVERLAY) {
@@ -202,17 +209,20 @@ public class PermissionsHandler {
                 });
             } else {
                 runOnUiThread(() -> {
-                    if (callback != null) callback.onPermissionDenied(PermissionType.OVERLAY, false);
+                    if (callback != null)
+                        callback.onPermissionDenied(PermissionType.OVERLAY, false);
                 });
             }
         } else if (requestCode == REQUEST_UNKNOWN_APP_SOURCES) {
             if (hasPermission(PermissionType.UNKNOWN_SOURCES)) {
                 runOnUiThread(() -> {
-                    if (callback != null) callback.onPermissionGranted(PermissionType.UNKNOWN_SOURCES);
+                    if (callback != null)
+                        callback.onPermissionGranted(PermissionType.UNKNOWN_SOURCES);
                 });
             } else {
                 runOnUiThread(() -> {
-                    if (callback != null) callback.onPermissionDenied(PermissionType.UNKNOWN_SOURCES, false);
+                    if (callback != null)
+                        callback.onPermissionDenied(PermissionType.UNKNOWN_SOURCES, false);
                     Toast.makeText(activity, "请允许安装未知来源应用再操作", Toast.LENGTH_LONG).show();
                 });
             }

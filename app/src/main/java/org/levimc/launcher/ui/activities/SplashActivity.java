@@ -12,7 +12,6 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
 
 import org.levimc.launcher.R;
 
@@ -68,7 +67,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void startAppNameAnimation() {
-        AlphaAnimation alphaAnimation = new AlphaAnimation(0f,1f);
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
         alphaAnimation.setDuration(2000);
         alphaAnimation.setFillAfter(true);
         tvAppName.startAnimation(alphaAnimation);

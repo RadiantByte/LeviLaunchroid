@@ -30,6 +30,7 @@ public class GameVersionSelectDialog extends Dialog {
         super(ctx);
         this.bigGroups = bigGroups;
     }
+
     public void setOnVersionSelectListener(OnVersionSelectListener l) {
         this.listener = l;
     }
@@ -40,9 +41,9 @@ public class GameVersionSelectDialog extends Dialog {
         setContentView(R.layout.dialog_game_version_select);
         RecyclerView recyclerView = findViewById(R.id.recycler_versions);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        UltimateVersionAdapter adapter = new UltimateVersionAdapter(getContext() ,bigGroups);
+        UltimateVersionAdapter adapter = new UltimateVersionAdapter(getContext(), bigGroups);
         adapter.setOnVersionSelectListener(v -> {
-            if(listener != null) listener.onVersionSelected(v);
+            if (listener != null) listener.onVersionSelected(v);
             dismiss();
         });
         Window window = getWindow();

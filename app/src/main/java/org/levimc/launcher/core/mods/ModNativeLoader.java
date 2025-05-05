@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
 public class ModNativeLoader {
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public static void loadEnabledSoMods(ModManager modManager, File cacheDir) {

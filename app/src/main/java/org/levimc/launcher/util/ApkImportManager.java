@@ -36,7 +36,8 @@ public class ApkImportManager {
             new CustomAlertDialog(activity)
                     .setTitleText(activity.getString(R.string.illegal_apk_title))
                     .setMessage(activity.getString(R.string.not_mc_apk))
-                    .setPositiveButton(activity.getString(R.string.exit), v -> {})
+                    .setPositiveButton(activity.getString(R.string.exit), v -> {
+                    })
                     .show();
             return;
         }
@@ -51,6 +52,7 @@ public class ApkImportManager {
                             public void onProgress(int progress) {
 
                             }
+
                             @Override
                             public void onSuccess(String versionName) {
                                 activity.runOnUiThread(() -> {
@@ -63,6 +65,7 @@ public class ApkImportManager {
                                     VersionManager.get(activity).loadAllVersions();
                                 });
                             }
+
                             @Override
                             public void onError(String errorMsg) {
                                 activity.runOnUiThread(() -> {
@@ -73,16 +76,19 @@ public class ApkImportManager {
                         });
                         installer.install(apkUri, versionName);
                     }
+
                     @Override
-                    public void onCancelled() {}
+                    public void onCancelled() {
+                    }
                 });
-        dialog.show(((AppCompatActivity)activity).getSupportFragmentManager(), "ApkVersionConfirmDialog");
+        dialog.show(((AppCompatActivity) activity).getSupportFragmentManager(), "ApkVersionConfirmDialog");
     }
 
     void showProgress() {
         //progressDialog.setProgress(0);
         if (!progressDialog.isShowing()) progressDialog.show();
     }
+
     void dismissProgress() {
         if (progressDialog.isShowing()) progressDialog.dismiss();
     }

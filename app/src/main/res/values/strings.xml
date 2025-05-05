@@ -86,6 +86,19 @@
     <string name="version_ignored">This version has been ignored</string>
     <string name="downloading_update">Downloading update…</string>
 
+    <string name="repair_libs_in_progress">Repairing game library files…</string>
+    <string name="repair_completed">Repair Completed</string>
+    <string name="repair_libs_success_message">Game library files have been successfully repaired. You can now launch the game.</string>
+    <string name="repair_failed">Repair Failed</string>
+    <string name="repair_libs_failed_message">Failed to repair game library files. Please check file integrity.</string>
+    <string name="repair_error">Repair Error</string>
+    <string name="repair_libs_error_message">An error occurred during repair: %s</string>
+    <string name="missing_libs_title">Missing game library files - %s</string>
+    <string name="missing_libs_message">Required game library files are missing. Do you want to repair them now?</string>
+    <string name="repair">Repair</string>
+    <string name="repair_libs_dialog_title">Repairing Game Libraries</string>
+    <string name="requires_repair">[Needs Repair]</string>
+    
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

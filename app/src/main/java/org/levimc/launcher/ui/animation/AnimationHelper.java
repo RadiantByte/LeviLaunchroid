@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
+
 import org.levimc.launcher.R;
 import org.levimc.launcher.databinding.ActivityMainBinding;
 
@@ -44,7 +45,7 @@ public class AnimationHelper {
 
     private static void animateGithubIcon(View githubIcon) {
         githubIcon.setAlpha(1f);
-        ObjectAnimator animator = ObjectAnimator.ofFloat(githubIcon, "translationY", -15f,15f);
+        ObjectAnimator animator = ObjectAnimator.ofFloat(githubIcon, "translationY", -15f, 15f);
         animator.setInterpolator(new LinearInterpolator());
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setRepeatMode(ValueAnimator.REVERSE);

@@ -2,6 +2,7 @@ package org.levimc.launcher.util;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+
 import androidx.appcompat.app.AppCompatDelegate;
 
 public class ThemeManager {

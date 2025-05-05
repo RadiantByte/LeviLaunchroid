@@ -8,8 +8,11 @@ import net.dongliu.apk.parser.bean.ApkMeta;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ApkUtils {
     public static String extractMinecraftVersionNameFromUri(Context context, Uri uri) {
@@ -42,5 +45,42 @@ public class ApkUtils {
             }
         }
         return "Error Apk";
+    }
+
+    public static String abiToSystemLibDir(String abi) {
+        if (abi == null) return "unknown";
+        switch (abi) {
+            case "armeabi-v7a":
+                return "arm";
+            case "arm64-v8a":
+                return "arm64";
+            default:
+                return abi;
+        }
+    }
+
+    public static void unzipLibsToSystemAbi(File libBaseDir, ZipInputStream zis) throws IOException {
+        ZipEntry entry;
+        while ((entry = zis.getNextEntry()) != null) {
+            String name = entry.getName();
+            if (name.startsWith("lib/") && !entry.isDirectory()) {
+                String[] parts = name.split("/");
+                if (parts.length < 3) continue;
+                String abi = parts[1];
+                String systemAbi = abiToSystemLibDir(abi);
+                String soName = parts[2];
+                File outFile = new File(libBaseDir, systemAbi + "/" + soName);
+                File parent = outFile.getParentFile();
+                if (!parent.exists()) parent.mkdirs();
+                try (FileOutputStream fos = new FileOutputStream(outFile)) {
+                    byte[] buffer = new byte[8192];
+                    int len;
+                    while ((len = zis.read(buffer)) != -1) {
+                        fos.write(buffer, 0, len);
+                    }
+                }
+            }
+            zis.closeEntry();
+        }
     }
 }
