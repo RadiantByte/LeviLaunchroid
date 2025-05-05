@@ -9,7 +9,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:minWidth="320dp"
+    android:minWidth="480dp"
     android:minHeight="320dp"
     android:background="@drawable/bg_rounded_card">
 

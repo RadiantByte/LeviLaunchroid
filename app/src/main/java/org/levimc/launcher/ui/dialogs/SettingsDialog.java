@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -17,6 +18,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.util.ThemeManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,5 +123,44 @@ public class SettingsDialog extends Dialog {
             action.run();
             return out[0];
         }
+    }
+
+    public void addThemeSelectorItem(ThemeManager themeManager) {
+        String[] themeOptions = {
+                getContext().getString(R.string.theme_follow_system),
+                getContext().getString(R.string.theme_light),
+                getContext().getString(R.string.theme_dark)
+        };
+
+        int currentMode = themeManager.getCurrentMode();
+
+        final Spinner[] spinnerRef = new Spinner[1];
+        Runnable action = () -> {
+            Spinner spinner = addSpinnerItem(
+                    getContext().getString(R.string.theme_title),
+                    themeOptions,
+                    currentMode
+            );
+            if (spinner != null) {
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        themeManager.setThemeMode(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                });
+                spinnerRef[0] = spinner;
+            }
+        };
+
+        if (settingsItemsContainer == null) {
+            itemAddQueue.add(action);
+        } else {
+            action.run();
+        }
+
     }
 }

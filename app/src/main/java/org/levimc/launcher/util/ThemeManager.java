@@ -6,8 +6,12 @@ import android.content.SharedPreferences;
 import androidx.appcompat.app.AppCompatDelegate;
 
 public class ThemeManager {
+    public static final int MODE_FOLLOW_SYSTEM = 0;
+    public static final int MODE_LIGHT = 1;
+    public static final int MODE_DARK = 2;
+
     private static final String THEME_PREFS = "theme_prefs";
-    private static final String DARK_MODE_KEY = "dark_mode";
+    private static final String THEME_MODE_KEY = "theme_mode";
     private final SharedPreferences prefs;
 
     public ThemeManager(Activity activity) {
@@ -15,21 +19,29 @@ public class ThemeManager {
     }
 
     public void applyTheme() {
-        boolean isDark = prefs.getBoolean(DARK_MODE_KEY, false);
-        AppCompatDelegate.setDefaultNightMode(
-                isDark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-        );
+        setThemeMode(prefs.getInt(THEME_MODE_KEY, MODE_FOLLOW_SYSTEM));
     }
 
-    public boolean toggleTheme(boolean isDarkMode) {
-        prefs.edit().putBoolean(DARK_MODE_KEY, isDarkMode).apply();
-        AppCompatDelegate.setDefaultNightMode(
-                isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
-        );
-        return isDarkMode;
+    public void setThemeMode(int mode) {
+        prefs.edit().putInt(THEME_MODE_KEY, mode).apply();
+        updateNightMode();
     }
 
-    public boolean isDarkMode() {
-        return prefs.getBoolean(DARK_MODE_KEY, false);
+    private void updateNightMode() {
+        int mode = prefs.getInt(THEME_MODE_KEY, MODE_FOLLOW_SYSTEM);
+        switch (mode) {
+            case MODE_LIGHT:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case MODE_DARK:
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            default: // MODE_FOLLOW_SYSTEM
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        }
+    }
+
+    public int getCurrentMode() {
+        return prefs.getInt(THEME_MODE_KEY, MODE_FOLLOW_SYSTEM);
     }
 }

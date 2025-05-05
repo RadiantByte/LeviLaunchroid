@@ -37,6 +37,7 @@ import org.levimc.launcher.util.GithubReleaseUpdater;
 import org.levimc.launcher.util.LanguageManager;
 import org.levimc.launcher.util.PermissionsHandler;
 import org.levimc.launcher.util.ResourcepackHandler;
+import org.levimc.launcher.util.ThemeManager;
 import org.levimc.launcher.util.UIHelper;
 
 import java.util.List;
@@ -228,22 +229,29 @@ public class MainActivity extends BaseActivity {
 
     private void showSettingsDialog() throws PackageManager.NameNotFoundException {
         FeatureSettings fs = FeatureSettings.getInstance();
+        ThemeManager themeManager = new ThemeManager(this);
+
         SettingsDialog dlg = new SettingsDialog(this);
-        dlg.addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled(), (btn, check) -> {
-            fs.setDebugLogDialogEnabled(check);
-        });
+        
+        dlg.addThemeSelectorItem(themeManager);
+
+        dlg.addSwitchItem(
+                getString(R.string.enable_debug_log),
+                fs.isDebugLogDialogEnabled(),
+                (btn, check) -> fs.setDebugLogDialogEnabled(check)
+        );
+
         String localVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         dlg.addActionButton(
                 getString(R.string.version_prefix) + localVersion,
                 getString(R.string.check_update),
-                v -> {
-                    new GithubReleaseUpdater(
-                            this,
-                            "LiteLDev",
-                            "LeviLaunchroid"
-                    ).checkUpdate();
-                }
+                v -> new GithubReleaseUpdater(
+                        this,
+                        "LiteLDev",
+                        "LeviLaunchroid"
+                ).checkUpdate()
         );
+
         dlg.show();
     }
 
