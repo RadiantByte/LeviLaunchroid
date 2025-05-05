@@ -104,6 +104,8 @@
     <string name="theme_light">Force Day Mode</string>
     <string name="theme_dark">Force Night Mode</string>
 
+    <string name="error_no_browser">No browser available</string>
+    
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

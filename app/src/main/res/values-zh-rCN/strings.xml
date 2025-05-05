@@ -102,7 +102,8 @@
     <string name="theme_follow_system">跟随系统</string>
     <string name="theme_light">强制白天</string>
     <string name="theme_dark">强制夜间</string>
-    
+
+    <string name="error_no_browser">无法打开浏览器</string>
     <!-- Language Setting -->
     <string name="language">语言</string>
     <string name="english">English</string>

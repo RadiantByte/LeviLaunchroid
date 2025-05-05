@@ -1,8 +1,10 @@
 package org.levimc.launcher.ui.activities;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -225,6 +227,17 @@ public class MainActivity extends BaseActivity {
                 throw new RuntimeException(e);
             }
         });
+        
+        binding.githubIcon.setOnClickListener(v -> {
+            Uri uri = Uri.parse("https://github.com/LiteLDev/LeviLaunchroid");
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            try {
+                v.getContext().startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(v.getContext(), R.string.error_no_browser, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     private void showSettingsDialog() throws PackageManager.NameNotFoundException {
@@ -232,7 +245,7 @@ public class MainActivity extends BaseActivity {
         ThemeManager themeManager = new ThemeManager(this);
 
         SettingsDialog dlg = new SettingsDialog(this);
-        
+
         dlg.addThemeSelectorItem(themeManager);
 
         dlg.addSwitchItem(
