@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -19,8 +20,6 @@ import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 public class PermissionsHandler {
 
     public static final int REQUEST_STORAGE = 1001;
-    public static final int REQUEST_OVERLAY = 1002;
-    public static final int REQUEST_UNKNOWN_APP_SOURCES = 1003;
 
     public interface PermissionResultCallback {
         void onPermissionGranted(PermissionType type);
@@ -34,7 +33,9 @@ public class PermissionsHandler {
 
     private static volatile PermissionsHandler instance;
     private Activity activity;
+    private ActivityResultLauncher<Intent> activityResultLauncher;
     private PermissionResultCallback callback;
+    private PermissionType pendingType = null;
 
     private PermissionsHandler() {
     }
@@ -50,8 +51,9 @@ public class PermissionsHandler {
         return instance;
     }
 
-    public void setActivity(Activity activity) {
+    public void setActivity(Activity activity, ActivityResultLauncher<Intent> resultLauncher) {
         this.activity = activity;
+        this.activityResultLauncher = resultLauncher;
     }
 
     public boolean hasPermission(PermissionType type) {
@@ -68,7 +70,6 @@ public class PermissionsHandler {
                 return Settings.canDrawOverlays(activity);
             case UNKNOWN_SOURCES:
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
                     return activity.getPackageManager().canRequestPackageInstalls();
                 }
                 return true;
@@ -78,6 +79,7 @@ public class PermissionsHandler {
 
     public void requestPermission(PermissionType type, PermissionResultCallback callback) {
         this.callback = callback;
+        this.pendingType = type;
         if (activity == null)
             throw new IllegalStateException("Activity not set. Call setActivity() first.");
         if (hasPermission(type)) {
@@ -109,7 +111,8 @@ public class PermissionsHandler {
                             .setPositiveButton(activity.getString(R.string.grant_permission), (v) -> {
                                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
                                         Uri.parse("package:" + activity.getPackageName()));
-                                activity.startActivityForResult(intent, REQUEST_STORAGE);
+                                if (activityResultLauncher != null)
+                                    activityResultLauncher.launch(intent);
                             })
                             .setNegativeButton(activity.getString(R.string.cancel), (v) -> {
                                 if (callback != null)
@@ -137,7 +140,8 @@ public class PermissionsHandler {
                             })
                             .setPositiveButton(activity.getString(R.string.grant_permission), (v) -> {
                                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + activity.getPackageName()));
-                                activity.startActivityForResult(intent, REQUEST_OVERLAY);
+                                if (activityResultLauncher != null)
+                                    activityResultLauncher.launch(intent);
                             })
                             .show();
                 } else {
@@ -157,7 +161,8 @@ public class PermissionsHandler {
                             .setPositiveButton(activity.getString(R.string.grant_permission), (v) -> {
                                 Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
                                         Uri.parse("package:" + activity.getPackageName()));
-                                activity.startActivityForResult(intent, REQUEST_UNKNOWN_APP_SOURCES);
+                                if (activityResultLauncher != null)
+                                    activityResultLauncher.launch(intent);
                             })
                             .setNegativeButton(activity.getString(R.string.cancel), (v) -> {
                                 if (callback != null)
@@ -169,6 +174,7 @@ public class PermissionsHandler {
         }
     }
 
+    // 只适用于Android 6-10 的运行时权限
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -190,42 +196,25 @@ public class PermissionsHandler {
         }
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_STORAGE) {
-            if (hasPermission(PermissionType.STORAGE)) {
-                runOnUiThread(() -> {
-                    if (callback != null) callback.onPermissionGranted(PermissionType.STORAGE);
-                });
-            } else {
-                runOnUiThread(() -> {
-                    if (callback != null)
-                        callback.onPermissionDenied(PermissionType.STORAGE, false);
-                });
-            }
-        } else if (requestCode == REQUEST_OVERLAY) {
-            if (hasPermission(PermissionType.OVERLAY)) {
-                runOnUiThread(() -> {
-                    if (callback != null) callback.onPermissionGranted(PermissionType.OVERLAY);
-                });
-            } else {
-                runOnUiThread(() -> {
-                    if (callback != null)
-                        callback.onPermissionDenied(PermissionType.OVERLAY, false);
-                });
-            }
-        } else if (requestCode == REQUEST_UNKNOWN_APP_SOURCES) {
-            if (hasPermission(PermissionType.UNKNOWN_SOURCES)) {
-                runOnUiThread(() -> {
-                    if (callback != null)
-                        callback.onPermissionGranted(PermissionType.UNKNOWN_SOURCES);
-                });
-            } else {
-                runOnUiThread(() -> {
-                    if (callback != null)
-                        callback.onPermissionDenied(PermissionType.UNKNOWN_SOURCES, false);
+    // 这是新版 activityResultLauncher 回调的入口，requestCode已由新版管理
+    public void onActivityResult(int resultCode, Intent data) {
+        if (pendingType == null) return;
+        PermissionType type = pendingType;
+        pendingType = null;
+
+        if (hasPermission(type)) {
+            runOnUiThread(() -> {
+                if (callback != null)
+                    callback.onPermissionGranted(type);
+            });
+        } else {
+            runOnUiThread(() -> {
+                if (callback != null)
+                    callback.onPermissionDenied(type, false);
+                if (type == PermissionType.UNKNOWN_SOURCES) {
                     Toast.makeText(activity, "请允许安装未知来源应用再操作", Toast.LENGTH_LONG).show();
-                });
-            }
+                }
+            });
         }
     }
 

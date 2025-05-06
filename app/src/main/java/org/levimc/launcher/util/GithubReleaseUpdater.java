@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.FileProvider;
 
 import org.json.JSONArray;
@@ -34,11 +35,14 @@ public class GithubReleaseUpdater {
     private final String owner;
     private final String repo;
     private final OkHttpClient client = new OkHttpClient();
+    private ActivityResultLauncher<Intent> permissionResultLauncher;
 
-    public GithubReleaseUpdater(Activity activity, String owner, String repo) {
+    public GithubReleaseUpdater(Activity activity, String owner, String repo,
+                                ActivityResultLauncher<Intent> permissionResultLauncher) {
         this.activity = activity;
         this.owner = owner;
         this.repo = repo;
+        this.permissionResultLauncher = permissionResultLauncher;
     }
 
     public static int compareVersion(String a, String b) {
@@ -228,8 +232,9 @@ public class GithubReleaseUpdater {
     }
 
     private void installApk(File apkFile) {
-        PermissionsHandler.getInstance().setActivity(activity);
-        PermissionsHandler.getInstance().requestPermission(PermissionsHandler.PermissionType.UNKNOWN_SOURCES,
+        PermissionsHandler handler = PermissionsHandler.getInstance();
+        handler.setActivity(activity, permissionResultLauncher);
+        handler.requestPermission(PermissionsHandler.PermissionType.UNKNOWN_SOURCES,
                 new PermissionsHandler.PermissionResultCallback() {
                     @Override
                     public void onPermissionGranted(PermissionsHandler.PermissionType type) {

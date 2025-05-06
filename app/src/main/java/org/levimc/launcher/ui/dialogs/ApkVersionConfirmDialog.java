@@ -34,7 +34,6 @@ public class ApkVersionConfirmDialog extends DialogFragment {
     private EditText editVersionName;
     private TextView textError;
     private Button btnInstall;
-
     private String initialVersionName = "";
 
     public ApkVersionConfirmDialog setInitialVersionName(String versionName) {

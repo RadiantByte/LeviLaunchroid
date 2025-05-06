@@ -3,7 +3,11 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id 'org.tboox.gradle-xmake-plugin' version '1.2.2'
 }
-
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+}
 android {
     namespace 'org.levimc.launcher'
     compileSdk 35
@@ -33,7 +37,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug{
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -44,7 +48,7 @@ android {
         targetCompatibility JavaVersion.VERSION_21
     }
     externalNativeBuild {
-        xmake{
+        xmake {
             path "src/main/cpp/leviutils/xmake.lua"
             logLevel "verbose"
             buildMode "release"

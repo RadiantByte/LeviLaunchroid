@@ -15,6 +15,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -61,6 +63,8 @@ public class MainActivity extends BaseActivity {
     private MainViewModel viewModel;
     private VersionManager versionManager;
     private GameVersion currentVersion;
+    private ActivityResultLauncher<Intent> permissionResultLauncher;
+    private ActivityResultLauncher<Intent> apkImportResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +92,25 @@ public class MainActivity extends BaseActivity {
         AnimationHelper.prepareInitialStates(binding);
         AnimationHelper.runInitializationSequence(binding);
 
+        permissionResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (permissionsHandler != null) {
+                        permissionsHandler.onActivityResult(result.getResultCode(), result.getData());
+                    }
+                }
+        );
+
+        apkImportResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (apkImportManager != null)
+                        apkImportManager.handleActivityResult(result.getResultCode(), result.getData());
+                }
+        );
+
         permissionsHandler = PermissionsHandler.getInstance();
-        permissionsHandler.setActivity(this);
+        permissionsHandler.setActivity(this, permissionResultLauncher);
 
         permissionsHandler.requestPermission(PermissionsHandler.PermissionType.STORAGE, new PermissionsHandler.PermissionResultCallback() {
             @Override
@@ -128,12 +149,13 @@ public class MainActivity extends BaseActivity {
 
         handleIncomingFiles();
         initSettings();
-
-        new GithubReleaseUpdater(
+        GithubReleaseUpdater updater = new GithubReleaseUpdater(
                 this,
                 "LiteLDev",
-                "LeviLaunchroid"
-        ).checkUpdateOnLaunch();
+                "LeviLaunchroid",
+                permissionResultLauncher
+        );
+        updater.checkUpdateOnLaunch();
 
         VersionManager.get(this).getCustomVersions().forEach(version -> {
             if (version.needsRepair) {
@@ -147,15 +169,6 @@ public class MainActivity extends BaseActivity {
         if (fs.isDebugLogDialogEnabled()) {
             LogOverlay.getInstance(this).show();
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (permissionsHandler != null)
-            permissionsHandler.onActivityResult(requestCode, resultCode, data);
-        if (apkImportManager != null)
-            apkImportManager.handleActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -214,7 +227,7 @@ public class MainActivity extends BaseActivity {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("application/vnd.android.package-archive");
-            startActivityForResult(intent, 1004);
+            apkImportResultLauncher.launch(intent);
         });
 
         FeatureSettings.init(getApplicationContext());
@@ -257,10 +270,13 @@ public class MainActivity extends BaseActivity {
         dlg.addActionButton(
                 getString(R.string.version_prefix) + localVersion,
                 getString(R.string.check_update),
+
                 v -> new GithubReleaseUpdater(
                         this,
                         "LiteLDev",
-                        "LeviLaunchroid"
+                        "LeviLaunchroid",
+                        permissionResultLauncher
+
                 ).checkUpdate()
         );
 

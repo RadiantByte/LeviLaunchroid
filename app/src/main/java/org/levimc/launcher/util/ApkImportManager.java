@@ -93,12 +93,10 @@ public class ApkImportManager {
         if (progressDialog.isShowing()) progressDialog.dismiss();
     }
 
-    public boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMPORT_APK && resultCode == Activity.RESULT_OK && data != null) {
+    public void handleActivityResult(int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
             handleApkImportResult(data);
-            return true;
         }
-        return false;
     }
 
 }

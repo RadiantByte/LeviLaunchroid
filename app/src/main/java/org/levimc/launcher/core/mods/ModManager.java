@@ -137,7 +137,7 @@ public class ModManager {
 
     private synchronized void initFileObserver() {
         if (modsDir == null) return;
-        modDirObserver = new FileObserver(modsDir.getAbsolutePath(), FileObserver.CREATE | FileObserver.DELETE | FileObserver.MOVED_FROM | FileObserver.MOVED_TO) {
+        modDirObserver = new FileObserver(modsDir, FileObserver.CREATE | FileObserver.DELETE | FileObserver.MOVED_FROM | FileObserver.MOVED_TO) {
             @Override
             public void onEvent(int event, String path) {
                 postModChanged();
