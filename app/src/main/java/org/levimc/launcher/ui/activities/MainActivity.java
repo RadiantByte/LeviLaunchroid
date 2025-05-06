@@ -81,7 +81,6 @@ public class MainActivity extends BaseActivity {
 
         apkImportManager = new ApkImportManager(this, viewModel);
 
-        UIHelper.setTransparentNavigationBar(this);
 
         minecraftLauncher = new MinecraftLauncher(this, getClassLoader());
 
@@ -227,7 +226,7 @@ public class MainActivity extends BaseActivity {
                 throw new RuntimeException(e);
             }
         });
-        
+
         binding.githubIcon.setOnClickListener(v -> {
             Uri uri = Uri.parse("https://github.com/LiteLDev/LeviLaunchroid");
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
