@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.OpenableColumns;
@@ -43,20 +42,12 @@ public class FileHandler {
         this.context = context;
         this.modManager = modManager;
 
-        // Handle case when no version is selected
         GameVersion currentVersion = version.getSelectedVersion();
         if (currentVersion != null && currentVersion.modsDir != null) {
             this.targetPath = currentVersion.modsDir.getAbsolutePath();
         } else {
-            // Default mods directory if no version selected
-            File defaultModsDir = new File(Environment.getExternalStorageDirectory(), "games/org.levimc/mods");
-            this.targetPath = defaultModsDir.getAbsolutePath();
+            this.targetPath = null;
         }
-    }
-
-    public FileHandler setCustomTargetPath(String path) {
-        this.targetPath = path;
-        return this;
     }
 
     public void processIncomingFilesWithConfirmation(Intent intent, FileOperationCallback callback) {
@@ -86,6 +77,9 @@ public class FileHandler {
                 String fileName = resolveFileName(uri);
                 if (fileName == null || !fileName.endsWith(".so")) continue;
 
+                if (targetPath == null) {
+                    return;
+                }
                 File targetDir = new File(targetPath);
                 if (!createDirectoryIfNeeded(targetDir)) continue;
 

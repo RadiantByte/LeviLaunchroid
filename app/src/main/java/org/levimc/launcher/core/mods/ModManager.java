@@ -1,6 +1,5 @@
 package org.levimc.launcher.core.mods;
 
-import android.os.Environment;
 import android.os.FileObserver;
 
 import androidx.lifecycle.MutableLiveData;
@@ -30,12 +29,16 @@ public class ModManager {
     private final Gson gson = new Gson();
 
     private ModManager() {
-        modsDir = currentVersion != null ? currentVersion.modsDir :
-                new File(Environment.getExternalStorageDirectory(), "games/org.levimc/mods");
-        configFile = new File(modsDir, "mods_config.json");
-        if (!modsDir.exists()) modsDir.mkdirs();
-        loadConfig();
-        initFileObserver();
+        if (currentVersion != null && currentVersion.modsDir != null) {
+            modsDir = currentVersion.modsDir;
+            configFile = new File(modsDir, "mods_config.json");
+            if (!modsDir.exists()) modsDir.mkdirs();
+            loadConfig();
+            initFileObserver();
+        } else {
+            modsDir = null;
+            configFile = null;
+        }
     }
 
     public static synchronized ModManager getInstance() {

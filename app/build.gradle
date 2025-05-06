@@ -3,11 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id 'org.tboox.gradle-xmake-plugin' version '1.2.2'
 }
-allprojects {
-    tasks.withType(JavaCompile) {
-        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-    }
-}
+
 android {
     namespace 'org.levimc.launcher'
     compileSdk 35
