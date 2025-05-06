@@ -105,7 +105,12 @@
     <string name="theme_dark">Force Night Mode</string>
 
     <string name="error_no_browser">No browser available</string>
-    
+
+    <string name="eula_title">LeviLauncher License Agreement</string>
+    <string name="eula_message"><b>Welcome to LeviLauncher</b>\n\nBy using this software you agree to:\n\n• This is an <b>unofficial</b> Minecraft launcher\n• You must own a <b>licensed</b> copy of Minecraft\n• Any form of piracy or cheating is prohibited\n• Mods/resource packs are used at your own risk\n• Not affiliated with Mojang/Microsoft\n\nContinued use constitutes agreement</string>
+    <string name="eula_agree">Accept</string>
+    <string name="eula_exit">Decline</string>
+
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

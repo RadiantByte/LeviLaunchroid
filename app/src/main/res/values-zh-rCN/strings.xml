@@ -104,6 +104,12 @@
     <string name="theme_dark">强制夜间</string>
 
     <string name="error_no_browser">无法打开浏览器</string>
+
+    <string name="eula_title">LeviLauncher 用户协议</string>
+    <string name="eula_message"><b>欢迎使用 LeviLauncher</b>\n\n使用本软件即表示您同意：\n\n• 此为<b>非官方</b> Minecraft 启动器\n• 您需拥有<b>合法授权</b>的 Minecraft 副本\n• 禁止任何形式的盗版或作弊行为\n• 模组/资源包使用风险自负\n• 与 Mojang/Microsoft 无关联\n\n继续使用视为接受条款</string>
+    <string name="eula_agree">接受</string>
+    <string name="eula_exit">拒绝</string>
+
     <!-- Language Setting -->
     <string name="language">语言</string>
     <string name="english">English</string>

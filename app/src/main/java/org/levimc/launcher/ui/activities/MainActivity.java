@@ -3,6 +3,7 @@ package org.levimc.launcher.ui.activities;
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import org.levimc.launcher.databinding.ActivityMainBinding;
 import org.levimc.launcher.service.LogOverlay;
 import org.levimc.launcher.settings.FeatureSettings;
 import org.levimc.launcher.ui.animation.AnimationHelper;
+import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.dialogs.GameVersionSelectDialog;
 import org.levimc.launcher.ui.dialogs.SettingsDialog;
 import org.levimc.launcher.ui.dialogs.gameversionselect.BigGroup;
@@ -162,6 +164,12 @@ public class MainActivity extends BaseActivity {
                 VersionManager.attemptRepairLibs(this, version);
             }
         });
+
+        SharedPreferences prefs = getSharedPreferences("LauncherPrefs", MODE_PRIVATE);
+        boolean eulaAccepted = prefs.getBoolean("eula_accepted", false);
+        if (!eulaAccepted) {
+            showEulaDialog();
+        }
     }
 
     private void initSettings() {
@@ -177,6 +185,23 @@ public class MainActivity extends BaseActivity {
         if (permissionsHandler != null) {
             permissionsHandler.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    private void showEulaDialog() {
+        CustomAlertDialog dia = new CustomAlertDialog(this)
+                .setTitleText(getString(R.string.eula_title))
+                .setMessage(getString(R.string.eula_message))
+                .setPositiveButton(getString(R.string.eula_agree), v -> {
+                    getSharedPreferences("LauncherPrefs", MODE_PRIVATE)
+                            .edit()
+                            .putBoolean("eula_accepted", true)
+                            .apply();
+                })
+                .setNegativeButton(getString(R.string.eula_exit), v -> {
+                    finishAffinity();
+                });
+        dia.setCancelable(false);
+        dia.show();
     }
 
     @SuppressLint({"ClickableViewAccessibility", "UnsafeIntentLaunch"})
@@ -276,7 +301,6 @@ public class MainActivity extends BaseActivity {
                         "LiteLDev",
                         "LeviLaunchroid",
                         permissionResultLauncher
-
                 ).checkUpdate()
         );
 
