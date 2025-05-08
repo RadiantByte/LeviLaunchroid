@@ -115,7 +115,7 @@ struct LogWindow::Impl {
         if (filter.IsActive() && !filter.PassFilter(lineStart, lineEnd))
           continue;
         ImGui::PushTextWrapPos(0.0f);
-        textAnsiUnformatted({lineStart, lineEnd});
+        textAnsiUnformatted(std::string_view(lineStart, lineEnd - lineStart));
         ImGui::PopTextWrapPos();
       }
     }

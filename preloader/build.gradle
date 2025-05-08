@@ -21,7 +21,7 @@ android {
             abiFilters "arm64-v8a"
         }
         externalNativeBuild {
-            xmake{
+            xmake {
                 path "src/main/cpp/preloader/xmake.lua"
                 logLevel "verbose"
                 buildMode "release"
@@ -41,7 +41,7 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
 
-    ndkVersion "27.0.12077973"
+    ndkVersion "25.2.9519653"
 }
 
 dependencies {
