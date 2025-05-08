@@ -48,7 +48,7 @@ jobs:
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r27
+          ndk-version: r25c
           link-to-sdk: true
 
       - name: Grant Execute Permission to gradlew
