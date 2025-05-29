@@ -113,6 +113,8 @@
     <string name="eula_agree">接受</string>
     <string name="eula_exit">拒绝</string>
 
+    <string name="allow_unknown_sources">请允许安装未知来源应用再操作</string>
+    
     <!-- Language Setting -->
     <string name="language">语言</string>
     <string name="english">English</string>

@@ -174,7 +174,6 @@ public class PermissionsHandler {
         }
     }
 
-    // 只适用于Android 6-10 的运行时权限
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == REQUEST_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -196,7 +195,6 @@ public class PermissionsHandler {
         }
     }
 
-    // 这是新版 activityResultLauncher 回调的入口，requestCode已由新版管理
     public void onActivityResult(int resultCode, Intent data) {
         if (pendingType == null) return;
         PermissionType type = pendingType;
@@ -212,7 +210,7 @@ public class PermissionsHandler {
                 if (callback != null)
                     callback.onPermissionDenied(type, false);
                 if (type == PermissionType.UNKNOWN_SOURCES) {
-                    Toast.makeText(activity, "请允许安装未知来源应用再操作", Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity, activity.getString(R.string.allow_unknown_sources), Toast.LENGTH_LONG).show();
                 }
             });
         }

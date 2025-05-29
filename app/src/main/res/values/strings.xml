@@ -114,6 +114,8 @@
     <string name="eula_agree">Accept</string>
     <string name="eula_exit">Decline</string>
 
+    <string name="allow_unknown_sources">Please allow installation from unknown sources before proceeding</string>
+    
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>
