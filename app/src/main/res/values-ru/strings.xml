@@ -123,7 +123,8 @@
     <string name="toast_delete_success">Успешно удалено</string>
     <string name="toast_delete_failed">Ошибка удаления: %1$s</string>
     <string name="error_delete_builtin_version">Нельзя удалить встроенную версию</string>
-
+    <string name="invalid_mod_file">Вы выбрали недопустимый мод-файл!</string>
+    
     <!-- Настройки языка -->
     <string name="language">Язык</string>
     <string name="english">English</string>

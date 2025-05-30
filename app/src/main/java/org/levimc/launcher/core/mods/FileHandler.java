@@ -50,22 +50,36 @@ public class FileHandler {
         }
     }
 
-    public void processIncomingFilesWithConfirmation(Intent intent, FileOperationCallback callback) {
+    public void processIncomingFilesWithConfirmation(Intent intent, FileOperationCallback callback, boolean isButtonClick) {
         List<Uri> fileUris = extractFileUris(intent);
-        if (fileUris.isEmpty()) {
+
+        List<Uri> soUris = new ArrayList<>();
+        for (Uri uri : fileUris) {
+            String fileName = resolveFileName(uri);
+            if (fileName != null && fileName.endsWith(".so")) {
+                soUris.add(uri);
+            }
+        }
+
+        if (soUris.isEmpty()) {
+            if (isButtonClick) {
+                new CustomAlertDialog(context)
+                        .setTitleText(context.getString(R.string.invalid_mod_file))
+                        .setPositiveButton((context.getString(R.string.confirm)), (d) -> handleFilesWithOverwriteCheck(soUris, callback))
+                        .show();
+            }
             return;
         }
 
         new CustomAlertDialog(context)
-                .setTitleText(context.getString(R.string.overwrite_file_title))
-                .setMessage(context.getString(R.string.import_confirmation_message, fileUris.size()))
-                .setPositiveButton((context.getString(R.string.confirm)), (d) -> handleFilesWithOverwriteCheck(fileUris, callback))
+                .setTitleText(context.getString(R.string.import_confirmation_title))
+                .setMessage(context.getString(R.string.import_confirmation_message, soUris.size()))
+                .setPositiveButton((context.getString(R.string.confirm)), (d) -> handleFilesWithOverwriteCheck(soUris, callback))
                 .setNegativeButton(context.getString(R.string.cancel), (d) -> {
                     if (callback != null)
                         callback.onError(context.getString(R.string.user_cancelled));
                 })
                 .show();
-
     }
 
     private void handleFilesWithOverwriteCheck(List<Uri> fileUris, FileOperationCallback callback) {

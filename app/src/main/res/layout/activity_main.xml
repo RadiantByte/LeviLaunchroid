@@ -11,7 +11,6 @@
     android:paddingEnd="15dp"
     android:paddingTop="0dp"
     android:paddingBottom="24dp">
-
     <LinearLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -20,12 +19,10 @@
         android:gravity="center_vertical"
         android:paddingStart="15dp"
         android:paddingEnd="15dp">
-
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_leaf_logo" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,12 +32,10 @@
             android:textColor="#8BC34A"
             android:textSize="24sp"
             android:textStyle="bold" />
-
         <Space
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1" />
-
         <ImageButton
             android:id="@+id/settings_button"
             android:layout_width="25dp"
@@ -50,7 +45,6 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_settings"
             app:tint="@color/on_surface" />
-
         <ImageButton
             android:id="@+id/language_button"
             android:layout_width="25dp"
@@ -61,15 +55,12 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_internet"
             app:tint="@color/on_surface" />
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginHorizontal="5dp">
-        </LinearLayout>
+            android:layout_marginHorizontal="5dp"></LinearLayout>
     </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -77,7 +68,6 @@
         android:orientation="vertical"
         android:paddingTop="15dp"
         android:paddingBottom="0dp">
-
         <LinearLayout
             android:id="@+id/main_card"
             android:layout_width="match_parent"
@@ -86,15 +76,12 @@
             android:orientation="vertical"
             android:padding="15dp"
             android:paddingEnd="16dp">
-
-            <!-- 顶部横排 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingEnd="8dp">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -103,7 +90,6 @@
                     android:textColor="@color/on_surface"
                     android:textSize="32sp"
                     android:textStyle="bold" />
-
                 <Button
                     android:id="@+id/import_apk_button"
                     android:layout_width="wrap_content"
@@ -117,12 +103,10 @@
                     android:textSize="18sp"
                     android:gravity="center"
                     android:layout_gravity="center_vertical" />
-
                 <Space
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:layout_weight="1" />
-
                 <ImageButton
                     android:id="@+id/delete_version_button"
                     android:layout_width="36dp"
@@ -133,9 +117,7 @@
                     android:src="@drawable/ic_delete"
                     android:tint="@color/error"
                     android:visibility="visible" />
-
             </LinearLayout>
-
             <!-- 版本选择 & 启动按钮 -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -144,7 +126,6 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingEnd="8dp">
-
                 <TextView
                     android:id="@+id/text_minecraft_version"
                     android:layout_width="0dp"
@@ -158,7 +139,6 @@
                     android:lineHeight="24dp"
                     android:includeFontPadding="false"
                     android:fontFamily="@font/misans" />
-
                 <ImageButton
                     android:id="@+id/select_version_button"
                     android:layout_width="36dp"
@@ -167,7 +147,6 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_arrow_down"
                     android:tint="@color/on_surface" />
-
                 <ProgressBar
                     android:id="@+id/progress_loader"
                     style="?android:attr/progressBarStyleSmall"
@@ -175,7 +154,6 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:visibility="gone" />
-
                 <Button
                     android:id="@+id/launch_button"
                     android:layout_width="wrap_content"
@@ -191,7 +169,6 @@
                     android:textColor="@color/on_primary" />
             </LinearLayout>
         </LinearLayout>
-
         <!-- 下方卡片区 -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -201,7 +178,6 @@
             android:orientation="horizontal"
             android:weightSum="2"
             android:paddingEnd="8dp">
-
             <!-- mods 卡片 -->
             <LinearLayout
                 android:id="@+id/mod_card"
@@ -212,17 +188,32 @@
                 android:background="@drawable/card_background"
                 android:orientation="vertical"
                 android:paddingEnd="8dp">
-
-                <TextView
-                    android:id="@+id/mods_title_text"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/mods_title"
-                    android:fontFamily="@font/misans"
-                    android:textColor="@color/on_surface"
-                    android:textSize="16sp"
-                    android:padding="6dp" />
-
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:id="@+id/mods_title_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mods_title"
+                        android:fontFamily="@font/misans"
+                        android:textColor="@color/on_surface"
+                        android:textSize="16sp"
+                        android:padding="6dp" />
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+                    <ImageButton
+                        android:id="@+id/add_mod_button"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_add" />
+                </LinearLayout>
                 <ScrollView
                     android:id="@+id/mod_header"
                     android:layout_width="match_parent"
@@ -236,7 +227,6 @@
                         android:orientation="vertical"
                         android:padding="8dp"
                         android:paddingTop="0dp">
-
                         <TextView
                             android:id="@+id/no_mods_text"
                             android:layout_width="match_parent"
@@ -248,8 +238,6 @@
                     </LinearLayout>
                 </ScrollView>
             </LinearLayout>
-
-            <!-- about 卡片 -->
             <LinearLayout
                 android:id="@+id/about_card"
                 android:layout_width="0dp"
@@ -260,7 +248,6 @@
                 android:orientation="vertical"
                 android:padding="15dp"
                 android:paddingEnd="8dp">
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -269,24 +256,20 @@
                     android:textColor="@color/on_surface"
                     android:textSize="15sp"
                     android:textStyle="bold" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:orientation="vertical">
-
                     <ImageView
                         android:id="@+id/github_icon"
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:src="@drawable/ic_github"
                         app:tint="@color/on_surface" />
-
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
 </LinearLayout>

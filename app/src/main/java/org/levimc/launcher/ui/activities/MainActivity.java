@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.levimc.launcher.R;
@@ -66,6 +65,7 @@ public class MainActivity extends BaseActivity {
     private VersionManager versionManager;
     private ActivityResultLauncher<Intent> permissionResultLauncher;
     private ActivityResultLauncher<Intent> apkImportResultLauncher;
+    private ActivityResultLauncher<Intent> soImportResultLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +106,30 @@ public class MainActivity extends BaseActivity {
                 result -> {
                     if (apkImportManager != null)
                         apkImportManager.handleActivityResult(result.getResultCode(), result.getData());
+                }
+        );
+
+        soImportResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        fileHandler.processIncomingFilesWithConfirmation(result.getData(), new FileHandler.FileOperationCallback() {
+                            @Override
+                            public void onSuccess(int processedFiles) {
+                                UIHelper.showToast(MainActivity.this, getString(R.string.files_processed, processedFiles));
+                            }
+
+                            @Override
+                            public void onError(String errorMessage) {
+                            }
+
+                            @Override
+                            public void onProgressUpdate(int progress) {
+                                if (binding != null) binding.progressLoader.setProgress(progress);
+                            }
+                        }, true);
+                    }
                 }
         );
 
@@ -272,6 +296,13 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        binding.addModButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+            soImportResultLauncher.launch(intent);
+        });
+
         binding.deleteVersionButton.setOnClickListener(v -> {
             new CustomAlertDialog(this)
                     .setTitleText(getString(R.string.dialog_title_delete_version))
@@ -350,19 +381,13 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onError(String errorMessage) {
-                if (TextUtils.isEmpty(errorMessage)) return;
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.error)
-                        .setMessage(errorMessage)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
             }
 
             @Override
             public void onProgressUpdate(int progress) {
                 if (binding != null) binding.progressLoader.setProgress(progress);
             }
-        });
+        }, false);
     }
 
     private void updateModsUI(List<Mod> mods) {
