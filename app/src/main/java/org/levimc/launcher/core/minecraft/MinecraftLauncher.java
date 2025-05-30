@@ -53,7 +53,7 @@ public class MinecraftLauncher {
         fakeInfo.publicSourceDir = fakeInfo.sourceDir;
         String systemAbi = abiToSystemLibDir(Build.SUPPORTED_ABIS[0]);
 
-        File dstLibDir = new File(context.getDataDir(), "minecraft/" + version.uuid + "/lib/" + systemAbi);
+        File dstLibDir = new File(context.getDataDir(), "minecraft/" + version.directoryName + "/lib/" + systemAbi);
 
         fakeInfo.nativeLibraryDir = dstLibDir.getAbsolutePath();
 

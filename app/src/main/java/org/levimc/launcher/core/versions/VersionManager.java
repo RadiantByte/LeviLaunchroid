@@ -7,7 +7,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 
-import org.json.JSONObject;
+import androidx.annotation.NonNull;
+
 import org.levimc.launcher.R;
 import org.levimc.launcher.ui.activities.MainActivity;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
@@ -21,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -65,76 +65,96 @@ public class VersionManager {
                 || packageName.startsWith("com.mojang.");
     }
 
-    private boolean ensureLibsExist(File versionDir, String uuid, LibsRepairCallback callback) {
-        File libDir = new File(context.getDataDir(), "minecraft/" + uuid + "/lib");
-        File so1 = new File(libDir, "arm64/libminecraftpe.so");
-        File so2 = new File(libDir, "arm/libminecraftpe.so");
-        boolean exists = so1.exists() || so2.exists();
-
-        if (exists) return true;
-
-        File apkFile = new File(versionDir, "base.apk.levi");
-        if (!apkFile.exists()) return false;
-
-        return false;
-    }
-
-    public void repairLibsAsync(File versionDir, String uuid, LibsRepairCallback callback) {
+    public void repairLibsAsync(File versionDir, boolean onlyVersionTxt, LibsRepairCallback callback) {
         new Thread(() -> {
+            String dirName = versionDir.getName();
+            File libDir = new File(context.getDataDir(), "minecraft/" + dirName + "/lib");
+            File apkFile = new File(versionDir, "base.apk.levi");
             try {
                 callback.onRepairStarted();
 
-                File libDir = new File(context.getDataDir(), "minecraft/" + uuid + "/lib");
-                File apkFile = new File(versionDir, "base.apk.levi");
+                // ==== onlyVersionTxt 只修txt ====
+                if (onlyVersionTxt) {
+                    // 直接读取versionName并写入version.txt
+                    String versionName = "unknown";
+                    try (net.dongliu.apk.parser.ApkFile apk = new net.dongliu.apk.parser.ApkFile(apkFile)) {
+                        net.dongliu.apk.parser.bean.ApkMeta meta = apk.getApkMeta();
+                        if (meta.getVersionName() != null) {
+                            versionName = meta.getVersionName();
+                        }
+                    } catch (Exception ignore) {
+                    }
+                    if (versionName == null || versionName.isEmpty()) versionName = "unknown";
+                    File versionTxt = new File(context.getDataDir(), "minecraft/" + dirName + "/version.txt");
+                    try (FileOutputStream out = new FileOutputStream(versionTxt, false)) {
+                        out.write(versionName.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    } catch (Exception ignore) {
+                    }
 
+                    callback.onRepairCompleted(true);
+                    return;
+                }
+                // ==== 否则，正常修lib并修txt ====
+
+                long totalSize = 0;
                 try (InputStream is = new FileInputStream(apkFile);
                      ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is))) {
-
                     ZipEntry entry;
-                    long totalSize = 0;
-                    long processedSize = 0;
-
                     while ((entry = zis.getNextEntry()) != null) {
                         if (entry.getName().startsWith("lib/") && !entry.isDirectory()) {
                             totalSize += entry.getSize();
                         }
                         zis.closeEntry();
                     }
+                }
 
-                    zis.close();
-                    is.close();
-                    try (InputStream is2 = new FileInputStream(apkFile);
-                         ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(is2))) {
+                long processedSize = 0;
+                try (InputStream is = new FileInputStream(apkFile);
+                     ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is))) {
+                    ZipEntry entry;
+                    while ((entry = zis.getNextEntry()) != null) {
+                        if (entry.getName().startsWith("lib/") && !entry.isDirectory()) {
+                            String[] parts = entry.getName().split("/");
+                            if (parts.length < 3) continue;
+                            String abi = parts[1];
+                            String systemAbi = ApkUtils.abiToSystemLibDir(abi);
+                            String soName = parts[2];
+                            File outFile = new File(libDir, systemAbi + "/" + soName);
+                            File parent = outFile.getParentFile();
+                            if (!parent.exists()) parent.mkdirs();
 
-                        while ((entry = zis2.getNextEntry()) != null) {
-                            if (entry.getName().startsWith("lib/") && !entry.isDirectory()) {
-                                String[] parts = entry.getName().split("/");
-                                if (parts.length < 3) continue;
-
-                                String abi = parts[1];
-                                String systemAbi = ApkUtils.abiToSystemLibDir(abi);
-                                String soName = parts[2];
-                                File outFile = new File(libDir, systemAbi + "/" + soName);
-                                File parent = outFile.getParentFile();
-                                if (!parent.exists()) parent.mkdirs();
-
-                                try (FileOutputStream fos = new FileOutputStream(outFile)) {
-                                    byte[] buffer = new byte[8192];
-                                    int len;
-                                    while ((len = zis2.read(buffer)) != -1) {
-                                        fos.write(buffer, 0, len);
-                                        processedSize += len;
-                                        int progress = (int) ((processedSize * 100) / totalSize);
-                                        callback.onRepairProgress(progress);
-                                    }
+                            try (FileOutputStream fos = new FileOutputStream(outFile)) {
+                                byte[] buffer = new byte[8192];
+                                int len;
+                                while ((len = zis.read(buffer)) != -1) {
+                                    fos.write(buffer, 0, len);
+                                    processedSize += len;
+                                    int progress = totalSize > 0 ? (int) ((processedSize * 100) / totalSize) : 0;
+                                    callback.onRepairProgress(progress);
                                 }
                             }
-                            zis2.closeEntry();
                         }
+                        zis.closeEntry();
                     }
-
-                    callback.onRepairCompleted(true);
                 }
+
+                // 修复version.txt
+                String versionName = "unknown";
+                try (net.dongliu.apk.parser.ApkFile apk = new net.dongliu.apk.parser.ApkFile(apkFile)) {
+                    net.dongliu.apk.parser.bean.ApkMeta meta = apk.getApkMeta();
+                    if (meta.getVersionName() != null) {
+                        versionName = meta.getVersionName();
+                    }
+                } catch (Exception ignore) {
+                }
+                if (versionName == null || versionName.isEmpty()) versionName = "unknown";
+                File versionTxt = new File(context.getDataDir(), "minecraft/" + dirName + "/version.txt");
+                try (FileOutputStream out = new FileOutputStream(versionTxt, false)) {
+                    out.write(versionName.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                } catch (Exception ignore) {
+                }
+
+                callback.onRepairCompleted(true);
             } catch (Exception e) {
                 callback.onRepairFailed(e);
             }
@@ -158,7 +178,6 @@ public class VersionManager {
                         "",
                         pi.applicationInfo.loadLabel(pm) + " (" + pi.versionName + ")",
                         pi.versionName,
-                        "",
                         versionDir,
                         true,
                         pi.packageName
@@ -171,51 +190,65 @@ public class VersionManager {
         File[] dirs = baseDir.listFiles(File::isDirectory);
         if (dirs != null) {
             for (File dir : dirs) {
-                File vj = new File(dir, "version.json");
-                if (vj.exists()) {
-                    boolean exists = false;
-                    for (GameVersion g : installedVersions) {
-                        if (g.versionDir.getAbsolutePath().equals(dir.getAbsolutePath())) {
-                            exists = true;
-                            break;
+                File apk = new File(dir, "base.apk.levi");
+                if (apk.exists()) {
+                    File libDir = new File(context.getDataDir(), "minecraft/" + dir.getName() + "/lib");
+                    File so1 = new File(libDir, "arm64/libminecraftpe.so");
+                    File so2 = new File(libDir, "arm/libminecraftpe.so");
+                    boolean libOk = so1.exists() || so2.exists();
+
+                    File versionTxt = new File(context.getDataDir(), "minecraft/" + dir.getName() + "/version.txt");
+                    boolean txtOk = versionTxt.exists() && versionTxt.length() > 0;
+
+                    GameVersion gv = getGameVersion(dir);
+
+                    gv.needsRepair = false;
+                    gv.onlyVersionTxt = false;
+
+                    if (!libOk) {
+                        gv.needsRepair = true;
+                        if (!gv.displayName.endsWith(" ❌")) {
+                            gv.displayName += " ❌";
+                        }
+                    } else if (!txtOk) {
+                        gv.needsRepair = true;
+                        gv.onlyVersionTxt = true;
+                        if (!gv.displayName.endsWith(" ❌")) {
+                            gv.displayName += " ❌";
                         }
                     }
-                    if (exists) continue;
-                    try (FileInputStream fi = new FileInputStream(vj); Scanner sc = new Scanner(fi).useDelimiter("\\A")) {
-                        String json = sc.hasNext() ? sc.next() : "";
-                        JSONObject obj = new JSONObject(json);
-                        String versionName = obj.optString("versionName", dir.getName());
-                        String versionCode = obj.optString("version", "");
-                        String uuid = obj.optString("uuid", "");
 
-                        File libDir = new File(context.getDataDir(), "minecraft/" + uuid + "/lib");
-                        File so1 = new File(libDir, "arm64/libminecraftpe.so");
-                        File so2 = new File(libDir, "arm/libminecraftpe.so");
-                        boolean libOk = so1.exists() || so2.exists();
-
-                        if (libOk) {
-                            GameVersion gv = new GameVersion(dir.getName(), versionName + " (" + versionCode + ")", versionCode, uuid, dir, false, null);
-                            customVersions.add(gv);
-                        } else {
-                            GameVersion gv = new GameVersion(
-                                    dir.getName(),
-                                    versionName + " (" + versionCode + ") ❌",
-                                    versionCode,
-                                    uuid,
-                                    dir,
-                                    false,
-                                    null
-                            );
-                            gv.needsRepair = true;
-                            customVersions.add(gv);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    customVersions.add(gv);
                 }
             }
         }
         restoreSelectedVersion();
+    }
+
+    @NonNull
+    private GameVersion getGameVersion(File dir) {
+        String versionCode = dir.getName();
+        File versionTxt = new File(context.getDataDir(), "minecraft/" + dir.getName() + "/version.txt");
+        if (versionTxt.exists()) {
+            try (FileInputStream in = new FileInputStream(versionTxt)) {
+                byte[] data = new byte[(int) versionTxt.length()];
+                in.read(data);
+                versionCode = new String(data, "UTF-8").trim();
+            } catch (Exception e) {
+            }
+        }
+
+        String displayName = dir.getName() + " (" + versionCode + ")";
+
+        GameVersion gv = new GameVersion(
+                dir.getName(),     // directoryName
+                displayName,       // displayName
+                versionCode,       // versionCode
+                dir,               // versionDir
+                false,             // isInstalled
+                null               // packageName
+        );
+        return gv;
     }
 
     private void restoreSelectedVersion() {
@@ -252,7 +285,6 @@ public class VersionManager {
     public GameVersion getSelectedVersion() {
         if (selectedVersion != null) return selectedVersion;
 
-        // Try to find a valid version
         if (!installedVersions.isEmpty()) {
             selectVersion(installedVersions.get(0));
             return installedVersions.get(0);
@@ -262,7 +294,7 @@ public class VersionManager {
             return customVersions.get(0);
         }
 
-        return null; // No versions available
+        return null;
     }
 
     public void selectVersion(GameVersion version) {
@@ -341,7 +373,7 @@ public class VersionManager {
                 .setMessage(activity.getString(R.string.missing_libs_message))
                 .setPositiveButton(activity.getString(R.string.repair), v -> {
                     repairDialog.show();
-                    VersionManager.get(activity).repairLibsAsync(version.versionDir, version.uuid, callback);
+                    VersionManager.get(activity).repairLibsAsync(version.versionDir, version.onlyVersionTxt, callback);
                 })
                 .setNegativeButton(activity.getString(R.string.cancel), null)
                 .show();

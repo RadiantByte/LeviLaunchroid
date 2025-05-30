@@ -11,8 +11,6 @@ import android.provider.OpenableColumns;
 import net.dongliu.apk.parser.ApkFile;
 import net.dongliu.apk.parser.bean.ApkMeta;
 
-import org.json.JSONObject;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -51,11 +48,11 @@ public class ApkInstaller {
     public void install(final Uri apkOrApksUri, final String dirName) {
         executor.submit(() -> {
             try {
-                String uuid = UUID.randomUUID().toString();
                 String versionName = extractVersionName(apkOrApksUri);
-                File libTargetDir = new File(context.getDataDir(), "minecraft/" + uuid + "/lib");
+                File libTargetDir = new File(context.getDataDir(), "minecraft/" + dirName + "/lib");
                 File baseDir = new File(Environment.getExternalStorageDirectory(), "games/org.levimc/minecraft/" + dirName);
                 if (!baseDir.exists() && !baseDir.mkdirs()) {
+                    postError("open base dir failed");
                     return;
                 }
                 String fileName = getFileName(apkOrApksUri);
@@ -103,7 +100,7 @@ public class ApkInstaller {
                         }
                     }
                     if (!foundApk) {
-                        postError("apks no apk");
+                        postError("no apk file");
                         return;
                     }
                 } else {
@@ -125,18 +122,17 @@ public class ApkInstaller {
                         ApkUtils.unzipLibsToSystemAbi(libTargetDir, zis2);
                     }
                 }
-
-                JSONObject json = new JSONObject();
-                json.put("name", dirName);
-                json.put("uuid", uuid);
-                json.put("version", versionName);
-
-                File versionJson = new File(baseDir, "version.json");
-                try (FileWriter writer = new FileWriter(versionJson)) {
-                    writer.write(json.toString(4));
+                File internalVersionTxt = new File(
+                        new File(context.getDataDir(), "minecraft/" + dirName), "version.txt"
+                );
+                try (FileWriter writer = new FileWriter(internalVersionTxt, false)) {
+                    writer.write(versionName);
                 }
+
                 postSuccess(versionName);
+
             } catch (Exception e) {
+                postError("install error: " + e.getMessage());
             }
         });
     }

@@ -117,7 +117,11 @@ public class UltimateVersionAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         public void bind(GameVersion v, OnVersionSelectListener listener) {
             StringBuilder sb = new StringBuilder();
-            sb.append(v.displayName).append(" [").append(v.versionCode).append("]");
+            if (v.directoryName.isEmpty()) {
+                sb.append(v.displayName).append(" [").append(v.versionCode).append("]");
+            } else {
+                sb.append(v.directoryName).append(" [").append(v.versionCode).append("]");
+            }
             if (v.isInstalled && v.packageName != null) {
                 sb.append(" ").append(v.packageName);
             }
