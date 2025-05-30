@@ -64,7 +64,6 @@ public class MainActivity extends BaseActivity {
     private ApkImportManager apkImportManager;
     private MainViewModel viewModel;
     private VersionManager versionManager;
-    private GameVersion currentVersion;
     private ActivityResultLauncher<Intent> permissionResultLauncher;
     private ActivityResultLauncher<Intent> apkImportResultLauncher;
 
@@ -83,7 +82,6 @@ public class MainActivity extends BaseActivity {
 
         versionManager = VersionManager.get(this);
         versionManager.loadAllVersions();
-        currentVersion = versionManager.getSelectedVersion();
 
         apkImportManager = new ApkImportManager(this, viewModel);
 
@@ -135,8 +133,8 @@ public class MainActivity extends BaseActivity {
 
         setTextMinecraftVersion();
 
-        if (currentVersion != null) {
-            viewModel.setCurrentVersion(currentVersion);
+        if (versionManager.getSelectedVersion() != null) {
+            viewModel.setCurrentVersion(versionManager.getSelectedVersion());
         }
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -240,7 +238,6 @@ public class MainActivity extends BaseActivity {
             List<BigGroup> bigGroups = VersionUtil.buildBigGroups(installedList, customList);
             GameVersionSelectDialog dialog = new GameVersionSelectDialog(this, bigGroups);
             dialog.setOnVersionSelectListener(version -> {
-                currentVersion = version;
                 versionManager.selectVersion(version);
                 viewModel.setCurrentVersion(version);
                 setTextMinecraftVersion();
@@ -275,6 +272,32 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        binding.deleteVersionButton.setOnClickListener(v -> {
+            new CustomAlertDialog(this)
+                    .setTitleText(getString(R.string.dialog_title_delete_version))
+                    .setMessage(getString(R.string.dialog_message_delete_version))
+                    .setPositiveButton(getString(R.string.dialog_positive_delete), v2 -> {
+                        VersionManager.get(this).deleteCustomVersion(versionManager.getSelectedVersion(), new VersionManager.OnDeleteVersionCallback() {
+                            @Override
+                            public void onDeleteCompleted(boolean success) {
+                                runOnUiThread(() -> {
+                                    Toast.makeText(MainActivity.this, getString(R.string.toast_delete_success), Toast.LENGTH_SHORT).show();
+                                    viewModel.setCurrentVersion(versionManager.getSelectedVersion());
+                                    setTextMinecraftVersion();
+                                });
+                            }
+
+                            @Override
+                            public void onDeleteFailed(Exception e) {
+                                runOnUiThread(() -> {
+                                    Toast.makeText(MainActivity.this, getString(R.string.toast_delete_failed, e.getMessage()), Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        });
+                    })
+                    .setNegativeButton(getString(R.string.dialog_negative_cancel), null)
+                    .show();
+        });
     }
 
     private void showSettingsDialog() throws PackageManager.NameNotFoundException {
@@ -309,7 +332,7 @@ public class MainActivity extends BaseActivity {
 
     public void setTextMinecraftVersion() {
         if (binding == null) return;
-        String display = currentVersion != null ? currentVersion.displayName : getString(R.string.not_found_version);
+        String display = versionManager.getSelectedVersion() != null ? versionManager.getSelectedVersion().displayName : getString(R.string.not_found_version);
         if (!TextUtils.isEmpty(display)) {
             binding.textMinecraftVersion.setText(display);
         }

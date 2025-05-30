@@ -10,6 +10,7 @@ import android.os.Environment;
 import androidx.annotation.NonNull;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.core.mods.ModManager;
 import org.levimc.launcher.ui.activities.MainActivity;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.dialogs.LibsRepairDialog;
@@ -43,6 +44,12 @@ public class VersionManager {
         void onRepairFailed(Exception e);
     }
 
+    public interface OnDeleteVersionCallback {
+        void onDeleteCompleted(boolean success);
+
+        void onDeleteFailed(Exception e);
+    }
+
     public static VersionManager get(Context ctx) {
         if (instance == null) instance = new VersionManager(ctx.getApplicationContext());
         return instance;
@@ -73,9 +80,7 @@ public class VersionManager {
             try {
                 callback.onRepairStarted();
 
-                // ==== onlyVersionTxt 只修txt ====
                 if (onlyVersionTxt) {
-                    // 直接读取versionName并写入version.txt
                     String versionName = "unknown";
                     try (net.dongliu.apk.parser.ApkFile apk = new net.dongliu.apk.parser.ApkFile(apkFile)) {
                         net.dongliu.apk.parser.bean.ApkMeta meta = apk.getApkMeta();
@@ -94,7 +99,6 @@ public class VersionManager {
                     callback.onRepairCompleted(true);
                     return;
                 }
-                // ==== 否则，正常修lib并修txt ====
 
                 long totalSize = 0;
                 try (InputStream is = new FileInputStream(apkFile);
@@ -138,7 +142,6 @@ public class VersionManager {
                     }
                 }
 
-                // 修复version.txt
                 String versionName = "unknown";
                 try (net.dongliu.apk.parser.ApkFile apk = new net.dongliu.apk.parser.ApkFile(apkFile)) {
                     net.dongliu.apk.parser.bean.ApkMeta meta = apk.getApkMeta();
@@ -298,7 +301,9 @@ public class VersionManager {
     }
 
     public void selectVersion(GameVersion version) {
+
         this.selectedVersion = version;
+
         SharedPreferences.Editor editor = prefs.edit();
         if (version.isInstalled) {
             editor.putString("selected_type", "installed");
@@ -377,5 +382,66 @@ public class VersionManager {
                 })
                 .setNegativeButton(activity.getString(R.string.cancel), null)
                 .show();
+    }
+
+    public void deleteCustomVersion(GameVersion version, OnDeleteVersionCallback callback) {
+        if (version == null || version.isInstalled) {
+            if (callback != null)
+                callback.onDeleteFailed(new IllegalArgumentException(context.getString(R.string.error_delete_builtin_version)));
+            return;
+        }
+
+        ModManager modManager = ModManager.getInstance();
+        if (modManager.getCurrentVersion() != null &&
+                modManager.getCurrentVersion().equals(version)) {
+            modManager.setCurrentVersion(null);
+        }
+
+        boolean isSelected = version.equals(selectedVersion);
+
+        new Thread(() -> {
+            try {
+                File extDir = version.versionDir;
+                if (extDir != null && extDir.exists()) {
+                    deleteDir(extDir);
+                }
+
+                File intDir = new File(context.getDataDir(), "minecraft/" + extDir.getName());
+                if (intDir.exists()) {
+                    deleteDir(intDir);
+                }
+
+                if (isSelected) {
+                    selectedVersion = null;
+                    reload();
+                    if (!customVersions.isEmpty()) {
+                        selectVersion(customVersions.get(0));
+                    } else if (!installedVersions.isEmpty()) {
+                        selectVersion(installedVersions.get(0));
+                    } else {
+                        selectVersion(null);
+                    }
+                } else {
+                    reload();
+                }
+
+                if (callback != null)
+                    callback.onDeleteCompleted(true);
+            } catch (Exception e) {
+                if (callback != null)
+                    callback.onDeleteFailed(e);
+            }
+        }).start();
+    }
+
+    private boolean deleteDir(File file) {
+        if (file == null || !file.exists()) return true;
+        if (file.isDirectory()) {
+            File[] files = file.listFiles();
+            if (files != null) for (File c : files) {
+                deleteDir(c);
+            }
+        }
+        return file.delete();
     }
 }

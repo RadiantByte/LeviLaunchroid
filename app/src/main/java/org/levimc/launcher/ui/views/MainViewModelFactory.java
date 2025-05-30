@@ -1,9 +1,11 @@
 package org.levimc.launcher.ui.views;
 
 import android.app.Application;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+
 import org.levimc.launcher.core.mods.ModManager;
 import org.levimc.launcher.core.versions.VersionManager;
 

@@ -113,8 +113,16 @@
     <string name="eula_message"><b>Добро пожаловать в LeviLauncher</b>\n\nПри использовании данной программы вы соглашаетесь с тем что:\n\n• Это <b>неофициальный</b> лаунчер Minecraft\n• Вам необходимо владеть <b>лицензионной</b> копией Minecraft\n• Любая форма пиратства и читов запрещена\n• Моды/наборы ресурсов используются на ваш риск\n• Не связано с Mojang/Microsoft\n\nДальнейшее использование означает согласие с лицензионным соглашением</string>
     <string name="eula_agree">Принять</string>
     <string name="eula_exit">Отклонить</string>
-    
+
     <string name="allow_unknown_sources">Пожалуйста, разрешите установку из неизвестных источников и повторите попытку</string>
+
+    <string name="dialog_title_delete_version">Удалить версию</string>
+    <string name="dialog_message_delete_version">Вы уверены, что хотите удалить эту пользовательскую версию? Это действие не может быть отменено.</string>
+    <string name="dialog_positive_delete">Удалить</string>
+    <string name="dialog_negative_cancel">Отмена</string>
+    <string name="toast_delete_success">Успешно удалено</string>
+    <string name="toast_delete_failed">Ошибка удаления: %1$s</string>
+    <string name="error_delete_builtin_version">Нельзя удалить встроенную версию</string>
 
     <!-- Настройки языка -->
     <string name="language">Язык</string>
