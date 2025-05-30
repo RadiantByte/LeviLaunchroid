@@ -48,6 +48,15 @@ public class ApkInstaller {
     public void install(final Uri apkOrApksUri, final String dirName) {
         executor.submit(() -> {
             try {
+                File internalDir = new File(context.getDataDir(), "minecraft/" + dirName);
+                if (internalDir.exists() && !deleteDir(internalDir)) {
+                    return;
+                }
+                File externalDir = new File(Environment.getExternalStorageDirectory(), "games/org.levimc/minecraft/" + dirName);
+                if (externalDir.exists() && !deleteDir(externalDir)) {
+                    return;
+                }
+
                 String versionName = extractVersionName(apkOrApksUri);
                 File libTargetDir = new File(context.getDataDir(), "minecraft/" + dirName + "/lib");
                 File baseDir = new File(Environment.getExternalStorageDirectory(), "games/org.levimc/minecraft/" + dirName);
@@ -229,5 +238,17 @@ public class ApkInstaller {
             cursor.close();
         }
         return result;
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir == null || !dir.exists()) return true;
+        if (dir.isFile()) return dir.delete();
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File child : files) {
+                if (!deleteDir(child)) return false;
+            }
+        }
+        return dir.delete();
     }
 }

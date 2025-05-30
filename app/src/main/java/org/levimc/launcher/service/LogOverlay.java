@@ -88,11 +88,9 @@ public class LogOverlay {
             params.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
         }
 
-        params.flags = WindowManager.LayoutParams.FLAG_FULLSCREEN |
-                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS |
-                WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION |
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
         if (isDrawLayout) {
             params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
