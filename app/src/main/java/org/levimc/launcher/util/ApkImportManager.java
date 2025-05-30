@@ -17,7 +17,6 @@ import org.levimc.launcher.ui.views.MainViewModel;
 import java.util.concurrent.Executors;
 
 public class ApkImportManager {
-    public static final int REQUEST_IMPORT_APK = 1004;
     private final Activity activity;
     private final MainViewModel viewModel;
     private final InstallProgressDialog progressDialog;
