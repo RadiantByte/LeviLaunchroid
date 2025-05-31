@@ -133,25 +133,6 @@ public class MainActivity extends BaseActivity {
                 }
         );
 
-        permissionsHandler = PermissionsHandler.getInstance();
-        permissionsHandler.setActivity(this, permissionResultLauncher);
-
-        permissionsHandler.requestPermission(PermissionsHandler.PermissionType.STORAGE, new PermissionsHandler.PermissionResultCallback() {
-            @Override
-            public void onPermissionGranted(PermissionsHandler.PermissionType type) {
-                if (type == PermissionsHandler.PermissionType.STORAGE) {
-                    viewModel.refreshMods();
-                }
-            }
-
-            @Override
-            public void onPermissionDenied(PermissionsHandler.PermissionType type, boolean permanentlyDenied) {
-                if (type == PermissionsHandler.PermissionType.STORAGE) {
-                    Toast.makeText(MainActivity.this, R.string.storage_permission_not_granted, Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            }
-        });
 
         fileHandler = new FileHandler(this, viewModel, versionManager);
 
@@ -187,11 +168,33 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        permissionsHandler = PermissionsHandler.getInstance();
+        permissionsHandler.setActivity(this, permissionResultLauncher);
+
+        permissionsHandler.requestPermission(PermissionsHandler.PermissionType.STORAGE, new PermissionsHandler.PermissionResultCallback() {
+            @Override
+            public void onPermissionGranted(PermissionsHandler.PermissionType type) {
+                if (type == PermissionsHandler.PermissionType.STORAGE) {
+                    viewModel.refreshMods();
+                }
+            }
+
+            @Override
+            public void onPermissionDenied(PermissionsHandler.PermissionType type, boolean permanentlyDenied) {
+                if (type == PermissionsHandler.PermissionType.STORAGE) {
+                    Toast.makeText(MainActivity.this, R.string.storage_permission_not_granted, Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        });
+
         SharedPreferences prefs = getSharedPreferences("LauncherPrefs", MODE_PRIVATE);
         boolean eulaAccepted = prefs.getBoolean("eula_accepted", false);
         if (!eulaAccepted) {
             showEulaDialog();
         }
+
+
     }
 
     private void initSettings() {
