@@ -124,7 +124,8 @@
     <string name="toast_delete_failed">Delete failed: %1$s</string>
     <string name="error_delete_builtin_version">Cannot delete built-in version</string>
     <string name="invalid_mod_file">You selected an invalid mod file!</string>
-
+    <string name="error_versions">Error Versions</string>
+    
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

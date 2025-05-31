@@ -10,43 +10,86 @@ import java.util.List;
 import java.util.Map;
 
 public class VersionUtil {
+
+    public static class GroupByResult {
+        public LinkedHashMap<String, VersionGroup> validGroups = new LinkedHashMap<>();
+        public LinkedHashMap<String, VersionGroup> errorGroups = new LinkedHashMap<>();
+    }
+
     public static List<BigGroup> buildBigGroups(List<GameVersion> installed, List<GameVersion> custom) {
         List<BigGroup> bigGroups = new ArrayList<>();
+
         if (!installed.isEmpty()) {
-            BigGroup bg = new BigGroup(R.string.installed_packages);
-            bg.versionGroups.addAll(groupByVersion(installed).values());
-            bigGroups.add(bg);
+            GroupByResult groupResult = groupByVersion(installed);
+            if (!groupResult.validGroups.isEmpty()) {
+                BigGroup bg = new BigGroup(R.string.installed_packages);
+                bg.versionGroups.addAll(groupResult.validGroups.values());
+                bigGroups.add(bg);
+            }
+            if (!groupResult.errorGroups.isEmpty()) {
+                BigGroup bg = new BigGroup(R.string.error_versions);
+                bg.versionGroups.addAll(groupResult.errorGroups.values());
+                bigGroups.add(bg);
+            }
         }
         if (!custom.isEmpty()) {
-            BigGroup bg = new BigGroup(R.string.local_custom);
-            bg.versionGroups.addAll(groupByVersion(custom).values());
-            bigGroups.add(bg);
+            GroupByResult groupResult = groupByVersion(custom);
+            if (!groupResult.validGroups.isEmpty()) {
+                BigGroup bg = new BigGroup(R.string.local_custom);
+                bg.versionGroups.addAll(groupResult.validGroups.values());
+                bigGroups.add(bg);
+            }
+            if (!groupResult.errorGroups.isEmpty()) {
+                BigGroup bg = new BigGroup(R.string.error_versions);
+                bg.versionGroups.addAll(groupResult.errorGroups.values());
+                bigGroups.add(bg);
+            }
         }
         return bigGroups;
     }
 
-    public static LinkedHashMap<String, VersionGroup> groupByVersion(List<GameVersion> list) {
-        Map<String, VersionGroup> tempMap = new HashMap<>();
+    public static GroupByResult groupByVersion(List<GameVersion> list) {
+        Map<String, VersionGroup> validMap = new HashMap<>();
+        Map<String, VersionGroup> errorMap = new HashMap<>();
+
         for (GameVersion gv : list) {
-            VersionGroup vg = tempMap.get(gv.versionCode);
+            String code = gv.versionCode;
+            // 判断是否合法
+            boolean valid = isValidVersion(code);
+            Map<String, VersionGroup> map = valid ? validMap : errorMap;
+            VersionGroup vg = map.get(code);
             if (vg == null) {
-                vg = new VersionGroup(gv.versionCode);
-                tempMap.put(gv.versionCode, vg);
+                vg = new VersionGroup(code);
+                map.put(code, vg);
             }
             vg.versions.add(gv);
         }
 
-        List<String> sortedKeys = new ArrayList<>(tempMap.keySet());
-        sortedKeys.sort((a, b) -> compareVersionCode(b, a));
+        List<String> validKeys = new ArrayList<>(validMap.keySet());
+        List<String> errorKeys = new ArrayList<>(errorMap.keySet());
 
-        LinkedHashMap<String, VersionGroup> sortedMap = new LinkedHashMap<>();
-        for (String key : sortedKeys) {
-            sortedMap.put(key, tempMap.get(key));
-        }
-        return sortedMap;
+        validKeys.sort((a, b) -> compareVersionCode(b, a));
+        errorKeys.sort(String::compareTo);
+
+        GroupByResult result = new GroupByResult();
+        for (String key : validKeys)
+            result.validGroups.put(key, validMap.get(key));
+        for (String key : errorKeys)
+            result.errorGroups.put(key, errorMap.get(key));
+
+        return result;
     }
 
     public static int compareVersionCode(String v1, String v2) {
+        if (!isValidVersion(v1) && !isValidVersion(v2)) {
+            return v1.compareTo(v2);
+        }
+        if (!isValidVersion(v1)) {
+            return 1;
+        }
+        if (!isValidVersion(v2)) {
+            return -1;
+        }
         String[] arr1 = v1.split("\\.");
         String[] arr2 = v2.split("\\.");
         int len = Math.max(arr1.length, arr2.length);
@@ -56,5 +99,15 @@ public class VersionUtil {
             if (n1 != n2) return n1 - n2;
         }
         return 0;
+    }
+    
+    public static boolean isValidVersion(String v) {
+        String[] arr = v.split("\\.");
+        for (String s : arr) {
+            if (!s.matches("\\d+")) {
+                return false;
+            }
+        }
+        return true;
     }
 }
