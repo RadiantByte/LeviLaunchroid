@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
-    id 'org.tboox.gradle-xmake-plugin' version '1.2.2'
+    id 'org.tboox.gradle-xmake-plugin' version '1.2.3'
 }
 
 android {
