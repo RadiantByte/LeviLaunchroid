@@ -17,8 +17,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
+import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -34,36 +37,47 @@ public class ApkInstaller {
     }
 
     private static final String APK_FILE_NAME = "base.apk.levi";
+    private static final int BUFFER_SIZE = 8192;
 
     private final Context context;
     private final ExecutorService executor;
     private final InstallCallback callback;
 
     public ApkInstaller(Context context, ExecutorService executor, InstallCallback callback) {
-        this.context = context;
+        this.context = context.getApplicationContext();
         this.executor = executor;
         this.callback = callback;
+    }
+
+    public static class VersionAbi {
+        public final String versionName, abiList;
+
+        public VersionAbi(String versionName, String abiList) {
+            this.versionName = versionName;
+            this.abiList = abiList;
+        }
     }
 
     public void install(final Uri apkOrApksUri, final String dirName) {
         executor.submit(() -> {
             try {
                 File internalDir = new File(context.getDataDir(), "minecraft/" + dirName);
-                if (internalDir.exists() && !deleteDir(internalDir)) {
+                if (internalDir.exists() && !deleteDir(internalDir))
                     return;
-                }
                 File externalDir = new File(Environment.getExternalStorageDirectory(), "games/org.levimc/minecraft/" + dirName);
-                if (externalDir.exists() && !deleteDir(externalDir)) {
+                if (externalDir.exists() && !deleteDir(externalDir))
+                    return;
+
+                VersionAbi info = extractVersionAndAbi(apkOrApksUri);
+                String versionName = info.versionName, abiList = info.abiList;
+
+                File libTargetDir = new File(internalDir, "lib");
+                File baseDir = externalDir;
+                if (!baseDir.exists() && !baseDir.mkdirs()) {
+                    postError("Open base dir failed");
                     return;
                 }
 
-                String versionName = extractVersionName(apkOrApksUri);
-                File libTargetDir = new File(context.getDataDir(), "minecraft/" + dirName + "/lib");
-                File baseDir = new File(Environment.getExternalStorageDirectory(), "games/org.levimc/minecraft/" + dirName);
-                if (!baseDir.exists() && !baseDir.mkdirs()) {
-                    postError("open base dir failed");
-                    return;
-                }
                 String fileName = getFileName(apkOrApksUri);
                 if (fileName != null && fileName.toLowerCase().endsWith(".apks")) {
                     boolean foundApk = false;
@@ -71,29 +85,18 @@ public class ApkInstaller {
                          ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is))) {
                         ZipEntry entry;
                         while ((entry = zis.getNextEntry()) != null) {
-                            String outputName;
+                            String outputName = entry.isDirectory() ? entry.getName() : (entry.getName().equals("base.apk") ? APK_FILE_NAME : entry.getName());
+                            File outFile = new File(baseDir, outputName);
                             if (entry.isDirectory()) {
-                                outputName = entry.getName();
-                                File outDir = new File(baseDir, outputName);
-                                outDir.mkdirs();
+                                outFile.mkdirs();
                                 zis.closeEntry();
                                 continue;
-                            } else {
-                                if (entry.getName().equals("base.apk")) {
-                                    outputName = APK_FILE_NAME;
-                                } else {
-                                    outputName = entry.getName();
-                                }
                             }
-                            File outFile = new File(baseDir, outputName);
                             File parent = outFile.getParentFile();
                             if (!parent.exists()) parent.mkdirs();
+
                             try (FileOutputStream fos = new FileOutputStream(outFile)) {
-                                byte[] buffer = new byte[8192];
-                                int len;
-                                while ((len = zis.read(buffer)) != -1) {
-                                    fos.write(buffer, 0, len);
-                                }
+                                copyStream(zis, fos);
                             }
 
                             if (outputName.equals(APK_FILE_NAME)) {
@@ -109,7 +112,7 @@ public class ApkInstaller {
                         }
                     }
                     if (!foundApk) {
-                        postError("no apk file");
+                        postError("No apk file");
                         return;
                     }
                 } else {
@@ -117,33 +120,41 @@ public class ApkInstaller {
                     try (InputStream is = context.getContentResolver().openInputStream(apkOrApksUri);
                          OutputStream os = new FileOutputStream(dstApkFile)) {
                         if (is == null) {
-                            postError("open apk failed");
+                            postError("Open apk failed");
                             return;
                         }
-                        byte[] buffer = new byte[8192];
-                        int len;
-                        while ((len = is.read(buffer)) != -1) {
-                            os.write(buffer, 0, len);
-                        }
+                        copyStream(is, os);
                     }
                     try (InputStream is2 = new FileInputStream(dstApkFile);
                          ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(is2))) {
                         ApkUtils.unzipLibsToSystemAbi(libTargetDir, zis2);
                     }
                 }
-                File internalVersionTxt = new File(
-                        new File(context.getDataDir(), "minecraft/" + dirName), "version.txt"
-                );
-                try (FileWriter writer = new FileWriter(internalVersionTxt, false)) {
-                    writer.write(versionName);
-                }
+
+                // version.txt & abi.txt
+                writeTextFile(new File(internalDir, "version.txt"), versionName);
+                writeTextFile(new File(internalDir, "abi.txt"), abiList);
 
                 postSuccess(versionName);
 
             } catch (Exception e) {
-                postError("install error: " + e.getMessage());
+                postError("Install error: " + e.getMessage());
             }
         });
+    }
+
+    private static void copyStream(InputStream is, OutputStream os) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int len;
+        while ((len = is.read(buffer)) != -1) {
+            os.write(buffer, 0, len);
+        }
+    }
+
+    private static void writeTextFile(File file, String content) throws IOException {
+        try (Writer writer = new FileWriter(file, false)) {
+            writer.write(content);
+        }
     }
 
     private void postProgress(int progress) {
@@ -164,67 +175,77 @@ public class ApkInstaller {
         });
     }
 
-    private String extractVersionName(Uri apkOrApksUri) throws Exception {
+    private VersionAbi extractVersionAndAbi(Uri apkOrApksUri) throws Exception {
         File tempFile = new File(context.getCacheDir(), "temp_apk_" + System.currentTimeMillis() + ".apk");
-        InputStream is = null;
-        OutputStream os = null;
+        String fileName = getFileName(apkOrApksUri);
         try {
-            String fileName = getFileName(apkOrApksUri);
             if (fileName != null && fileName.toLowerCase().endsWith(".apks")) {
                 try (InputStream apksIs = context.getContentResolver().openInputStream(apkOrApksUri);
-                     ZipInputStream zis = new ZipInputStream(new BufferedInputStream(apksIs))) {
-                    ZipEntry entry;
+                     ZipInputStream zis = new ZipInputStream(new BufferedInputStream(apksIs));
+                     OutputStream os = new FileOutputStream(tempFile)) {
                     boolean found = false;
+                    ZipEntry entry;
                     while ((entry = zis.getNextEntry()) != null) {
                         if (!entry.isDirectory() && entry.getName().endsWith(".apk")) {
                             if (entry.getName().equals("base.apk") || !found) {
-                                os = new FileOutputStream(tempFile);
-                                byte[] buffer = new byte[8192];
-                                int len;
-                                while ((len = zis.read(buffer)) != -1) {
-                                    os.write(buffer, 0, len);
-                                }
-                                os.close();
+                                copyStream(zis, os);
                                 found = true;
                                 if (entry.getName().equals("base.apk")) break;
                             }
                         }
                         zis.closeEntry();
                     }
-                    if (!found) throw new FileNotFoundException("apks 包中没有 base.apk!");
+                    if (!found) throw new FileNotFoundException("apks no base.apk!");
                 }
             } else {
-                is = context.getContentResolver().openInputStream(apkOrApksUri);
-                if (is == null) throw new FileNotFoundException("打开apk失败");
-                os = new FileOutputStream(tempFile);
-                byte[] buffer = new byte[8192];
-                int len;
-                while ((len = is.read(buffer)) != -1) {
-                    os.write(buffer, 0, len);
-                }
-                os.close();
-            }
-
-            try (ApkFile apkFile = new ApkFile(tempFile)) {
-                ApkMeta apkMeta = apkFile.getApkMeta();
-                String pkgName = apkMeta.getPackageName();
-                String vName = apkMeta.getVersionName();
-                if ("com.mojang.minecraftpe".equals(pkgName) && vName != null && !vName.isEmpty()) {
-                    return vName;
+                try (InputStream is = context.getContentResolver().openInputStream(apkOrApksUri);
+                     OutputStream os = new FileOutputStream(tempFile)) {
+                    if (is == null) throw new FileNotFoundException("打开apk失败");
+                    copyStream(is, os);
                 }
             }
+            String versionName = extractApkVersionName(tempFile);
+            String abiList = extractAbiList(tempFile);
+            return new VersionAbi(versionName, abiList);
         } finally {
-            if (is != null) try {
-                is.close();
-            } catch (Throwable ignored) {
-            }
-            if (os != null) try {
-                os.close();
-            } catch (Throwable ignored) {
-            }
             tempFile.delete();
         }
+    }
+
+    private String extractApkVersionName(File apkFile) {
+        try (ApkFile apk = new ApkFile(apkFile)) {
+            ApkMeta meta = apk.getApkMeta();
+            String pkgName = meta.getPackageName();
+            String vName = meta.getVersionName();
+            if ("com.mojang.minecraftpe".equals(pkgName) && vName != null && !vName.isEmpty()) {
+                return vName;
+            }
+        } catch (Exception ignored) {
+        }
         return "unknown_version";
+    }
+
+    private String extractAbiList(File apkFile) {
+        StringBuilder abis = new StringBuilder();
+        HashSet<String> abiSet = new HashSet<>();
+        try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(apkFile)))) {
+            ZipEntry entry;
+            while ((entry = zis.getNextEntry()) != null) {
+                String name = entry.getName();
+                if (name.startsWith("lib/") && name.endsWith(".so")) {
+                    String[] parts = name.split("/");
+                    if (parts.length >= 3) {
+                        abiSet.add(parts[1]);
+                    }
+                }
+                zis.closeEntry();
+            }
+        } catch (IOException ignored) {
+        }
+        for (String abi : abiSet) {
+            abis.append(abi).append('\n');
+        }
+        return abis.length() == 0 ? "none" : abis.toString().trim();
     }
 
     private String getFileName(Uri uri) {

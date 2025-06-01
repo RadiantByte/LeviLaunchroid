@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MissingClass" >
+    tools:ignore="MissingClass">
 
     <uses-sdk
         android:minSdkVersion="24"
         android:targetSdkVersion="35"
-        tools:overrideLibrary="androidx.core.splashscreen"/>
+        tools:overrideLibrary="androidx.core.splashscreen" />
 
     <uses-feature
         android:glEsVersion="0x20000"
@@ -27,11 +27,15 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.OVERLAY_WINDOW" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <queries>
         <package android:name="com.mojang.minecraftpe" />
@@ -43,9 +47,10 @@
         android:requestLegacyExternalStorage="true"
         android:theme="@style/Base.Theme.FullScreen"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:supportsRtl="true" >
+        android:supportsRtl="true">
 
-        <activity android:name="org.levimc.launcher.ui.activities.SplashActivity"
+        <activity
+            android:name="org.levimc.launcher.ui.activities.SplashActivity"
             android:exported="true"
             android:screenOrientation="sensorLandscape"
             tools:ignore="DiscouragedApi">
@@ -73,50 +78,50 @@
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="preloader" />
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="*/*"/>
-                <data android:host="*"/>
-                <data android:scheme="file"/>
-                <data android:scheme="content"/>
-                <data android:pathPattern=".*\\.so"/>
-                <data android:pathPattern=".*\\..*\\.so"/>
-                <data android:pathPattern=".*\\..*\\..*\\.so"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.so"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.so"/>
-                <data android:pathPattern=".*\\.mcworld"/>
-                <data android:pathPattern=".*\\..*\\.mcworld"/>
-                <data android:pathPattern=".*\\..*\\..*\\.mcworld"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.mcworld"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mcworld"/>
-                <data android:pathPattern=".*\\.mcpack"/>
-                <data android:pathPattern=".*\\..*\\.mcpack"/>
-                <data android:pathPattern=".*\\..*\\..*\\.mcpack"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.mcpack"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mcpack"/>
-                <data android:pathPattern=".*\\.mcaddon"/>
-                <data android:pathPattern=".*\\..*\\.mcaddon"/>
-                <data android:pathPattern=".*\\..*\\..*\\.mcaddon"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.mcaddon"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mcaddon"/>
-                <data android:pathPattern=".*\\.mctemplate"/>
-                <data android:pathPattern=".*\\..*\\.mctemplate"/>
-                <data android:pathPattern=".*\\..*\\..*\\.mctemplate"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\.mctemplate"/>
-                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mctemplate"/>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="*/*" />
+                <data android:host="*" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:pathPattern=".*\\.so" />
+                <data android:pathPattern=".*\\..*\\.so" />
+                <data android:pathPattern=".*\\..*\\..*\\.so" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.so" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.so" />
+                <data android:pathPattern=".*\\.mcworld" />
+                <data android:pathPattern=".*\\..*\\.mcworld" />
+                <data android:pathPattern=".*\\..*\\..*\\.mcworld" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.mcworld" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mcworld" />
+                <data android:pathPattern=".*\\.mcpack" />
+                <data android:pathPattern=".*\\..*\\.mcpack" />
+                <data android:pathPattern=".*\\..*\\..*\\.mcpack" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.mcpack" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mcpack" />
+                <data android:pathPattern=".*\\.mcaddon" />
+                <data android:pathPattern=".*\\..*\\.mcaddon" />
+                <data android:pathPattern=".*\\..*\\..*\\.mcaddon" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.mcaddon" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mcaddon" />
+                <data android:pathPattern=".*\\.mctemplate" />
+                <data android:pathPattern=".*\\..*\\.mctemplate" />
+                <data android:pathPattern=".*\\..*\\..*\\.mctemplate" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.mctemplate" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.mctemplate" />
             </intent-filter>
             <intent-filter>
-                <action
-                        android:name="xbox_live_game_invite" />
-                <action
-                        android:name="xbox_live_achievement_unlock" />
-                <category
-                        android:name="android.intent.category.DEFAULT" />
+                <action android:name="xbox_live_game_invite" />
+                <action android:name="xbox_live_achievement_unlock" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
@@ -134,43 +139,42 @@
                 android:value="preloader" />
         </activity>
         <activity
-                android:name="com.microsoft.xal.browser.IntentHandler"
-                android:exported="true"
-                android:launchMode="singleTask"
-                android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
-                android:alwaysRetainTaskState="true">
+            android:name="com.microsoft.xal.browser.IntentHandler"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
+            android:alwaysRetainTaskState="true">
             <intent-filter>
-                <action
-                        android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW" />
                 <data
-                        android:scheme="ms-xal-0000000048183522"
-                        android:host="auth" />
-                <category
-                        android:name="android.intent.category.DEFAULT" />
-                <category
-                        android:name="android.intent.category.BROWSABLE" />
+                    android:scheme="ms-xal-0000000048183522"
+                    android:host="auth" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
         <activity
-                android:name="com.microsoft.xal.browser.BrowserLaunchActivity"
-                android:exported="false"
-                android:launchMode="singleTask"
-                android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
-                android:alwaysRetainTaskState="true" />
+            android:name="com.microsoft.xal.browser.BrowserLaunchActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
+            android:alwaysRetainTaskState="true" />
         <activity
-                android:name="com.microsoft.xal.browser.WebKitWebViewController"
-                android:exported="false"
-                android:launchMode="singleTask"
-                android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
-                android:alwaysRetainTaskState="true" />
+            android:name="com.microsoft.xal.browser.WebKitWebViewController"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
+            android:alwaysRetainTaskState="true" />
+
         <provider
-                android:name="androidx.core.content.FileProvider"
-                android:exported="false"
-                android:authorities="org.levimc.launcher.fileprovider"
-                android:grantUriPermissions="true">
+            android:name="androidx.core.content.FileProvider"
+            android:exported="false"
+            android:authorities="org.levimc.launcher.fileprovider"
+            android:grantUriPermissions="true">
             <meta-data
-                    android:name="android.support.FILE_PROVIDER_PATHS"
-                    android:resource="@xml/file_provider_paths"/>
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
         </provider>
     </application>
 
