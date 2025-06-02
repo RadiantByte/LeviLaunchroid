@@ -125,6 +125,10 @@
     <string name="error_delete_builtin_version">Нельзя удалить встроенную версию</string>
     <string name="invalid_mod_file">Вы выбрали недопустимый мод-файл!</string>
     <string name="error_versions">Ошибочные версии</string>
+
+    <string name="dialog_title_delete_mod">Удалить мод</string>
+    <string name="dialog_message_delete_mod">Вы уверены, что хотите удалить этот мод?</string>
+    
     <!-- Настройки языка -->
     <string name="language">Язык</string>
     <string name="english">English</string>

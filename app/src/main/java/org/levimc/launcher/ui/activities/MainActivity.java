@@ -8,17 +8,19 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.levimc.launcher.R;
 import org.levimc.launcher.core.minecraft.MinecraftLauncher;
@@ -29,6 +31,7 @@ import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.databinding.ActivityMainBinding;
 import org.levimc.launcher.service.LogOverlay;
 import org.levimc.launcher.settings.FeatureSettings;
+import org.levimc.launcher.ui.adapter.ModsAdapter;
 import org.levimc.launcher.ui.animation.AnimationHelper;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.dialogs.GameVersionSelectDialog;
@@ -45,6 +48,7 @@ import org.levimc.launcher.util.ResourcepackHandler;
 import org.levimc.launcher.util.ThemeManager;
 import org.levimc.launcher.util.UIHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,6 +70,7 @@ public class MainActivity extends BaseActivity {
     private ActivityResultLauncher<Intent> permissionResultLauncher;
     private ActivityResultLauncher<Intent> apkImportResultLauncher;
     private ActivityResultLauncher<Intent> soImportResultLauncher;
+    private ModsAdapter modsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +98,8 @@ public class MainActivity extends BaseActivity {
         requestBasicPermissions();
 
         showEulaIfNeeded();
+
+        initModsRecycler();
     }
 
     private void setupManagersAndHandlers() {
@@ -152,6 +159,41 @@ public class MainActivity extends BaseActivity {
         permissionsHandler.setActivity(this, permissionResultLauncher);
 
         initListeners();
+    }
+
+    private void initModsRecycler() {
+        modsAdapter = new ModsAdapter(new ArrayList<>());
+        binding.modsRecycler.setLayoutManager(new LinearLayoutManager(this));
+        binding.modsRecycler.setAdapter(modsAdapter);
+        modsAdapter.setOnModEnableChangeListener((mod, enabled) -> {
+            if (viewModel != null) viewModel.setModEnabled(mod.getFileName(), enabled);
+        });
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int pos = viewHolder.getAdapterPosition();
+                Mod mod = modsAdapter.getItem(pos);
+                new CustomAlertDialog(MainActivity.this)
+                        .setTitleText(getString(R.string.dialog_title_delete_mod))
+                        .setMessage(getString(R.string.dialog_message_delete_mod))
+                        .setPositiveButton(getString(R.string.dialog_positive_delete), v -> {
+                            viewModel.removeMod(mod);
+                            modsAdapter.removeAt(pos);
+                        })
+                        .setNegativeButton(getString(R.string.dialog_negative_cancel), v -> {
+                            modsAdapter.notifyItemChanged(pos);
+                        })
+                        .show();
+            }
+        };
+        new ItemTouchHelper(simpleCallback).attachToRecyclerView(binding.modsRecycler);
+
+        viewModel.getModsLiveData().observe(this, this::updateModsUI);
     }
 
     private void updateViewModelVersion() {
@@ -414,37 +456,14 @@ public class MainActivity extends BaseActivity {
     }
 
     private void updateModsUI(List<Mod> mods) {
+        modsAdapter.updateMods(mods != null ? mods : new ArrayList<>());
         if (binding == null) return;
-        binding.modContent.removeAllViews();
         int modCount = (mods != null) ? mods.size() : 0;
         binding.modsTitleText.setText(getString(R.string.mods_title, modCount));
-
         if (modCount == 0) {
             TextView tv = new TextView(this);
             tv.setText(R.string.no_mods_found);
-            binding.modContent.addView(tv);
-            return;
         }
-        for (Mod mod : mods) {
-            View modView = createModView(mod);
-            if (modView != null) {
-                binding.modContent.addView(modView);
-            }
-        }
-    }
-
-    private View createModView(Mod mod) {
-        if (mod == null) return null;
-        LayoutInflater inflater = LayoutInflater.from(this);
-        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.item_mod, null);
-        TextView name = view.findViewById(R.id.mod_name);
-        @SuppressLint("UseSwitchCompatOrMaterialCode") Switch switchBtn = view.findViewById(R.id.mod_switch);
-        if (name != null) name.setText(mod.getDisplayName());
-        if (switchBtn != null) {
-            switchBtn.setChecked(mod.isEnabled());
-            switchBtn.setOnCheckedChangeListener((btn, isChecked) -> viewModel.setModEnabled(mod.getFileName(), isChecked));
-        }
-        return view;
     }
 
     @Override

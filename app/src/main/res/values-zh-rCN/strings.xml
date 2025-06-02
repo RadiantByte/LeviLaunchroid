@@ -124,6 +124,10 @@
     <string name="error_delete_builtin_version">不能删除内置版本</string>
     <string name="invalid_mod_file">你选择了非法的模组文件！</string>
     <string name="error_versions">错误版本</string>
+
+    <string name="dialog_title_delete_mod">删除 Mod</string>
+    <string name="dialog_message_delete_mod">确定要删除该 Mod 吗？</string>
+
     <!-- Language Setting -->
     <string name="language">语言</string>
     <string name="english">English</string>

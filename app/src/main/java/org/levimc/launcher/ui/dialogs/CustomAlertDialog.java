@@ -67,8 +67,8 @@ public class CustomAlertDialog extends Dialog {
         Button btnNegative = findViewById(R.id.btn_negative);
         Button btnNeutral = findViewById(R.id.btn_neutral);
 
-        View spacingNegativeNeutral = findViewById(R.id.btn_spacing_neg_neu);
-        View spacingNeutralPositive = findViewById(R.id.btn_spacing_neu_pos);
+        //View spacingNegativeNeutral = findViewById(R.id.btn_spacing_neg_neu);
+        //View spacingNeutralPositive = findViewById(R.id.btn_spacing_neu_pos);
 
         tvTitle.setText(mTitle != null ? mTitle : "");
         tvMessage.setText(mMessage != null ? mMessage : "");
@@ -76,21 +76,21 @@ public class CustomAlertDialog extends Dialog {
         if (mNegativeText != null) {
             btnNegative.setText(mNegativeText);
             btnNegative.setVisibility(View.VISIBLE);
-            if (spacingNegativeNeutral != null) spacingNegativeNeutral.setVisibility(View.VISIBLE);
+            //if (spacingNegativeNeutral != null) spacingNegativeNeutral.setVisibility(View.VISIBLE);
         } else {
             btnNegative.setVisibility(View.GONE);
-            if (spacingNegativeNeutral != null) spacingNegativeNeutral.setVisibility(View.GONE);
+            //if (spacingNegativeNeutral != null) spacingNegativeNeutral.setVisibility(View.GONE);
         }
 
         // Neutral
         if (mNeutralText != null) {
             btnNeutral.setText(mNeutralText);
             btnNeutral.setVisibility(View.VISIBLE);
-            if (spacingNeutralPositive != null) spacingNeutralPositive.setVisibility(View.VISIBLE);
-            if (spacingNegativeNeutral != null) spacingNegativeNeutral.setVisibility(View.VISIBLE);
+            // if (spacingNeutralPositive != null) spacingNeutralPositive.setVisibility(View.VISIBLE);
+            // if (spacingNegativeNeutral != null) spacingNegativeNeutral.setVisibility(View.VISIBLE);
         } else {
             btnNeutral.setVisibility(View.GONE);
-            if (spacingNeutralPositive != null) spacingNeutralPositive.setVisibility(View.GONE);
+            //  if (spacingNeutralPositive != null) spacingNeutralPositive.setVisibility(View.GONE);
         }
 
         // Positive

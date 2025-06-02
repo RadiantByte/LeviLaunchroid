@@ -3,6 +3,7 @@ package org.levimc.launcher.ui.views;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
 import org.levimc.launcher.core.mods.Mod;
 import org.levimc.launcher.core.mods.ModManager;
 import org.levimc.launcher.core.versions.GameVersion;
@@ -27,6 +28,11 @@ public class MainViewModel extends ViewModel {
             List<Mod> mods = modManager.getMods();
             modsLiveData.postValue(mods);
         }).start();
+    }
+
+    public void removeMod(Mod mod) {
+        modManager.deleteMod(mod.getFileName());
+        refreshMods();
     }
 
     public void setCurrentVersion(GameVersion version) {

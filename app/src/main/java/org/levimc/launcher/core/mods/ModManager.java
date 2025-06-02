@@ -159,6 +159,16 @@ public class ModManager {
         }
     }
 
+    public synchronized void deleteMod(String fileName) {
+        if (currentVersion == null || modsDir == null) return;
+        if (!fileName.endsWith(".so")) fileName += ".so";
+        File modFile = new File(modsDir, fileName);
+        if (modFile.exists()) modFile.delete();
+        configMap.remove(fileName);
+        saveConfig();
+        postModChanged();
+    }
+
     private void postModChanged() {
         modsChangedLiveData.postValue(null);
     }
