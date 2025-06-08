@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 import org.levimc.launcher.core.mods.ModManager;
@@ -85,26 +86,53 @@ public class MinecraftLauncher {
 
     public void launch(Intent sourceIntent, GameVersion version) {
         try {
+            if (version == null) {
+                Logger.get().error("No version selected");
+                return;
+            }
+
             if (version.needsRepair) {
                 ((Activity) context).runOnUiThread(() -> VersionManager.attemptRepairLibs(((Activity) context), version));
                 return;
             }
 
             ((Activity) context).runOnUiThread(this::showLoading);
-            if (version == null) return;
+
             ApplicationInfo mcInfo = version.isInstalled ?
                     getApplicationInfo(version.packageName) :
                     createFakeApplicationInfo(version, MC_PACKAGE_NAME);
+
             File dexCacheDir = createCacheDexDir();
             cleanCacheDirectory(dexCacheDir);
+
             Object pathList = getPathList(classLoader);
+
             processDexFiles(mcInfo, dexCacheDir, pathList);
+
+            try {
+                Class<?> launcherClass = classLoader.loadClass("com.mojang.minecraftpe.Launcher");
+                if (launcherClass == null) {
+                    throw new ClassNotFoundException("Minecraft launcher class not found after DEX processing");
+                }
+            } catch (ClassNotFoundException e) {
+                Logger.get().error("Failed to load Minecraft launcher class: " + e.getMessage());
+                throw e;
+            }
+
             injectNativeLibraries(mcInfo, pathList);
+
             launchMinecraftActivity(mcInfo, sourceIntent);
+
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.get().error("Launch failed: " + e.getMessage(), e);
+            ((Activity) context).runOnUiThread(() -> {
+                Toast.makeText(context,
+                        "Failed to launch Minecraft: " + e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            });
         }
     }
+
 
     private File createCacheDexDir() {
         File dexCacheDir = new File(context.getCodeCacheDir(), "dex");
