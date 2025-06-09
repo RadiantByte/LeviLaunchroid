@@ -50,11 +50,10 @@ public class ApkInstaller {
     }
 
     public static class VersionAbi {
-        public final String versionName, abiList;
+        public final String versionName;
 
-        public VersionAbi(String versionName, String abiList) {
+        public VersionAbi(String versionName) {
             this.versionName = versionName;
-            this.abiList = abiList;
         }
     }
 
@@ -69,7 +68,7 @@ public class ApkInstaller {
                     return;
 
                 VersionAbi info = extractVersionAndAbi(apkOrApksUri);
-                String versionName = info.versionName, abiList = info.abiList;
+                String versionName = info.versionName;
 
                 File libTargetDir = new File(internalDir, "lib");
                 File baseDir = externalDir;
@@ -131,9 +130,8 @@ public class ApkInstaller {
                     }
                 }
 
-                // version.txt & abi.txt
+                // version.txt
                 writeTextFile(new File(internalDir, "version.txt"), versionName);
-                writeTextFile(new File(internalDir, "abi.txt"), abiList);
 
                 postSuccess(versionName);
 
@@ -205,8 +203,7 @@ public class ApkInstaller {
                 }
             }
             String versionName = extractApkVersionName(tempFile);
-            String abiList = extractAbiList(tempFile);
-            return new VersionAbi(versionName, abiList);
+            return new VersionAbi(versionName);
         } finally {
             tempFile.delete();
         }
@@ -223,29 +220,6 @@ public class ApkInstaller {
         } catch (Exception ignored) {
         }
         return "unknown_version";
-    }
-
-    private String extractAbiList(File apkFile) {
-        StringBuilder abis = new StringBuilder();
-        HashSet<String> abiSet = new HashSet<>();
-        try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(apkFile)))) {
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
-                String name = entry.getName();
-                if (name.startsWith("lib/") && name.endsWith(".so")) {
-                    String[] parts = name.split("/");
-                    if (parts.length >= 3) {
-                        abiSet.add(parts[1]);
-                    }
-                }
-                zis.closeEntry();
-            }
-        } catch (IOException ignored) {
-        }
-        for (String abi : abiSet) {
-            abis.append(abi).append('\n');
-        }
-        return abis.length() == 0 ? "none" : abis.toString().trim();
     }
 
     private String getFileName(Uri uri) {

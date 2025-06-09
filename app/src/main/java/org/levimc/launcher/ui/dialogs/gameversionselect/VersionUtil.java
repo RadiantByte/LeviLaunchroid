@@ -54,7 +54,6 @@ public class VersionUtil {
 
         for (GameVersion gv : list) {
             String code = gv.versionCode;
-            // 判断是否合法
             boolean valid = isValidVersion(code);
             Map<String, VersionGroup> map = valid ? validMap : errorMap;
             VersionGroup vg = map.get(code);

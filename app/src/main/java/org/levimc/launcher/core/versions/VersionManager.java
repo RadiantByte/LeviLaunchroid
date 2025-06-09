@@ -3,8 +3,10 @@ package org.levimc.launcher.core.versions;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
 
 import androidx.annotation.NonNull;
@@ -15,11 +17,13 @@ import org.levimc.launcher.ui.activities.MainActivity;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.dialogs.LibsRepairDialog;
 import org.levimc.launcher.util.ApkUtils;
+import org.levimc.launcher.util.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -99,7 +103,7 @@ public class VersionManager {
     }
 
     private String inferAbiFromNativeLibDir(String nativeLibDir) {
-        if (nativeLibDir == null) return "unknown";
+        if (nativeLibDir == null) return "null";
         if (nativeLibDir.contains("arm64")) return "arm64-v8a";
         if (nativeLibDir.contains("armeabi")) return "armeabi-v7a";
         if (nativeLibDir.contains("x86_64")) return "x86_64";
@@ -117,106 +121,94 @@ public class VersionManager {
         return "unknown";
     }
 
-    private boolean fileExists(File... files) {
-        for (File file : files)
-            if (file == null || !file.exists() || file.length() == 0)
-                return false;
-        return true;
-    }
-
-    public void repairLibsAsync(File versionDir, boolean onlyVersionTxt, boolean onlyAbiList, LibsRepairCallback callback) {
+    public void repairLibsAsync(GameVersion version, LibsRepairCallback callback) {
         new Thread(() -> {
             callback.onRepairStarted();
             try {
+                File versionDir = version.versionDir;
+                boolean onlyVersionTxt = version.onlyVersionTxt;
+                boolean isExtractFalse = version.isExtractFalse;
                 String dirName = versionDir.getName();
-                File apkFile = new File(versionDir, "base.apk.levi");
-                File dataDir = new File(context.getDataDir(), "minecraft/" + dirName);
 
-                if (onlyAbiList) {
-                    String abiList = extractAbiListFromApk(apkFile);
-                    writeStringToFile(new File(dataDir, "abi.txt"), abiList);
-                    callback.onRepairCompleted(true);
-                    return;
+                File apkFile;
+                if (isExtractFalse) {
+                    ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(version.packageName, 0);
+                    apkFile = new File(appInfo.sourceDir);
+                } else {
+                    apkFile = new File(versionDir, "base.apk.levi");
                 }
+
+                String dataDirName = isExtractFalse ? version.directoryName : dirName;
+                File dataDir = new File(context.getDataDir(), "minecraft/" + dataDirName);
 
                 if (onlyVersionTxt) {
-                    String versionName = getApkVersionName(apkFile);
-                    writeStringToFile(new File(dataDir, "version.txt"), versionName);
+                    writeVersionTxt(apkFile, dataDir);
                     callback.onRepairCompleted(true);
                     return;
                 }
 
-                long totalSize = 0;
-                try (ZipInputStream zis1 = new ZipInputStream(new BufferedInputStream(new FileInputStream(apkFile)))) {
-                    ZipEntry entry;
-                    while ((entry = zis1.getNextEntry()) != null) {
-                        if (entry.getName().startsWith("lib/") && !entry.isDirectory())
-                            totalSize += Math.max(0, entry.getSize());
-                    }
-                }
+                long totalSize = getLibsTotalSize(apkFile);
+                if (totalSize == 0) totalSize = 1;
 
-                long processedSize = 0;
                 File libDir = new File(dataDir, "lib");
-                try (ZipInputStream zis2 = new ZipInputStream(new BufferedInputStream(new FileInputStream(apkFile)))) {
+                long[] progress = {0};
+                int[] lastPercent = {-1};
+
+                try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(apkFile)))) {
                     ZipEntry entry;
                     byte[] buffer = new byte[BUFFER_SIZE];
-                    while ((entry = zis2.getNextEntry()) != null) {
+                    while ((entry = zis.getNextEntry()) != null) {
                         if (entry.getName().startsWith("lib/") && !entry.isDirectory()) {
                             String[] parts = entry.getName().split("/");
                             if (parts.length >= 3) {
                                 File outFile = new File(libDir, ApkUtils.abiToSystemLibDir(parts[1]) + "/" + parts[2]);
-                                if (!outFile.getParentFile().exists())
-                                    outFile.getParentFile().mkdirs();
+                                if (!outFile.getParentFile().exists()) outFile.getParentFile().mkdirs();
+
                                 try (FileOutputStream fos = new FileOutputStream(outFile)) {
                                     int len;
-                                    while ((len = zis2.read(buffer)) != -1) {
+                                    while ((len = zis.read(buffer)) != -1) {
                                         fos.write(buffer, 0, len);
-                                        processedSize += len;
-                                        if (totalSize > 0)
-                                            callback.onRepairProgress((int) ((processedSize * 100) / totalSize));
+                                        progress[0] += len;
                                     }
+                                }
+
+                                int percent = (int) ((progress[0] * 100) / totalSize);
+                                if (percent != lastPercent[0]) {
+                                    callback.onRepairProgress(percent);
+                                    lastPercent[0] = percent;
                                 }
                             }
                         }
                     }
                 }
 
-                String versionName = getApkVersionName(apkFile);
-                writeStringToFile(new File(dataDir, "version.txt"), versionName);
-
-                File abiTxt = new File(dataDir, "abi.txt");
-                String abiList = readFileToString(abiTxt);
-                if (abiList.isEmpty() || abiList.equals("unknown")) {
-                    abiList = extractAbiListFromApk(apkFile);
-                    writeStringToFile(abiTxt, abiList);
-                }
+                writeVersionTxt(apkFile, dataDir);
 
                 callback.onRepairCompleted(true);
+
             } catch (Exception e) {
                 callback.onRepairFailed(e);
             }
         }).start();
     }
 
-    private String extractAbiListFromApk(File apkFile) throws Exception {
-        StringBuilder abis = new StringBuilder();
-        HashSet<String> abiSet = new HashSet<>();
+    private void writeVersionTxt(File apkFile, File dataDir) throws IOException {
+        String versionName = getApkVersionName(apkFile);
+        if (!dataDir.exists()) dataDir.mkdirs();
+        writeStringToFile(new File(dataDir, "version.txt"), versionName);
+    }
+
+    private long getLibsTotalSize(File apkFile) throws IOException {
+        long totalSize = 0;
         try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(apkFile)))) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
-                String name = entry.getName();
-                if (name.startsWith("lib/") && name.endsWith(".so")) {
-                    String[] parts = name.split("/");
-                    if (parts.length >= 3) {
-                        abiSet.add(parts[1]);
-                    }
+                if (entry.getName().startsWith("lib/") && !entry.isDirectory()) {
+                    totalSize += Math.max(0, entry.getSize());
                 }
             }
         }
-        for (String abi : abiSet) {
-            abis.append(abi).append("\n");
-        }
-        return abis.length() == 0 ? "none" : abis.toString().trim();
+        return totalSize;
     }
 
     public void loadAllVersions() {
@@ -225,27 +217,37 @@ public class VersionManager {
 
         PackageManager pm = context.getPackageManager();
         List<PackageInfo> pkgs = pm.getInstalledPackages(0);
-        for (PackageInfo pi : pkgs) {
-            if (isMinecraftPackage(pi.packageName)) {
-                File versionDir = new File(Environment.getExternalStorageDirectory(), "games/org.levimc/minecraft/" + pi.packageName);
-                if (!versionDir.exists()) versionDir.mkdirs();
 
-                String abiList = inferAbiFromNativeLibDir(pi.applicationInfo.nativeLibraryDir);
-                String displayName = pi.applicationInfo.loadLabel(pm) + " (" + pi.versionName + ")";
-                //if (!"unknown".equals(abiList)) {
-                //    displayName += " [" + abiList.replace("\n", ", ") + "]";
-                //}
-                GameVersion gv = new GameVersion(
-                        "",
-                        displayName,
-                        pi.versionName,
-                        versionDir,
-                        true,
-                        pi.packageName,
-                        abiList
-                );
-                installedVersions.add(gv);
+        for (PackageInfo pi : pkgs) {
+            if (!isMinecraftPackage(pi.packageName)) continue;
+
+            File versionDir = getVersionDirForPackage(pi.packageName);
+            if (!versionDir.exists()) versionDir.mkdirs();
+
+            String abiList = inferAbiFromNativeLibDir(pi.applicationInfo.nativeLibraryDir);
+            String displayName = pi.applicationInfo.loadLabel(pm) + " (" + pi.versionName + ")";
+
+            boolean hasSoFiles = hasSoFilesInDir(new File(pi.applicationInfo.nativeLibraryDir));
+
+            GameVersion gv = new GameVersion(
+                    pi.packageName + "_" + pi.versionCode,
+                    displayName,
+                    pi.versionName,
+                    versionDir,
+                    true,
+                    pi.packageName,
+                    abiList
+            );
+
+            gv.needsRepair = false;
+            if (!hasSoFiles) {
+                gv.isExtractFalse = true;
+                boolean libOk = hasLibSoUnderLibDir(gv.directoryName);
+                if (!libOk) {
+                    gv.needsRepair = true;
+                }
             }
+            installedVersions.add(gv);
         }
 
         File baseDir = new File(Environment.getExternalStorageDirectory(), "games/org.levimc/minecraft/");
@@ -254,38 +256,63 @@ public class VersionManager {
         if (dirs != null) {
             for (File dir : dirs) {
                 File apk = new File(dir, "base.apk.levi");
-                if (apk.exists()) {
-                    File libDir = new File(context.getDataDir(), "minecraft/" + dir.getName() + "/lib");
-                    File so1 = new File(libDir, "arm64/libminecraftpe.so");
-                    File so2 = new File(libDir, "arm/libminecraftpe.so");
-                    File versionTxt = new File(context.getDataDir(), "minecraft/" + dir.getName() + "/version.txt");
-                    File abiTxt = new File(context.getDataDir(), "minecraft/" + dir.getName() + "/abi.txt");
-                    boolean libOk = so1.exists() || so2.exists();
-                    boolean txtOk = versionTxt.exists() && versionTxt.length() > 0;
-                    boolean abiOk = abiTxt.exists() && abiTxt.length() > 0;
+                if (!apk.exists()) continue;
 
-                    GameVersion gv = getGameVersion(dir);
-                    gv.needsRepair = false;
-                    gv.onlyVersionTxt = false;
-                    gv.onlyAbiList = false;
+                boolean libOk = hasLibSoUnderLibDir(dir.getName());
+                boolean txtOk = hasValidVersionTxt(dir.getName());
 
-                    if (!libOk) {
-                        gv.needsRepair = true;
-                        gv.displayName = gv.displayName.endsWith(" ❌") ? gv.displayName : (gv.displayName + " ❌");
-                    } else if (!txtOk) {
-                        gv.needsRepair = true;
-                        gv.onlyVersionTxt = true;
-                        gv.displayName = gv.displayName.endsWith(" ❌") ? gv.displayName : (gv.displayName + " ❌");
-                    } else if (!abiOk) {
-                        gv.needsRepair = true;
-                        gv.onlyAbiList = true;
-                        gv.displayName = gv.displayName.endsWith(" ❌") ? gv.displayName : (gv.displayName + " ❌");
-                    }
-                    customVersions.add(gv);
+                GameVersion gv = getGameVersion(dir);
+                gv.needsRepair = false;
+                gv.onlyVersionTxt = false;
+
+                if (!libOk) {
+                    gv.needsRepair = true;
+                    appendRepairMark(gv);
+                } else if (!txtOk) {
+                    gv.needsRepair = true;
+                    gv.onlyVersionTxt = true;
+                    appendRepairMark(gv);
                 }
+                customVersions.add(gv);
             }
         }
         restoreSelectedVersion();
+    }
+
+    @NonNull
+    private File getVersionDirForPackage(String packageName) {
+        return new File(Environment.getExternalStorageDirectory(),
+                "games/org.levimc/minecraft/" + packageName);
+    }
+
+    private boolean hasSoFilesInDir(File nativeLibDir) {
+        if (nativeLibDir == null) return false;
+        File[] files = nativeLibDir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().endsWith(".so")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasLibSoUnderLibDir(String dirName) {
+        File libDir = new File(context.getDataDir(), "minecraft/" + dirName + "/lib");
+        return new File(libDir, "arm64/libminecraftpe.so").exists()
+                || new File(libDir, "arm/libminecraftpe.so").exists();
+    }
+
+    private boolean hasValidVersionTxt(String dirName) {
+        File versionTxt = new File(context.getDataDir(), "minecraft/" + dirName + "/version.txt");
+        return versionTxt.exists() && versionTxt.length() > 0;
+    }
+
+    private void appendRepairMark(GameVersion gv) {
+        if (!gv.displayName.endsWith(" ❌")) {
+            gv.displayName += " ❌";
+        }
     }
 
     @NonNull
@@ -300,12 +327,7 @@ public class VersionManager {
                 displayName = dir.getName() + " (" + versionCode + ")";
             }
         }
-        String abiList = "unknown";
-        File abiTxt = new File(context.getDataDir(), "minecraft/" + dir.getName() + "/abi.txt");
-        if (abiTxt.exists() && abiTxt.length() < 4096) {
-            String txt = readFileToString(abiTxt);
-            if (!txt.isEmpty()) abiList = txt;
-        }
+        String abiList = getAbiList(dir);
         return new GameVersion(
                 dir.getName(),
                 displayName,
@@ -315,6 +337,21 @@ public class VersionManager {
                 null,
                 abiList
         );
+    }
+
+    @NonNull
+    private String getAbiList(File dir) {
+        File dstLibDir = new File(context.getDataDir(), "minecraft/" + dir.getName() + "/lib/");
+        String[] abiNames = new String[] {"arm64", "armeabi", "x86", "x86_64"};
+        String abiList = "unknown";
+        for (String abi : abiNames) {
+            File soFile = new File(dstLibDir, abi + "/libminecraftpe.so");
+            if (soFile.exists()) {
+                abiList  = inferAbiFromNativeLibDir(abi);
+                break;
+            }
+        }
+        return abiList;
     }
 
     private void restoreSelectedVersion() {
@@ -443,7 +480,7 @@ public class VersionManager {
                 .setMessage(activity.getString(R.string.missing_libs_message))
                 .setPositiveButton(activity.getString(R.string.repair), v -> {
                     repairDialog.show();
-                    VersionManager.get(activity).repairLibsAsync(version.versionDir, version.onlyVersionTxt, version.onlyAbiList, callback);
+                    VersionManager.get(activity).repairLibsAsync(version, callback);
                 })
                 .setNegativeButton(activity.getString(R.string.cancel), null)
                 .show();

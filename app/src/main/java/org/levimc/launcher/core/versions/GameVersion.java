@@ -15,6 +15,7 @@ public class GameVersion implements Parcelable {
     public boolean needsRepair;
     public boolean onlyVersionTxt;
     public boolean onlyAbiList;
+    public boolean isExtractFalse;
     public String abiList;
     public final File modsDir;
 
@@ -28,6 +29,7 @@ public class GameVersion implements Parcelable {
         this.needsRepair = false;
         this.onlyVersionTxt = false;
         this.onlyAbiList = false;
+        this.isExtractFalse = false;
         this.abiList = abiList;
         this.modsDir = versionDir == null ? null : new File(versionDir, "mods");
     }
@@ -43,6 +45,7 @@ public class GameVersion implements Parcelable {
         needsRepair = in.readByte() != 0;
         onlyVersionTxt = in.readByte() != 0;
         onlyAbiList = in.readByte() != 0;
+        isExtractFalse = in.readByte()!= 0;
         abiList = in.readString();
         String modsDirPath = in.readString();
         modsDir = modsDirPath == null ? null : new File(modsDirPath);
@@ -59,6 +62,7 @@ public class GameVersion implements Parcelable {
         dest.writeByte((byte) (needsRepair ? 1 : 0));
         dest.writeByte((byte) (onlyVersionTxt ? 1 : 0));
         dest.writeByte((byte) (onlyAbiList ? 1 : 0));
+        dest.writeByte((byte) (isExtractFalse? 1 : 0));
         dest.writeString(abiList);
         dest.writeString(modsDir == null ? null : modsDir.getAbsolutePath());
     }

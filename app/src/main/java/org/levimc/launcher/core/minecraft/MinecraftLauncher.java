@@ -86,6 +86,8 @@ public class MinecraftLauncher {
     }
 
     public void launch(Intent sourceIntent, GameVersion version) {
+        Activity activity = (Activity) context;
+
         try {
             if (version == null) {
                 Logger.get().error("No version selected");
@@ -93,15 +95,17 @@ public class MinecraftLauncher {
             }
 
             if (version.needsRepair) {
-                ((Activity) context).runOnUiThread(() -> VersionManager.attemptRepairLibs(((Activity) context), version));
+                activity.runOnUiThread(() ->
+                        VersionManager.attemptRepairLibs(activity, version)
+                );
                 return;
             }
 
-            ((Activity) context).runOnUiThread(this::showLoading);
+            activity.runOnUiThread(this::showLoading);
 
-            ApplicationInfo mcInfo = version.isInstalled ?
-                    getApplicationInfo(version.packageName) :
-                    createFakeApplicationInfo(version, MC_PACKAGE_NAME);
+            ApplicationInfo mcInfo = getApplicationInfoForVersion(version);
+
+            fixNativeLibraryDirIfNeeded(version, mcInfo);
 
             File dexCacheDir = createCacheDexDir();
             cleanCacheDirectory(dexCacheDir);
@@ -110,35 +114,61 @@ public class MinecraftLauncher {
 
             processDexFiles(mcInfo, dexCacheDir, pathList);
 
-            try {
-                Class<?> launcherClass = classLoader.loadClass("com.mojang.minecraftpe.Launcher");
-                if (launcherClass == null) {
-                    throw new ClassNotFoundException("Minecraft launcher class not found after DEX processing");
-                }
-            } catch (ClassNotFoundException e) {
-                Logger.get().error("Failed to load Minecraft launcher class: " + e.getMessage());
-                throw e;
-            }
+            assertLauncherClassExists();
 
             injectNativeLibraries(mcInfo, pathList);
 
-            if (FeatureSettings.getInstance().isVersionIsolationEnabled()) {
-                sourceIntent.putExtra("MC_PATH", version.versionDir.getAbsolutePath());
-            }else{
-                sourceIntent.putExtra("MC_PATH", "");
-            }
+            fillIntentWithMcPath(sourceIntent, version);
+
             launchMinecraftActivity(mcInfo, sourceIntent);
 
         } catch (Exception e) {
             Logger.get().error("Launch failed: " + e.getMessage(), e);
-            ((Activity) context).runOnUiThread(() -> {
-                Toast.makeText(context,
-                        "Failed to launch Minecraft: " + e.getMessage(),
-                        Toast.LENGTH_LONG).show();
-            });
+            showLaunchErrorOnUi(e.getMessage());
         }
     }
 
+    private ApplicationInfo getApplicationInfoForVersion(GameVersion version) throws Exception {
+        if (version.isInstalled) {
+            return getApplicationInfo(version.packageName);
+        } else {
+            return createFakeApplicationInfo(version, MC_PACKAGE_NAME);
+        }
+    }
+
+    private void fixNativeLibraryDirIfNeeded(GameVersion version, ApplicationInfo mcInfo) {
+        if (version.isExtractFalse) {
+            String systemAbi = abiToSystemLibDir(Build.SUPPORTED_ABIS[0]);
+            File dstLibDir = new File(context.getDataDir(), "minecraft/" + version.directoryName + "/lib/" + systemAbi);
+            mcInfo.nativeLibraryDir = dstLibDir.getAbsolutePath();
+        }
+    }
+
+    private void assertLauncherClassExists() throws ClassNotFoundException {
+        try {
+            Class<?> launcherClass = classLoader.loadClass("com.mojang.minecraftpe.Launcher");
+            if (launcherClass == null)
+                throw new ClassNotFoundException("Minecraft launcher class not found after DEX processing");
+        } catch (ClassNotFoundException e) {
+            Logger.get().error("Failed to load Minecraft launcher class: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    private void fillIntentWithMcPath(Intent sourceIntent, GameVersion version) {
+        if (FeatureSettings.getInstance().isVersionIsolationEnabled()) {
+            sourceIntent.putExtra("MC_PATH", version.versionDir.getAbsolutePath());
+        } else {
+            sourceIntent.putExtra("MC_PATH", "");
+        }
+    }
+
+    private void showLaunchErrorOnUi(String message) {
+        Activity activity = (Activity) context;
+        activity.runOnUiThread(() -> Toast.makeText(
+                activity, "Failed to launch Minecraft: " + message, Toast.LENGTH_LONG).show()
+        );
+    }
 
     private File createCacheDexDir() {
         File dexCacheDir = new File(context.getCodeCacheDir(), "dex");
