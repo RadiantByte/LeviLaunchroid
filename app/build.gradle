@@ -13,7 +13,6 @@ def getGitTag() {
             standardOutput = stdout
         }
         tag = stdout.toString().trim()
-
         if (tag.startsWith("v")) {
             tag = tag.substring(1)
         }
