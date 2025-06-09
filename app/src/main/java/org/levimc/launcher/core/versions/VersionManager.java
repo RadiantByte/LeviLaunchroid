@@ -505,9 +505,25 @@ public class VersionManager {
             try {
                 File extDir = version.versionDir;
                 if (extDir != null && extDir.exists()) {
+                    File worldsDir = new File(extDir, "games/com.mojang/minecraftWorlds");
+                    if (worldsDir.exists() && worldsDir.isDirectory()) {
+                        String backupBase = context.getExternalFilesDir("backups").getAbsolutePath();
+                        String timeStr = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(new java.util.Date());
+                        File backupDir = new File(backupBase, timeStr);
+                        backupDir.mkdirs();
+
+                        File[] worldFolders = worldsDir.listFiles(file -> file.isDirectory());
+                        if (worldFolders != null) {
+                            for (File worldFolder : worldFolders) {
+                                File destFolder = new File(backupDir, worldFolder.getName());
+                                copyDirectory(worldFolder, destFolder);
+                            }
+                        }
+                    }
                     deleteDir(extDir);
                 }
-                File intDir = new File(context.getDataDir(), "minecraft/" + extDir.getName());
+
+                File intDir = new File(context.getDataDir(), "minecraft/" + (extDir != null ? extDir.getName() : ""));
                 if (intDir.exists()) {
                     deleteDir(intDir);
                 }
@@ -533,6 +549,21 @@ public class VersionManager {
                     callback.onDeleteFailed(e);
             }
         }).start();
+    }
+
+    private void copyDirectory(File sourceDir, File targetDir) throws IOException {
+        if (sourceDir.isDirectory()) {
+            if (!targetDir.exists())
+                targetDir.mkdirs();
+            String[] children = sourceDir.list();
+            if (children != null) {
+                for (String child : children) {
+                    copyDirectory(new File(sourceDir, child), new File(targetDir, child));
+                }
+            }
+        } else {
+            java.nio.file.Files.copy(sourceDir.toPath(), targetDir.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     private boolean deleteDir(File file) {
