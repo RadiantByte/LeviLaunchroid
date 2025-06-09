@@ -128,6 +128,7 @@
     <string name="dialog_title_delete_mod">删除 Mod</string>
     <string name="dialog_message_delete_mod">确定要删除该 Mod 吗？</string>
 
+    <string name="version_isolation">版本隔离</string>
     <!-- Language Setting -->
     <string name="language">语言</string>
     <string name="english">English</string>

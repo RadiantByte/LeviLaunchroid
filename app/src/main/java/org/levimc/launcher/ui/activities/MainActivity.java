@@ -413,6 +413,11 @@ public class MainActivity extends BaseActivity {
                 fs.isDebugLogDialogEnabled(),
                 (btn, check) -> fs.setDebugLogDialogEnabled(check)
         );
+        dlg.addSwitchItem(
+                getString(R.string.version_isolation),
+                fs.isVersionIsolationEnabled(),
+                (btn, check) -> fs.setVersionIsolationEnabled(check)
+        );
         String localVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         dlg.addActionButton(
                 getString(R.string.version_prefix) + localVersion,

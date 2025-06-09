@@ -128,7 +128,9 @@
 
     <string name="dialog_title_delete_mod">Delete Mod</string>
     <string name="dialog_message_delete_mod">Are you sure you want to delete this mod?</string>
-    
+
+    <string name="version_isolation">Version Isolation</string>
+
     <!-- Language Setting -->
     <string name="language">Language</string>
     <string name="english">English</string>

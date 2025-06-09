@@ -128,7 +128,8 @@
 
     <string name="dialog_title_delete_mod">Удалить мод</string>
     <string name="dialog_message_delete_mod">Вы уверены, что хотите удалить этот мод?</string>
-    
+
+    <string name="version_isolation">Изоляция версий</string>
     <!-- Настройки языка -->
     <string name="language">Язык</string>
     <string name="english">English</string>

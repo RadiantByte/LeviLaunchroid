@@ -14,6 +14,7 @@ import org.levimc.launcher.core.mods.ModManager;
 import org.levimc.launcher.core.mods.ModNativeLoader;
 import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.core.versions.VersionManager;
+import org.levimc.launcher.settings.FeatureSettings;
 import org.levimc.launcher.ui.dialogs.LoadingDialog;
 import org.levimc.launcher.util.Logger;
 
@@ -121,6 +122,11 @@ public class MinecraftLauncher {
 
             injectNativeLibraries(mcInfo, pathList);
 
+            if (FeatureSettings.getInstance().isVersionIsolationEnabled()) {
+                sourceIntent.putExtra("MC_PATH", version.versionDir.getAbsolutePath());
+            }else{
+                sourceIntent.putExtra("MC_PATH", "");
+            }
             launchMinecraftActivity(mcInfo, sourceIntent);
 
         } catch (Exception e) {

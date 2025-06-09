@@ -11,6 +11,7 @@ public class FeatureSettings {
     private static volatile FeatureSettings INSTANCE;
     private static Context appContext;
     private boolean debugLogDialogEnabled = false;
+    private boolean versionIsolationEnabled = false;
 
     public static void init(Context context) {
         appContext = context.getApplicationContext();
@@ -56,6 +57,15 @@ public class FeatureSettings {
         } else {
             logOverlay.hide();
         }
+    }
+
+    public boolean isVersionIsolationEnabled() {
+        return versionIsolationEnabled;
+    }
+
+    public void setVersionIsolationEnabled(boolean enabled) {
+        this.versionIsolationEnabled = enabled;
+        autoSave();
     }
 
     private void autoSave() {
