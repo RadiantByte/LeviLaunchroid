@@ -153,6 +153,7 @@ public class VersionManager {
                 File versionDir = version.versionDir;
                 boolean onlyVersionTxt = version.onlyVersionTxt;
                 boolean isExtractFalse = version.isExtractFalse;
+
                 String dirName = versionDir.getName();
 
                 File apkFile;
@@ -374,7 +375,7 @@ public class VersionManager {
                 "unknown"
         );
 
-        gv.isExtractFalse = true;
+        gv.isExtractFalse = false;
         gv.directoryName = dir.getName();
 
         gv.abiList = inferAbiFromNativeLibDir(null, gv);
