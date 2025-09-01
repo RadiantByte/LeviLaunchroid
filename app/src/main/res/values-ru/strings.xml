@@ -52,6 +52,7 @@
     <string name="exit">Выйти</string>
 
     <string name="overlay_permission_message">Необходимо разрешение на отображение поверх других приложений</string>
+    <string name="overlay_permission_denied_message">Пожалуйста, предоставьте разрешение на наложение, иначе окно журнала не будет отображаться.</string>
     <string name="overlay_permission_not_granted">Разрешение на отображение поверх других приложений не выдано</string>
     <string name="storage_permission_not_granted">Разрешение на доступ к хранилищу не выдано</string>
 

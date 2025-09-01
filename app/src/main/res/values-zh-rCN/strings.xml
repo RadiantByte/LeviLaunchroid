@@ -55,6 +55,7 @@
     <string name="exit">退出</string>
 
     <string name="overlay_permission_message">请授予悬浮窗权限</string>
+    <string name="overlay_permission_denied_message">请授予悬浮窗权限，否则无法显示日志窗口。</string>
     <string name="overlay_permission_not_granted">未授予悬浮窗权限</string>
     <string name="storage_permission_not_granted">未授予存储权限</string>
 

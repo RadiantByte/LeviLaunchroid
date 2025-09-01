@@ -52,6 +52,7 @@
     <string name="exit">Exit</string>
 
     <string name="overlay_permission_message">Please grant the overlay permission</string>
+    <string name="overlay_permission_denied_message">Please grant overlay permission, otherwise the log window cannot be displayed.</string>
     <string name="overlay_permission_not_granted">Overlay permission not granted</string>
     <string name="storage_permission_not_granted">Storage permission not granted</string>
 

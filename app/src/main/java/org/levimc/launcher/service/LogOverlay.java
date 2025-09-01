@@ -2,15 +2,19 @@ package org.levimc.launcher.service;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-
+import android.widget.Toast;
+import org.levimc.launcher.R;
 import org.levimc.launcher.service.imgui.GIViewWrapper;
 import org.levimc.launcher.service.imgui.NativeMethods;
 
@@ -35,7 +39,7 @@ public class LogOverlay {
     }
 
     private LogOverlay(Context ctx) {
-        context = ctx;
+        context = ctx.getApplicationContext();
         APP_PID = android.os.Process.myPid();
         touchView = new View(context);
         drawView = new GIViewWrapper(context);
@@ -52,13 +56,15 @@ public class LogOverlay {
                 case MotionEvent.ACTION_MOVE:
                 case MotionEvent.ACTION_DOWN:
                 case MotionEvent.ACTION_UP:
-                    NativeMethods.MotionEventClick(action != MotionEvent.ACTION_UP, motionEvent.getRawX(), motionEvent.getRawY());
+                    NativeMethods.MotionEventClick(action != MotionEvent.ACTION_UP,
+                            motionEvent.getRawX(), motionEvent.getRawY());
                     break;
                 default:
                     break;
             }
             return false;
         });
+
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
@@ -69,13 +75,15 @@ public class LogOverlay {
                     touchParams.y = Integer.parseInt(rect[1]);
                     touchParams.width = Integer.parseInt(rect[2]);
                     touchParams.height = Integer.parseInt(rect[3]);
-                    winMrg.updateViewLayout(touchView, touchParams);
-                } catch (Exception e) {
+                    if (touchView.getParent() != null) {
+                        winMrg.updateViewLayout(touchView, touchParams);
+                    }
+                } catch (Exception ignored) {
                 }
-
                 handler.postDelayed(this, 20);
             }
         }, 1000);
+
         startLogging();
     }
 
@@ -85,7 +93,7 @@ public class LogOverlay {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
-            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
+            params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
         }
 
         params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
@@ -100,7 +108,8 @@ public class LogOverlay {
         params.format = PixelFormat.RGBA_8888;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            params.layoutInDisplayCutoutMode =
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
         }
 
         params.x = params.y = 0;
@@ -109,9 +118,22 @@ public class LogOverlay {
         return params;
     }
 
-
     public void show() {
         NativeMethods.SetOpen(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !Settings.canDrawOverlays(context)) {
+            Toast.makeText(context,
+                    context.getString(R.string.overlay_permission_denied_message),
+                    Toast.LENGTH_LONG).show();
+
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + context.getPackageName()));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+            return;
+        }
+        
         if (touchView.getParent() == null) {
             WindowManager.LayoutParams touchParams = GetLayoutParams(false);
             winMrg.addView(touchView, touchParams);
@@ -126,7 +148,7 @@ public class LogOverlay {
                 winMrg.removeView(drawView);
                 winMrg.removeView(touchView);
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -143,16 +165,12 @@ public class LogOverlay {
                             String timestamp = parts[0] + " " + parts[1];
                             String level = parts[4];
                             String tag = parts[5].split(":")[0];
-
                             String message = line.substring(line.indexOf(tag) + tag.length() + 1).trim();
 
-                            final String formattedLog = String.format("%s %s %s",
-                                    timestamp, level, message);
+                            final String formattedLog =
+                                    String.format("%s %s %s", timestamp, level, message);
 
-                            mainHandler.post(() -> {
-                                NativeMethods.AddLog(formattedLog + "\n");
-
-                            });
+                            mainHandler.post(() -> NativeMethods.AddLog(formattedLog + "\n"));
                         }
                     }
                 }
@@ -160,5 +178,4 @@ public class LogOverlay {
             }
         });
     }
-
 }
