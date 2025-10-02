@@ -11,7 +11,7 @@
     <string name="mod_load_order">加载顺序：%d</string>
     <string name="drag_to_reorder">拖动以重新排序</string>
     <string name="mod_reordered">模组顺序已更新</string>
-    
+
     <!-- About -->
     <string name="about_title">☕ 关于</string>
     <string name="copyright">©2024–2025 LeviMC. 保留所有权利</string>
@@ -196,5 +196,13 @@
     <string name="select_export_location">选择导出位置</string>
     <string name="invalid_world_file">无效的世界文件</string>
     <string name="invalid_resource_pack_file">无效的资源包文件</string>
+
+    <!-- Play Store Validation -->
+    <string name="minecraft_playstore_required_title">需要 Play 商店版本</string>
+    <string name="minecraft_playstore_required_message">此启动器仅适用于从 Google Play 商店下载的官方 Minecraft。请安装 Play 商店版本后再继续。</string>
+    <string name="buy_minecraft">获取 Minecraft</string>
+    <string name="minecraft_not_installed_title">未安装 Minecraft</string>
+    <string name="minecraft_not_installed_message">您的设备上似乎没有安装 Minecraft。请先从 Google Play 商店安装以使用此启动器。</string>
+    <string name="install_minecraft">安装 Minecraft</string>
 
 </resources>

@@ -199,4 +199,13 @@
     <string name="invalid_world_file">Invalid world file</string>
     <string name="invalid_resource_pack_file">Invalid resource pack file</string>
 
+    <!-- Play Store Validation -->
+    <string name="minecraft_playstore_required_title">Play Store Version Required</string>
+    <string name="minecraft_playstore_required_message">This launcher works only with the official Minecraft app from the Google Play Store. Please install the Play Store version to continue.</string>
+    <string name="buy_minecraft">Get Minecraft</string>
+    <string name="minecraft_not_installed_title">Minecraft Not Installed</string>
+    <string name="minecraft_not_installed_message">Minecraft isn’t installed on your device. Please install it from the Google Play Store to use this launcher.</string>
+    <string name="install_minecraft">Install Minecraft</string>
+
+
 </resources>

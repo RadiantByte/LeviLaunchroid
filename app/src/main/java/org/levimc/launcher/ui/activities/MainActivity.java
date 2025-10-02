@@ -35,6 +35,7 @@ import org.levimc.launcher.ui.adapter.ModsAdapter;
 import org.levimc.launcher.ui.animation.AnimationHelper;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.dialogs.GameVersionSelectDialog;
+import org.levimc.launcher.ui.dialogs.PlayStoreValidationDialog;
 import org.levimc.launcher.ui.dialogs.SettingsDialog;
 import org.levimc.launcher.ui.dialogs.gameversionselect.BigGroup;
 import org.levimc.launcher.ui.dialogs.gameversionselect.VersionUtil;
@@ -44,6 +45,7 @@ import org.levimc.launcher.util.ApkImportManager;
 import org.levimc.launcher.util.GithubReleaseUpdater;
 import org.levimc.launcher.util.LanguageManager;
 import org.levimc.launcher.util.PermissionsHandler;
+import org.levimc.launcher.util.PlayStoreValidator;
 import org.levimc.launcher.util.ResourcepackHandler;
 import org.levimc.launcher.util.ThemeManager;
 import org.levimc.launcher.util.UIHelper;
@@ -328,6 +330,16 @@ public class MainActivity extends BaseActivity {
     }
 
     private void launchGame() {
+        if (!PlayStoreValidator.isMinecraftInstalled(this)) {
+            PlayStoreValidationDialog.showNotInstalledDialog(this);
+            return;
+        }
+
+        if (!PlayStoreValidator.isMinecraftFromPlayStore(this)) {
+            PlayStoreValidationDialog.showNotFromPlayStoreDialog(this);
+            return;
+        }
+
         binding.launchButton.setEnabled(false);
         binding.progressLoader.setVisibility(View.VISIBLE);
         new Thread(() -> {
