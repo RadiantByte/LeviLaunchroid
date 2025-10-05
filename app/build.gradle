@@ -30,7 +30,7 @@ static def getVersionCodeByTimestamp() {
 
 android {
     namespace 'org.levimc.launcher'
-    compileSdk 35
+    compileSdk 36
     defaultConfig {
         applicationId "org.levimc.launcher"
         minSdk 24
@@ -64,21 +64,33 @@ android {
         }
 
     }
+    packagingOptions {
+        jniLibs.useLegacyPackaging = true
+        resources.excludes += [
+                "DebugProbesKt.bin"
+        ]
+
+        resources.pickFirsts += [
+                "META-INF/INDEX.LIST",
+                "META-INF/DEPENDENCIES"
+        ]
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
+
     externalNativeBuild {
-        xmake {
-            path "src/main/cpp/leviutils/xmake.lua"
-            logLevel "verbose"
-            buildMode "release"
+        cmake {
+            path "src/main/cpp/leviutils/CMakeLists.txt"
         }
     }
-    ndkVersion "25.2.9519653"
+
+    ndkVersion "27.0.12077973"
 }
 
 dependencies {
+    implementation project(':minecraft')
     implementation project(':preloader')
     implementation libs.core.splashscreen
     implementation libs.apk.parser
@@ -87,6 +99,9 @@ dependencies {
     implementation libs.constraintlayout
     implementation libs.material
     implementation libs.gson
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.conscrypt.android)
+    implementation(libs.androidx.games.activity.v122)
     implementation libs.okhttp3.okhttp
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
