@@ -70,5 +70,4 @@ Thumbs.db
 
 **/build/
 **/target/
-
-minecraft
+.kotlin
