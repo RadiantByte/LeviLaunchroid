@@ -7,9 +7,7 @@ import android.content.IntentFilter;
 import android.os.PowerManager;
 import androidx.annotation.NonNull;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class ThermalMonitor extends BroadcastReceiver {
     private final Context mContext;
     private boolean mLowPowerModeEnabled = false;

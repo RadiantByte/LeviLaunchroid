@@ -4,9 +4,7 @@ import android.view.View;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public abstract class Platform {
     @NotNull
     @Contract("_ -> new")

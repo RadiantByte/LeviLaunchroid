@@ -6,9 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class InputCharacteristics {
     private static final int DUALSENSE_DEVICE_ID = 3302;
     private static final int SONY_VENDOR_ID = 1356;

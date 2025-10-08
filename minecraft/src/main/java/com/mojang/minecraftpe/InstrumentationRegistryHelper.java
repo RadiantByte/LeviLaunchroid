@@ -3,9 +3,7 @@ package com.mojang.minecraftpe;
 import android.os.Bundle;
 import android.util.Log;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class InstrumentationRegistryHelper {
     public static boolean getIsRunningInAppCenter() {
         try {

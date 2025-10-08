@@ -1,15 +1,16 @@
 [versions]
-activityKtx = "1.11.0"
 agp = "8.13.0"
+coreKtx = "1.10.1"
+espressoCore = "3.5.1"
+appcompat = "1.7.0"
 annotation = "1.9.1"
-appcompat = "1.7.1"
+activityKtx = "1.11.0"
 apkParser = "2.6.10"
 browser = "1.9.0"
 conscryptAndroid = "2.5.3"
 constraintlayout = "2.2.1"
 core = "1.58.0.0"
 coreSplashscreen = "1.0.1"
-espressoCore = "3.7.0"
 firebase-iid = "21.1.0"
 firebase-messaging = "25.0.1"
 fragmentKtx = "1.8.9"
@@ -31,8 +32,16 @@ shadowhook = "2.0.0"
 simpleXml = "2.7.1"
 billing = "8.0.0"
 sqliteFramework = "2.6.1"
+activityCompose = "1.10.1"
+composeBom = "2024.09.00"
+materialIconsExtended = "1.7.8"
+lifecycleProcess = "2.9.3"
 
 [libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-games-activity-v122 = { module = "androidx.games:games-activity", version.ref = "gamesActivityVersion" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
@@ -44,7 +53,7 @@ androidx-annotation = { module = "androidx.annotation:annotation", version.ref =
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
 androidx-games-activity = { module = "androidx.games:games-activity", version.ref = "gamesActivity" }
-androidx-lifecycle-extensions = { group = "androidx.lifecycle", name = "lifecycle-extensions", version = "2.2.0" } # last release, now deprecated
+androidx-lifecycle-extensions = { group = "androidx.lifecycle", name = "lifecycle-extensions", version = "2.2.0" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
@@ -71,8 +80,22 @@ prov = { module = "com.madgag.spongycastle:prov", version.ref = "core" }
 shadowhook = { module = "com.bytedance.android:shadowhook", version.ref = "shadowhook" }
 simple-xml = { group = "org.simpleframework", name = "simple-xml", version.ref = "simpleXml" }
 billing = { group = "com.android.billingclient", name = "billing", version.ref = "billing" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+

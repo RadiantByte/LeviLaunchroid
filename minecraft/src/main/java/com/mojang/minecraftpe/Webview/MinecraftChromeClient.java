@@ -4,9 +4,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import com.mojang.minecraftpe.MainActivity;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 class MinecraftChromeClient extends WebChromeClient {
     public MinecraftWebview mView;
 

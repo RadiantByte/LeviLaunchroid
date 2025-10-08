@@ -3,9 +3,7 @@ package com.mojang.minecraftpe.platforms;
 import android.os.Handler;
 import android.view.View;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 
 public class Platform19 extends Platform9 {
     public Runnable decorViewSettings;

@@ -11,9 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class SessionInfo implements Serializable {
     private static final String NOT_YET_CONFIGURED = "Not yet configured";
     private static final String SEP = ";";

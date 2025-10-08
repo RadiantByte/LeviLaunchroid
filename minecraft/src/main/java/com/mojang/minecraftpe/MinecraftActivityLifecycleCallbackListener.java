@@ -5,9 +5,7 @@ import android.app.Application;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class MinecraftActivityLifecycleCallbackListener implements Application.ActivityLifecycleCallbacks {
     @Override
     public void onActivityDestroyed(Activity activity) {

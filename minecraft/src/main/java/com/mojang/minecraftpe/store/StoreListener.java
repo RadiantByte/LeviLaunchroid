@@ -1,8 +1,6 @@
 package com.mojang.minecraftpe.store;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public interface StoreListener {
     void onPurchaseCanceled(String str);
 

@@ -17,9 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class PDFWriter {
     private final Rect mImageRect;
     private final Rect mPageRect = new Rect(0, 0, 612, 792);

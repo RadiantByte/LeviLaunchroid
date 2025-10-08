@@ -22,9 +22,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 @SuppressLint({"DefaultLocale"})
 public class HardwareInformation {
     private static final CPUInfo cpuInfo = getCPUInfo();

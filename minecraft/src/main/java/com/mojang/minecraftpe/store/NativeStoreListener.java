@@ -1,8 +1,6 @@
 package com.mojang.minecraftpe.store;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class NativeStoreListener implements StoreListener {
     long mStoreListener;
 

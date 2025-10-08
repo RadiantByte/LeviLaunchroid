@@ -7,9 +7,7 @@ import android.content.IntentFilter;
 import androidx.core.app.NotificationCompat;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class BatteryMonitor extends BroadcastReceiver {
     private final Context mContext;
     public int mBatteryLevel = -1;

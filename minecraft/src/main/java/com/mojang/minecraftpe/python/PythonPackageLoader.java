@@ -8,9 +8,7 @@ import com.mojang.minecraftpe.utils.FileHelper;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class PythonPackageLoader {
     private final AssetManager assetManager;
     private final File destination;

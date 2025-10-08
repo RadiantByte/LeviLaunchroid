@@ -3,9 +3,7 @@ package com.mojang.minecraftpe.platforms;
 import android.os.Build;
 import android.view.View;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 
 public class Platform9 extends Platform {
     public void onVolumePressed() {
