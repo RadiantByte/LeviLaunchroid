@@ -10,6 +10,7 @@ import java.util.Map;
 
 
 public class NetworkObserver {
+    private static final String CONNECTIVITY_SERVICE = "connectivity";
 
     private static String s_lastCapabilities = "";
     private static String s_lastLinkProperties = "";
@@ -75,7 +76,7 @@ public class NetworkObserver {
     }
 
     private static ConnectivityManager getConnectivityManager(@NotNull Context context) {
-        return (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
     }
 
     private static NetworkRequest buildNetworkRequest() {
@@ -90,7 +91,7 @@ public class NetworkObserver {
             final NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
             final LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
 
-            return String.format("Locale.getDefault(), Network %d:%n  Capabilities: %s%n  Link properties: %s",
+            return String.format("Network %d:%n  Capabilities: %s%n  Link properties: %s",
                     network.hashCode(),
                     capabilities != null ? checkNetworkCapabilities(capabilities) : "Got null capabilities",
                     linkProperties != null ? checkLinkProperties(linkProperties) : "Got null link properties");
