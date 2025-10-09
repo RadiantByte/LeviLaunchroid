@@ -49,7 +49,6 @@ public class MinecraftLauncher {
                 gameManager.loadLibrary("c++_shared");
                 gameManager.loadLibrary("fmod");
                 gameManager.loadLibrary("MediaDecoders_Android");
-                gameManager.loadLibrary("pairipcore");
                 gameManager.loadLibrary("minecraftpe");
             }
             ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
