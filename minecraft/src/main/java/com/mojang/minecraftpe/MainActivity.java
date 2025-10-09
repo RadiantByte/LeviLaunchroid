@@ -47,7 +47,7 @@ import com.mojang.android.StringValue;
 import com.mojang.minecraftpe.input.InputDeviceManager;
 import com.mojang.minecraftpe.platforms.Platform;
 import com.mojang.minecraftpe.python.PythonPackageLoader;
-
+import com.pairip.VMRunner;
 import org.fmod.FMOD;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -64,11 +64,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * 13.08.2022
- *
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 @SuppressWarnings("JavaJniMissingFunction")
 public class MainActivity extends GameActivity implements View.OnKeyListener, FilePickerManagerHandler {
     static final int MSG_CORRELATION_CHECK = 672;

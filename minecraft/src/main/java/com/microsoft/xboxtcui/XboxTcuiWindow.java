@@ -9,7 +9,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-
+import com.mojang.minecraftpe.R;
 import com.microsoft.xbox.service.model.ProfileModel;
 import com.microsoft.xbox.toolkit.BackgroundThreadWaitor;
 import com.microsoft.xbox.toolkit.DialogManager;
@@ -24,7 +24,7 @@ import com.microsoft.xbox.toolkit.ui.NavigationManager;
 import com.microsoft.xbox.toolkit.ui.ScreenLayout;
 import com.microsoft.xbox.xle.app.SGProjectSpecificDialogManager;
 import com.microsoft.xbox.xle.app.XleProjectSpecificDataProvider;
-import com.mojang.minecraftpe.R;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Stack;

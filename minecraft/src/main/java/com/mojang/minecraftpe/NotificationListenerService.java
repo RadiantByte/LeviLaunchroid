@@ -9,11 +9,7 @@ import com.microsoft.xbox.service.notification.NotificationHelper;
 import com.microsoft.xbox.service.notification.NotificationResult;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * 13.08.2022
- *
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class NotificationListenerService extends FirebaseMessagingService {
     private static String sDeviceRegistrationToken = "";
 

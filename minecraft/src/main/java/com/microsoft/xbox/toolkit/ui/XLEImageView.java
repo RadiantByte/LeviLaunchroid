@@ -1,17 +1,13 @@
 package com.microsoft.xbox.toolkit.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
 import android.view.View;
-
+import android.widget.ImageView;
 import androidx.appcompat.widget.AppCompatImageView;
 
-/**
- * 07.01.2021
- *
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
 
 public class XLEImageView extends AppCompatImageView {
     public static final int IMAGE_ERROR = 2;

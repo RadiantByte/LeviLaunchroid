@@ -4,16 +4,12 @@ import com.microsoft.xbox.service.network.managers.IPeopleHubResult;
 import com.microsoft.xbox.toolkit.XLEAssert;
 import com.microsoft.xbox.xle.app.XLEUtil;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * 07.01.2021
- *
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
 
 public class FollowersData implements Serializable {
     private static final long serialVersionUID = 6714889261254600161L;

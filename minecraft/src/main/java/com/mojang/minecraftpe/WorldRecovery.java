@@ -15,11 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 
-/**
- * 13.08.2022
- *
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class WorldRecovery {
     private ContentResolver mContentResolver;
     private Context mContext;

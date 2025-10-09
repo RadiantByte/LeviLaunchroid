@@ -8,7 +8,6 @@ import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
-import android.app.Application
 
 /**
  * Unified manager for Minecraft package resolution, library loading, and asset management
@@ -47,6 +46,7 @@ class GamePackageManager private constructor(private val context: Context) {
         extractLibraries()
 
         assetManager = createAssetManager()
+        setupSecurityProvider()
     }
 
     private fun detectGamePackage(): String? {
@@ -64,14 +64,11 @@ class GamePackageManager private constructor(private val context: Context) {
 
     private fun resolveNativeLibDir(): String {
         val appInfo = packageContext.applicationInfo
-
         return if (appInfo.splitPublicSourceDirs?.isNotEmpty() == true) {
-            // App bundle format - extract to cache
             val cacheLibDir = File(context.cacheDir, "lib/${getDeviceAbi()}")
             cacheLibDir.mkdirs()
             cacheLibDir.absolutePath
         } else {
-            // Standard APK
             appInfo.nativeLibraryDir
         }
     }
@@ -88,12 +85,10 @@ class GamePackageManager private constructor(private val context: Context) {
         val appInfo = packageContext.applicationInfo
         val outputDir = File(nativeLibDir)
 
-        // Try native lib dir first
         if (File(appInfo.nativeLibraryDir).exists()) {
             copyFromNativeDir(appInfo.nativeLibraryDir, outputDir)
         }
 
-        // Extract from APKs if needed
         val apkPaths = mutableListOf<String>()
         appInfo.sourceDir?.let { apkPaths.add(it) }
         appInfo.splitPublicSourceDirs?.let { apkPaths.addAll(it) }
@@ -116,9 +111,9 @@ class GamePackageManager private constructor(private val context: Context) {
                     srcFile.copyTo(dstFile, overwrite = true)
                     dstFile.setReadable(true)
                     dstFile.setExecutable(true)
-                    Log.d(TAG, "Copied $lib")
+                    logFileOperation("Copied", lib)
                 } catch (e: Exception) {
-                    Log.w(TAG, "Failed to copy $lib: ${e.message}")
+                    logFileOperation("Failed to copy", lib)
                 }
             }
         }
@@ -146,7 +141,7 @@ class GamePackageManager private constructor(private val context: Context) {
 
                     output.setReadable(true)
                     output.setExecutable(true)
-                    Log.d(TAG, "Extracted $lib from ${File(apkPath).name}")
+                    logFileOperation("Extracted", lib, "from ${File(apkPath).name}")
                 }
             }
         } catch (e: Exception) {
@@ -166,6 +161,15 @@ class GamePackageManager private constructor(private val context: Context) {
         }
     }
 
+    private fun logFileOperation(action: String, lib: String, extra: String? = null, e: Exception? = null) {
+        val message = buildString {
+            append("$action $lib")
+            if (extra != null) append(" $extra")
+            if (e != null) append(": ${e.message}")
+        }
+        if (e != null) Log.w(TAG, message) else Log.d(TAG, message)
+    }
+
     private fun createAssetManager(): AssetManager {
         val assets = AssetManager::class.java.newInstance()
         val addAssetPathMethod = AssetManager::class.java.getMethod(
@@ -173,20 +177,27 @@ class GamePackageManager private constructor(private val context: Context) {
             String::class.java
         )
 
-        // Add game assets
-        addAssetPathMethod.invoke(assets, packageContext.packageResourcePath)
-
-        // Add split APK assets if present
-        val basePath = packageContext.packageResourcePath
-        val splitPath = basePath.replace("base.apk", "split_install_pack.apk")
-        if (File(splitPath).exists()) {
-            addAssetPathMethod.invoke(assets, splitPath)
+        val paths = mutableListOf<String>().apply {
+            add(packageContext.packageResourcePath)
+            val splitPath = packageContext.packageResourcePath.replace("base.apk", "split_install_pack.apk")
+            if (File(splitPath).exists()) add(splitPath)
+            add(context.packageResourcePath)
         }
 
-        // Add launcher assets
-        addAssetPathMethod.invoke(assets, context.packageResourcePath)
+        paths.forEach { path ->
+            addAssetPathMethod.invoke(assets, path)
+        }
 
         return assets
+    }
+
+    private fun setupSecurityProvider() {
+        Log.d(TAG, "Setting up security provider...")
+        try {
+            java.security.Security.insertProviderAt(org.conscrypt.Conscrypt.newProvider(), 1)
+        } catch (e: Exception) {
+            Log.w(TAG, "Conscrypt init failed: ${e.message}")
+        }
     }
 
     /**
@@ -215,12 +226,10 @@ class GamePackageManager private constructor(private val context: Context) {
      * Load all required libraries in order
      */
     fun loadAllLibraries() {
-        loadLibrary("c++_shared")
-        loadLibrary("fmod")
-        loadLibrary("MediaDecoders_Android")
-        loadLibrary("pairipcore")
-        loadLibrary("maesdk")
-        loadLibrary("minecraftpe")
+        requiredLibs.forEach { lib ->
+            val libName = lib.removePrefix("lib").removeSuffix(".so")
+            loadLibrary(libName)
+        }
     }
 
     /**

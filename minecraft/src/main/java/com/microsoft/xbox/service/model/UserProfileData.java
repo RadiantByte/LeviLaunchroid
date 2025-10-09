@@ -2,13 +2,9 @@ package com.microsoft.xbox.service.model;
 
 import com.microsoft.xbox.service.network.managers.IPeopleHubResult;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * 07.01.2021
- *
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
 
 public class UserProfileData {
     public String TenureLevel;
