@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
 
 
 public class ObjectLoader<T> extends WorkerLoader<ObjectLoader.Result<T>> {
