@@ -9,9 +9,7 @@ import android.os.*;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
-/**
- * @author <a href="https://github.com/timscriptov">timscriptov</a>
- */
+
 public class ImportService extends Service {
     static final int MSG_CORRELATION_CHECK = 672;
     static final int MSG_CORRELATION_RESPONSE = 837;
