@@ -28,9 +28,12 @@ class GamePackageManager private constructor(private val context: Context, priva
         "libc++_shared.so",
         "libfmod.so",
         "libMediaDecoders_Android.so",
-        "libpairipcore.so",
-        "libmaesdk.so",
         "libminecraftpe.so"
+    )
+
+    private val systemLoadedLibs = arrayOf(
+        "libpairipcore.so",
+        "libmaesdk.so"
     )
 
     init {
@@ -260,25 +263,38 @@ class GamePackageManager private constructor(private val context: Context, priva
 
     fun loadLibrary(name: String): Boolean {
         val libFile = File(nativeLibDir, if (name.startsWith("lib")) name else "lib$name.so")
-        return try {
-            if (libFile.exists() && libFile.length() > 0) {
-                System.load(libFile.absolutePath)
-                Log.d(TAG, "Loaded $name from $nativeLibDir")
-                true
-            } else {
-                Log.w(TAG, "Library $name not found in $nativeLibDir, attempting system load")
+        val libName = libFile.name
+        return if (systemLoadedLibs.contains(libName)) {
+            try {
                 System.loadLibrary(name.removePrefix("lib").removeSuffix(".so"))
                 Log.d(TAG, "Loaded $name as system library")
                 true
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to load system library $name: ${e.message}")
+                false
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to load $name: ${e.message}")
-            false
+        } else {
+            try {
+                if (libFile.exists() && libFile.length() > 0) {
+                    System.load(libFile.absolutePath)
+                    Log.d(TAG, "Loaded $name from $nativeLibDir")
+                    true
+                } else {
+                    Log.w(TAG, "Library $name not found in $nativeLibDir, attempting system load")
+                    System.loadLibrary(name.removePrefix("lib").removeSuffix(".so"))
+                    Log.d(TAG, "Loaded $name as system library")
+                    true
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to load $name: ${e.message}")
+                false
+            }
         }
     }
 
     fun loadAllLibraries() {
-        requiredLibs.forEach { lib ->
+        val allLibs = requiredLibs + systemLoadedLibs
+        allLibs.forEach { lib ->
             val libName = lib.removePrefix("lib").removeSuffix(".so")
             if (!loadLibrary(libName)) {
                 Log.e(TAG, "Failed to load required library $libName")

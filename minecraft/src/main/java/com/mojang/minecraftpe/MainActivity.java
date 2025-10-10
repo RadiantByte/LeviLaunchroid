@@ -48,6 +48,7 @@ import com.mojang.minecraftpe.input.InputDeviceManager;
 import com.mojang.minecraftpe.platforms.Platform;
 import com.mojang.minecraftpe.python.PythonPackageLoader;
 
+import org.conscrypt.BuildConfig;
 import org.fmod.FMOD;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -181,6 +182,8 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
     native void nativeFireNetworkChangedEvent(String networkConnectionType);
 
     native boolean isAndroidChromebook();
+
+
 
     public void buyGame() {
     }
@@ -1145,12 +1148,14 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
     }
 
     public String getAccessToken() {
-        return PreferenceManager.getDefaultSharedPreferences(this).getString("accessToken", "");
+        return PreferenceManager.getDefaultSharedPreferences(this).getString("accessToken", BuildConfig.FLAVOR);
     }
 
+
     public String getClientId() {
-        return PreferenceManager.getDefaultSharedPreferences(this).getString("clientId", "");
+        return PreferenceManager.getDefaultSharedPreferences(this).getString("clientId", BuildConfig.FLAVOR);
     }
+
 
     public String getProfileId() {
         return PreferenceManager.getDefaultSharedPreferences(this).getString("profileId", "");
@@ -1196,6 +1201,11 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
     boolean isHardwareKeyboardHidden() {
         return getWindow().getContext().getResources().getConfiguration().hardKeyboardHidden == 2;
     }
+
+    public void requestIntegrityToken(String str) {
+        nativeSetIntegrityToken(createUUID());
+    }
+
 
     boolean isTablet() {
         if (isChromebook()) {
@@ -1584,8 +1594,9 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
     }
 
     public String createUUID() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        return UUID.randomUUID().toString().replaceAll("-", BuildConfig.FLAVOR);
     }
+
 
     public Intent createAndroidLaunchIntent() {
         final Context applicationContext = getApplicationContext();
