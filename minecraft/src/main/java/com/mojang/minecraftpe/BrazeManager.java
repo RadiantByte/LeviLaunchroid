@@ -1,23 +1,12 @@
 package com.mojang.minecraftpe;
-
-import android.os.Process;
-import android.util.Log;
-
-
 public class BrazeManager {
-    private final MainActivity mActivity;
-
-    public BrazeManager(MainActivity mainActivity) {
-        mActivity = mainActivity;
-    }
-
-    public void setBrazeID(String str) {
-    }
-
-    public void enableBrazeSDK() {
+    public void configureBrazeAtRuntime() {
     }
 
     public void disableBrazeSDK() {
+    }
+
+    public void enableBrazeSDK() {
     }
 
     public boolean isBrazeSDKDisabled() {
@@ -27,18 +16,9 @@ public class BrazeManager {
     public void requestImmediateDataFlush() {
     }
 
-    public void configureBrazeAtRuntime() {
+    public void requestPushPermission() {
     }
 
-    public void requestPushPermission() {
-        if (mActivity.checkPermission("android.permission.POST_NOTIFICATIONS", Process.myPid(), Process.myUid()) != 0) {
-            mActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mActivity.suspendGameplayUpdates();
-                    mActivity.requestPermissions(new String[]{"android.permission.POST_NOTIFICATIONS"}, 2);
-                }
-            });
-        }
+    public void setBrazeID(String str) {
     }
 }
