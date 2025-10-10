@@ -9,7 +9,7 @@
 **A lightweight Android launcher for Minecraft: Bedrock Edition**
 
 [![GitHub Release](https://img.shields.io/github/v/release/LiteLDev/LeviLaunchroid?style=flat-square&color=blue)](https://github.com/LiteLDev/LeviLaunchroid/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Issues](https://img.shields.io/github/issues/LiteLDev/LeviLaunchroid?style=flat-square&color=red)](https://github.com/LiteLDev/LeviLaunchroid/issues)
 [![Stars](https://img.shields.io/github/stars/LiteLDev/LeviLaunchroid?style=flat-square&color=yellow)](https://github.com/LiteLDev/LeviLaunchroid)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-green?style=flat-square&logo=android)](https://www.android.com/)
@@ -146,15 +146,15 @@ LeviLauncher is designed for legitimate players of Minecraft Bedrock Edition. Pl
 
 - Modify LeviLauncher for personal gameplay and to test new features
 - Create educational content (videos, tutorials, blog posts) showcasing LeviLauncher's capabilities
-- Fork the repository for learning purposes or to create derivative projects, provided you comply with the GNU GPL v3.0
-- Share your modified versions with others as long as you comply with the GPL license terms
+- Fork the repository for learning purposes or to create derivative projects, provided you comply with the GNU LGPL v3.0
+- Share your modified versions with others as long as you comply with the LGPL license terms
 
 ### Prohibited Uses
 
-- Do not distribute modified versions without sharing the source code, as required by the GPL
+- Do not distribute modified versions without sharing the source code, as required by the LGPL
 - Do not claim LeviLauncher as your own without crediting the LeviMC team and its contributors
-- Selling LeviLauncher or derivatives without adhering to the GPL is strictly prohibited
-- Do not distribute LeviLauncher as closed-source or under a non-GPL license
+- Selling LeviLauncher or derivatives without adhering to the LGPL is strictly prohibited
+- Do not distribute LeviLauncher as closed-source or under a non-LGPL license
 - Do not use LeviLauncher to violate Mojang or Microsoft's user agreements
 
 > **Disclaimer:** The authors and contributors of LeviLauncher are not responsible for bans, damages, or issues arising from the use of this software. Use it at your own risk and in accordance with Minecraft's terms of service.
@@ -171,7 +171,7 @@ LeviLauncher would not be possible without the contributions and support of many
 
 - **LeviMC Organization** – For maintaining the LeviLauncher project and providing infrastructure support
 - **Android Community** – For excellent documentation, libraries, and tools that made this launcher possible
-- **UnpairedCore Library** – For Game load Suport in latest version
+- **UnpairedCore Library** – For providing essential utilities and components used in LeviLauncher. See [Kitsuri Studios - UnpairCore](https://github.com/Kitsuri-Studios/unpaircore)
 - **Open Source Community** – For all the libraries, frameworks, and tools that power this project
 - **Contributors** – A heartfelt thank you to all [contributors](https://github.com/LiteLDev/LeviLaunchroid/graphs/contributors) who have continuously improved and maintained LeviLauncher through their time and expertise
 
@@ -192,7 +192,7 @@ LeviLauncher would not be possible without the contributions and support of many
 <div align="center">
 
 [![GitHub Release](https://img.shields.io/github/v/release/LiteLDev/LeviLaunchroid?style=flat-square&color=blue)](https://github.com/LiteLDev/LeviLaunchroid/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: LGPL v3](https://img.shields.io/badge/License-LGPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/lgpl-3.0)
 [![Issues](https://img.shields.io/github/issues/LiteLDev/LeviLaunchroid?style=flat-square&color=red)](https://github.com/LiteLDev/LeviLaunchroid/issues)
 [![Stars](https://img.shields.io/github/stars/LiteLDev/LeviLaunchroid?style=flat-square&color=yellow)](https://github.com/LiteLDev/LeviLaunchroid)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-green?style=flat-square&logo=android)](https://www.android.com/)
