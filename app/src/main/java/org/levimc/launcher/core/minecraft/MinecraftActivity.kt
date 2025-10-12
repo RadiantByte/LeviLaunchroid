@@ -1,5 +1,6 @@
 package org.levimc.launcher.core.minecraft
 
+import android.content.Intent
 import android.content.res.AssetManager
 import android.os.Bundle
 import android.util.Log
@@ -57,6 +58,10 @@ class MinecraftActivity : MainActivity() {
             return
         }
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
     }
 
     override fun getAssets(): AssetManager {
