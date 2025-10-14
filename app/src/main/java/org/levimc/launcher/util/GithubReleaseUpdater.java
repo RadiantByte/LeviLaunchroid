@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -28,6 +29,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class GithubReleaseUpdater {
+    private static final String TAG = "GithubReleaseUpdater";
     private static final String GITHUB_LATEST_API = "https://api.github.com/repos/%s/%s/releases/latest";
     private static final String APK_ASSET_KEYWORD = ".apk";
     private static final String PREF_IGNORED_VERSION = "update_ignored_version";
@@ -66,7 +68,7 @@ public class GithubReleaseUpdater {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Logger.get().error("Request failed: " + e.getMessage());
+                Log.e(TAG, "Request failed: " + e.getMessage());
             }
 
             @Override
@@ -86,7 +88,7 @@ public class GithubReleaseUpdater {
                         }
                     }
                     if (downloadUrl == null) {
-                        Logger.get().error("No APK asset found in release.");
+                        Log.e(TAG, "No APK asset found in release.");
                         return;
                     }
                     String localVersion = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
@@ -97,7 +99,7 @@ public class GithubReleaseUpdater {
                                 Toast.makeText(activity, activity.getString(R.string.already_latest_version, localVersion), Toast.LENGTH_SHORT).show());
                     }
                 } catch (Exception e) {
-                    Logger.get().error("Parse error: " + e.getMessage());
+                    Log.e(TAG, "Parse error: " + e.getMessage());
                 }
             }
         });
@@ -109,7 +111,7 @@ public class GithubReleaseUpdater {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Logger.get().error("Request failed: " + e.getMessage());
+                Log.e(TAG, "Request failed: " + e.getMessage());
             }
 
             @Override
@@ -129,7 +131,7 @@ public class GithubReleaseUpdater {
                         }
                     }
                     if (downloadUrl == null) {
-                        Logger.get().error("No APK asset found in release.");
+                        Log.e(TAG, "No APK asset found in release.");
                         return;
                     }
                     String localVersion = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
@@ -141,7 +143,7 @@ public class GithubReleaseUpdater {
                         showUpdateDialogWithIgnore(latestVersion, downloadUrl);
                     }
                 } catch (Exception e) {
-                    Logger.get().error("Parse error: " + e.getMessage());
+                    Log.e(TAG, "Parse error: " + e.getMessage());
                 }
             }
         });

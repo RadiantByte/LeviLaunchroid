@@ -3,4 +3,3 @@ project(levi LANGUAGES CXX)
 
 add_subdirectory(unpaircore)
 add_subdirectory(preloader)
-add_subdirectory(levilauncher)

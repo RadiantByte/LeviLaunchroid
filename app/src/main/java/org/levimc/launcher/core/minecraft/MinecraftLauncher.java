@@ -13,7 +13,7 @@ import org.levimc.launcher.core.mods.ModNativeLoader;
 import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.settings.FeatureSettings;
 import org.levimc.launcher.ui.dialogs.LoadingDialog;
-import org.levimc.launcher.util.Logger;
+import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -70,7 +70,7 @@ public class MinecraftLauncher {
 
         try {
             if (version == null) {
-                Logger.get().error("No version selected");
+                Log.e(TAG, "No version selected");
                 showLaunchErrorOnUi("No version selected");
                 return;
             }
@@ -90,7 +90,7 @@ public class MinecraftLauncher {
             fillIntentWithMcPath(sourceIntent, version);
             launchMinecraftActivity(sourceIntent, version, false);
         } catch (Exception e) {
-            Logger.get().error("Launch failed: " + e.getMessage(), e);
+            Log.e(TAG, "Launch failed: " + e.getMessage(), e);
             dismissLoading();
             showLaunchErrorOnUi("Launch failed: " + e.getMessage());
         }
@@ -140,7 +140,7 @@ public class MinecraftLauncher {
                     activity.startActivity(sourceIntent);
                 });
             } catch (Exception e) {
-                Logger.get().error("Failed to launch Minecraft activity: " + e.getMessage(), e);
+                Log.e(TAG, "Failed to launch Minecraft activity: " + e.getMessage(), e);
                 activity.runOnUiThread(() -> {
                     dismissLoading();
                     Toast.makeText(context, "Failed to launch: " + e.getMessage(), Toast.LENGTH_LONG).show();

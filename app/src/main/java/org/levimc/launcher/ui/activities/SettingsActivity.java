@@ -65,7 +65,6 @@ public class SettingsActivity extends BaseActivity {
             FeatureSettings fs = FeatureSettings.getInstance();
             addThemeSelectorItem(themeManager);
             addLanguageSelectorItem(languageManager);
-            addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled(), (btn, checked) -> fs.setDebugLogDialogEnabled(checked));
             addSwitchItem(getString(R.string.version_isolation), fs.isVersionIsolationEnabled(), (btn, checked) -> fs.setVersionIsolationEnabled(checked));
 
             try {

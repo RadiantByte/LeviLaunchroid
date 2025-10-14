@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.PopupMenu;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -28,7 +27,6 @@ import org.levimc.launcher.core.mods.Mod;
 import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.databinding.ActivityMainBinding;
-import org.levimc.launcher.service.LogOverlay;
 import org.levimc.launcher.settings.FeatureSettings;
 import org.levimc.launcher.ui.adapter.ModsAdapter;
 import org.levimc.launcher.ui.adapter.QuickActionsAdapter;
@@ -55,10 +53,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends BaseActivity {
-    static {
-        System.loadLibrary("levilauncher");
-    }
-
     private ActivityMainBinding binding;
     private MinecraftLauncher minecraftLauncher;
     private LanguageManager languageManager;
@@ -84,7 +78,6 @@ public class MainActivity extends BaseActivity {
         updateViewModelVersion();
         checkResourcepack();
         handleIncomingFiles();
-        initSettingsUi();
         new GithubReleaseUpdater(this, "LiteLDev", "LeviLaunchroid", permissionResultLauncher).checkUpdateOnLaunch();
         repairNeededVersions();
         requestBasicPermissions();
@@ -273,12 +266,7 @@ public class MainActivity extends BaseActivity {
         abiLabel.setBackgroundResource(bgRes);
     }
 
-    private void initSettingsUi() {
-        FeatureSettings fs = FeatureSettings.getInstance();
-        if (fs.isDebugLogDialogEnabled()) {
-            LogOverlay.getInstance(this).show();
-        }
-    }
+    // 已移除调试日志叠加层逻辑，无需初始化
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -502,11 +490,7 @@ public class MainActivity extends BaseActivity {
         ThemeManager themeManager = new ThemeManager(this);
         SettingsDialog dlg = new SettingsDialog(this);
         dlg.addThemeSelectorItem(themeManager);
-        dlg.addSwitchItem(
-                getString(R.string.enable_debug_log),
-                fs.isDebugLogDialogEnabled(),
-                (btn, check) -> fs.setDebugLogDialogEnabled(check)
-        );
+        // 已移除调试日志叠加层开关
         dlg.addSwitchItem(
                 getString(R.string.version_isolation),
                 fs.isVersionIsolationEnabled(),

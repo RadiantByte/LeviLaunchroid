@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import com.google.android.material.color.DynamicColors
 import org.levimc.launcher.settings.FeatureSettings
 
 class LauncherApplication : Application() {
@@ -14,7 +13,6 @@ class LauncherApplication : Application() {
         context = applicationContext
         FeatureSettings.init(applicationContext)
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        DynamicColors.applyToActivitiesIfAvailable(this)
     }
 
     companion object {

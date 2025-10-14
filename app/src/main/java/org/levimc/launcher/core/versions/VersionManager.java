@@ -17,7 +17,6 @@ import org.levimc.launcher.ui.activities.MainActivity;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.dialogs.LibsRepairDialog;
 import org.levimc.launcher.util.ApkUtils;
-import org.levimc.launcher.util.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.File;
