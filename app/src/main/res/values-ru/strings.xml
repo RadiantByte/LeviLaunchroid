@@ -16,6 +16,9 @@
     <string name="about_title">☕ О приложении</string>
     <string name="copyright">©2024–2025 LeviMC. Все права защищены.</string>
     <string name="font_license">Это приложение использует шрифт Misans.</string>
+    <string name="quick_actions_title">Быстрые действия</string>
+    <string name="content_management_subtitle">Управление мирами, ресурсами и пакетами поведения</string>
+    <string name="import_apk_subtitle">Установка Minecraft из файла APK</string>
 
     <!-- Диалоги -->
     <string name="resourcepack_detected_title">Обнаружен набор ресурсов</string>

@@ -15,8 +15,6 @@ public class AnimationHelper {
         binding.header.setVisibility(View.INVISIBLE);
         setViewAnimationState(binding.mainCard, -50f);
         setViewAnimationState(binding.modCard, -30f);
-        setViewAnimationState(binding.aboutCard, 30f);
-        binding.githubIcon.setAlpha(0f);
     }
 
     private static void setViewAnimationState(View view, float translationX) {
@@ -28,8 +26,6 @@ public class AnimationHelper {
         binding.header.postDelayed(() -> startHeaderAnimation(binding.header), 300);
         binding.mainCard.postDelayed(() -> animateView(binding.mainCard, 600, 1.2f), 500);
         binding.modCard.postDelayed(() -> animateView(binding.modCard, 400, 1f), 700);
-        binding.aboutCard.postDelayed(() -> animateView(binding.aboutCard, 400, 1f), 800);
-        binding.githubIcon.postDelayed(() -> animateGithubIcon(binding.githubIcon), 1000);
     }
 
     private static void startHeaderAnimation(View header) {
@@ -43,13 +39,5 @@ public class AnimationHelper {
                 .setDuration(duration).start();
     }
 
-    private static void animateGithubIcon(View githubIcon) {
-        githubIcon.setAlpha(1f);
-        ObjectAnimator animator = ObjectAnimator.ofFloat(githubIcon, "translationY", -15f, 15f);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.setRepeatCount(ValueAnimator.INFINITE);
-        animator.setRepeatMode(ValueAnimator.REVERSE);
-        animator.setDuration(1500);
-        animator.start();
-    }
+    // Github icon animation removed along with About card.
 }

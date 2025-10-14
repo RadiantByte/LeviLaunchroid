@@ -288,22 +288,12 @@ public class MainActivity extends BaseActivity {
             if (languageManager != null) languageManager.showLanguageMenu(v);
         });
         binding.selectVersionButton.setOnClickListener(v -> showVersionSelectDialog());
-        binding.manageButton.setOnClickListener(v -> {
-            PopupMenu menu = new PopupMenu(this, v);
-            menu.getMenu().add(R.string.content_management).setOnMenuItemClickListener(item -> {
-                openContentManagement();
-                return true;
-            });
-            menu.getMenu().add(R.string.import_apk).setOnMenuItemClickListener(item -> {
-                startFilePicker("application/vnd.android.package-archive", apkImportResultLauncher);
-                return true;
-            });
-            menu.show();
-        });
         binding.addModButton.setOnClickListener(v -> startFilePicker("*/*", soImportResultLauncher));
         binding.settingsButton.setOnClickListener(v -> showSettingsSafely());
-        binding.githubIcon.setOnClickListener(v -> openGithub());
         binding.deleteVersionButton.setOnClickListener(v -> showDeleteVersionDialog());
+
+        binding.contentManagementButton.setOnClickListener(v -> openContentManagement());
+        binding.importApkButton.setOnClickListener(v -> startFilePicker("application/vnd.android.package-archive", apkImportResultLauncher));
 
         binding.modCard.setOnClickListener(v -> openModsFullscreen());
 

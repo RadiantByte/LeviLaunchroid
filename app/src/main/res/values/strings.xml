@@ -17,6 +17,10 @@
     <string name="about_title">☕ About</string>
     <string name="copyright">©2024–2025 LeviMC. All rights reserved.</string>
     <string name="font_license">This app uses the Misans font.</string>
+    <string name="about_footer_github">GitHub: https://github.com/LiteLDev/LeviLaunchroid</string>
+    <string name="quick_actions_title">Quick Actions</string>
+    <string name="content_management_subtitle">Manage worlds, resource packs and behavior packs</string>
+    <string name="import_apk_subtitle">Install Minecraft from an APK file</string>
 
     <!-- Dialogs -->
     <string name="resourcepack_detected_title">Resource Pack Detected</string>

@@ -116,19 +116,6 @@
                     android:textSize="16sp"
                     android:background="@drawable/bg_abi_default"/>
 
-                <Button
-                    android:id="@+id/manage_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minHeight="0dp"
-                    android:backgroundTint="@color/primary"
-                    android:text="@string/manage"
-                    android:textColor="@color/on_primary"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginStart="8dp"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:layout_gravity="center_vertical" />
 
                 <Space
                     android:layout_width="0dp"
@@ -146,7 +133,6 @@
                     android:tint="@color/error"
                     android:visibility="visible" />
             </LinearLayout>
-            <!-- 版本选择 & 启动按钮 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -201,7 +187,6 @@
                     android:textColor="@color/on_primary" />
             </LinearLayout>
         </LinearLayout>
-        <!-- 下方卡片区 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -210,8 +195,6 @@
             android:orientation="horizontal"
             android:weightSum="2"
             android:paddingEnd="8dp">
-            <!-- mods 卡片 -->
-            <!-- mods 卡片 -->
             <LinearLayout
                 android:id="@+id/mod_card"
                 android:layout_width="0dp"
@@ -220,6 +203,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/card_background"
                 android:orientation="vertical"
+                android:padding="15dp"
                 android:paddingEnd="8dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -229,7 +213,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:paddingEnd="8dp">
 
                     <TextView
                         android:id="@+id/mods_title_text"
@@ -238,8 +223,8 @@
                         android:text="@string/mods_title"
                         android:fontFamily="@font/misans"
                         android:textColor="@color/on_surface"
-                        android:textSize="16sp"
-                        android:padding="6dp" />
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
 
                     <Space
                         android:layout_width="0dp"
@@ -266,7 +251,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/about_card"
+                android:id="@+id/tools_card"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="6dp"
@@ -280,25 +265,83 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/misans"
-                    android:text="@string/about_title"
+                    android:text="@string/quick_actions_title"
                     android:textColor="@color/on_surface"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
+                <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent"
+                    android:fillViewport="true">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingTop="8dp">
 
-                    <ImageView
-                        android:id="@+id/github_icon"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:src="@drawable/ic_github"
-                        app:tint="@color/on_surface" />
-                </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/content_management_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/content_management"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="@font/misans" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/content_management_subtitle"
+                            android:textSize="12sp"
+                            android:textColor="@color/on_surface"
+                            android:alpha="0.8"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/misans" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/import_apk_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:layout_marginTop="6dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/import_apk"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/on_surface"
+                            android:fontFamily="@font/misans" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/import_apk_subtitle"
+                            android:textSize="12sp"
+                            android:textColor="@color/on_surface"
+                            android:alpha="0.8"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/misans" />
+                    </LinearLayout>
+                    </LinearLayout>
+                </ScrollView>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
