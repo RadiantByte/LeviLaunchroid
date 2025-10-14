@@ -19,16 +19,12 @@ public class ResourcepackHandler {
     private final Activity activity;
     private final MinecraftLauncher minecraftLauncher;
     private final ExecutorService executor;
-    private final ProgressBar progressLoader;
-    private final Button launchBtn;
 
     public ResourcepackHandler(Activity activity, MinecraftLauncher minecraftLauncher,
-                               ExecutorService executor, ProgressBar progressLoader, Button launchBtn) {
+                               ExecutorService executor) {
         this.activity = activity;
         this.minecraftLauncher = minecraftLauncher;
         this.executor = executor;
-        this.progressLoader = progressLoader;
-        this.launchBtn = launchBtn;
     }
 
     public void checkIntentForResourcepack() {
@@ -56,16 +52,12 @@ public class ResourcepackHandler {
     }
 
     private void launchMinecraft(Intent intent) {
-        launchBtn.setEnabled(false);
-        progressLoader.setVisibility(android.view.View.VISIBLE);
         executor.execute(() -> {
             VersionManager versionManager = VersionManager.get(activity);
             GameVersion currentVersion = versionManager.getSelectedVersion();
 
             minecraftLauncher.launch(intent, currentVersion);
             activity.runOnUiThread(() -> {
-                progressLoader.setVisibility(android.view.View.GONE);
-                launchBtn.setEnabled(true);
             });
         });
     }

@@ -24,6 +24,7 @@ public class MinecraftLauncher {
     private final Context context;
     private GamePackageManager gameManager;
     public static final String MC_PACKAGE_NAME = "com.mojang.minecraftpe";
+    private LoadingDialog loadingDialog;
 
     public MinecraftLauncher(Context context) {
         this.context = context;
@@ -80,13 +81,17 @@ public class MinecraftLauncher {
                 );
                 return;
             }
-
-            activity.runOnUiThread(this::showLoading);
+            activity.runOnUiThread(() -> {
+                dismissLoading();
+                loadingDialog = new LoadingDialog(activity);
+                loadingDialog.show();
+            });
             gameManager = GamePackageManager.Companion.getInstance(context.getApplicationContext(), version);
             fillIntentWithMcPath(sourceIntent, version);
             launchMinecraftActivity(sourceIntent, version, false);
         } catch (Exception e) {
             Logger.get().error("Launch failed: " + e.getMessage(), e);
+            dismissLoading();
             showLaunchErrorOnUi("Launch failed: " + e.getMessage());
         }
     }
@@ -119,7 +124,6 @@ public class MinecraftLauncher {
                 sourceIntent.putExtra("MODS_ENABLED", modsEnabled);
                 sourceIntent.putExtra("MINECRAFT_VERSION", version.versionCode);
                 sourceIntent.putExtra("MINECRAFT_VERSION_DIR", version.directoryName);
-                sourceIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                 if (shouldLoadMaesdk(version)) {
                     gameManager.loadAllLibraries();
@@ -132,14 +136,15 @@ public class MinecraftLauncher {
                 ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
 
                 activity.runOnUiThread(() -> {
-                    activity.finish();
-                    context.startActivity(sourceIntent);
+                    dismissLoading();
+                    activity.startActivity(sourceIntent);
                 });
             } catch (Exception e) {
                 Logger.get().error("Failed to launch Minecraft activity: " + e.getMessage(), e);
-                activity.runOnUiThread(() ->
-                        Toast.makeText(context, "Failed to launch: " + e.getMessage(), Toast.LENGTH_LONG).show()
-                );
+                activity.runOnUiThread(() -> {
+                    dismissLoading();
+                    Toast.makeText(context, "Failed to launch: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
             }
         }).start();
     }
@@ -173,8 +178,15 @@ public class MinecraftLauncher {
         }
     }
 
-    private void showLoading() {
-        new LoadingDialog(context).show();
+    private void dismissLoading() {
+        try {
+            if (loadingDialog != null && loadingDialog.isShowing()) {
+                loadingDialog.dismiss();
+            }
+        } catch (Exception ignored) {
+        } finally {
+            loadingDialog = null;
+        }
     }
 
     private void showLaunchErrorOnUi(String message) {

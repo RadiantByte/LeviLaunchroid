@@ -6,6 +6,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -29,6 +31,7 @@ public class ModsFullscreenActivity extends AppCompatActivity {
     private MainViewModel viewModel;
     private TextView totalModsCount;
     private TextView enabledModsCount;
+    private ActivityResultLauncher<Intent> pickModLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,28 @@ public class ModsFullscreenActivity extends AppCompatActivity {
         setupViews();
         setupViewModel();
         setupRecyclerView();
+        pickModLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        FileHandler fileHandler = new FileHandler(this, viewModel, VersionManager.get(this));
+                        fileHandler.processIncomingFilesWithConfirmation(result.getData(), new FileHandler.FileOperationCallback() {
+                            @Override
+                            public void onSuccess(int processedFiles) {
+                                Toast.makeText(ModsFullscreenActivity.this, getString(R.string.files_processed, processedFiles), Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onError(String errorMessage) {
+                            }
+
+                            @Override
+                            public void onProgressUpdate(int progress) {
+                            }
+                        }, true);
+                    }
+                }
+        );
     }
 
     private void setupViews() {
@@ -57,7 +82,7 @@ public class ModsFullscreenActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
-        startActivityForResult(intent, 1002);
+        pickModLauncher.launch(intent);
     }
 
     private void setupViewModel() {
@@ -141,25 +166,5 @@ public class ModsFullscreenActivity extends AppCompatActivity {
         }
     }
     
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1002 && resultCode == RESULT_OK && data != null) {
-            FileHandler fileHandler = new FileHandler(this, viewModel, VersionManager.get(this));
-            fileHandler.processIncomingFilesWithConfirmation(data, new FileHandler.FileOperationCallback() {
-                @Override
-                public void onSuccess(int processedFiles) {
-                    Toast.makeText(ModsFullscreenActivity.this, getString(R.string.files_processed, processedFiles), Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-                }
-
-                @Override
-                public void onProgressUpdate(int progress) {
-                }
-            }, true);
-        }
-    }
+    
 }

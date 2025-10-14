@@ -58,10 +58,26 @@ class MinecraftActivity : MainActivity() {
             return
         }
         super.onCreate(savedInstanceState)
+        MinecraftActivityState.onCreated(this)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        MinecraftActivityState.onResumed()
+    }
+
+    override fun onPause() {
+        MinecraftActivityState.onPaused()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        MinecraftActivityState.onDestroyed()
+        super.onDestroy()
     }
 
     override fun getAssets(): AssetManager {

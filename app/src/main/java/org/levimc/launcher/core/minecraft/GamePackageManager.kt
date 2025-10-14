@@ -88,7 +88,7 @@ class GamePackageManager private constructor(private val context: Context, priva
             it.contains("arm64-v8a") || it.contains("x86_64")
         } ?: Build.SUPPORTED_32_BIT_ABIS.firstOrNull {
             it.contains("armeabi-v7a") || it.contains("x86")
-        } ?: Build.CPU_ABI
+        } ?: (Build.SUPPORTED_ABIS.firstOrNull() ?: "armeabi-v7a")
     }
 
     private fun extractLibraries() {

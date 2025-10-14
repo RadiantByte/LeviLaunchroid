@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import org.levimc.launcher.core.minecraft.MinecraftActivity;
+import org.levimc.launcher.core.minecraft.MinecraftActivityState;
 
 import java.util.List;
 
@@ -30,19 +31,19 @@ public class IntentHandler extends BaseActivity {
     @SuppressLint("IntentReset")
     private void handleDeepLink(Intent originalIntent) {
         Intent newIntent = new Intent(originalIntent);
-
-        if (isMinecraftResourceFile(originalIntent)) {
-            if (isMinecraftActivityRunning()) {
-                newIntent.setClass(this, MinecraftActivity.class);
-                newIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            } else {
-                newIntent.setClassName(this, "org.levimc.launcher.ui.activities.MainActivity");
-            }
+        if (isMinecraftActivityRunning()) {
+            newIntent.setClass(this, MinecraftActivity.class);
+            newIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         } else {
-            if (isMcRunning()) {
-                newIntent.setClassName(this, "com.mojang.minecraftpe.Launcher");
-            } else {
+
+            if (isMinecraftResourceFile(originalIntent)) {
                 newIntent.setClassName(this, "org.levimc.launcher.ui.activities.MainActivity");
+            } else {
+                if (isMcRunning()) {
+                    newIntent.setClassName(this, "com.mojang.minecraftpe.Launcher");
+                } else {
+                    newIntent.setClassName(this, "org.levimc.launcher.ui.activities.MainActivity");
+                }
             }
         }
 
@@ -66,6 +67,7 @@ public class IntentHandler extends BaseActivity {
     }
 
     private boolean isMinecraftActivityRunning() {
+        if (MinecraftActivityState.isRunning()) return true;
         try {
             ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
             if (activityManager != null) {

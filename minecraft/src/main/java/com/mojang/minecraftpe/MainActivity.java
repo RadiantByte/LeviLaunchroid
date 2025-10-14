@@ -1511,7 +1511,6 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
         mInstance = null;
         nativeOnDestroy();
         super.onDestroy();
-        System.exit(0);
     }
 
     @Override

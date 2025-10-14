@@ -196,7 +196,7 @@ public class MainActivity extends BaseActivity {
     private void checkResourcepack() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         new ResourcepackHandler(
-                this, minecraftLauncher, executorService, binding.progressLoader, binding.launchButton
+                this, minecraftLauncher, executorService
         ).checkIntentForResourcepack();
     }
 
@@ -245,6 +245,13 @@ public class MainActivity extends BaseActivity {
                 .setNegativeButton(getString(R.string.eula_exit), v -> finishAffinity());
         dia.setCancelable(false);
         dia.show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setTextMinecraftVersion();
+        updateAbiLabel();
     }
 
     private void updateAbiLabel() {
@@ -328,28 +335,18 @@ public class MainActivity extends BaseActivity {
 
     private void openModsFullscreen() {
         Intent intent = new Intent(this, ModsFullscreenActivity.class);
-        startActivityForResult(intent, 1001);
+        startActivity(intent);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1001 && resultCode == RESULT_OK) {
-            if (data != null && "add_mod".equals(data.getStringExtra("action"))) {
-                startFilePicker("*/*", soImportResultLauncher);
-            }
-        }
-    }
+    
 
     private void launchGame() {
         binding.launchButton.setEnabled(false);
-        binding.progressLoader.setVisibility(View.VISIBLE);
 
         GameVersion version = versionManager != null ? versionManager.getSelectedVersion() : null;
 
         // Check if no version is selected
         if (version == null) {
-            binding.progressLoader.setVisibility(View.GONE);
             binding.launchButton.setEnabled(true);
             new CustomAlertDialog(this)
                     .setTitleText(getString(R.string.dialog_title_no_version))
@@ -361,7 +358,6 @@ public class MainActivity extends BaseActivity {
 
         // Check if trying to load installed version with version isolation enabled
         if (version.isInstalled && FeatureSettings.getInstance().isVersionIsolationEnabled()) {
-            binding.progressLoader.setVisibility(View.GONE);
             binding.launchButton.setEnabled(true);
             new CustomAlertDialog(this)
                     .setTitleText(getString(R.string.dialog_title_disable_version_isolation))
@@ -377,7 +373,6 @@ public class MainActivity extends BaseActivity {
 
         // Check if trying to load imported version without version isolation
         if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
-            binding.progressLoader.setVisibility(View.GONE);
             binding.launchButton.setEnabled(true);
             new CustomAlertDialog(this)
                     .setTitleText(getString(R.string.dialog_title_version_isolation))
@@ -393,7 +388,6 @@ public class MainActivity extends BaseActivity {
 
         // Check if license is verified or Minecraft is from Play Store
         if (!PlayStoreValidator.isMinecraftFromPlayStore(this)) {
-            binding.progressLoader.setVisibility(View.GONE);
             binding.launchButton.setEnabled(true);
             PlayStoreValidationDialog.showNotFromPlayStoreDialog(this);
             return;
@@ -403,12 +397,10 @@ public class MainActivity extends BaseActivity {
             try {
                 minecraftLauncher.launch(getIntent(), version);
                 runOnUiThread(() -> {
-                    binding.progressLoader.setVisibility(View.GONE);
                     binding.launchButton.setEnabled(true);
                 });
             } catch (Exception e) {
                 runOnUiThread(() -> {
-                    binding.progressLoader.setVisibility(View.GONE);
                     binding.launchButton.setEnabled(true);
                     new CustomAlertDialog(this)
                             .setTitleText(getString(R.string.dialog_title_launch_failed))
