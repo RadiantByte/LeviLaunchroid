@@ -71,6 +71,9 @@ public class ApkInstaller {
                 String versionName = info.versionName;
 
                 File libTargetDir = new File(internalDir, "lib");
+                if (libTargetDir.exists()) {
+                    deleteDir(libTargetDir);
+                }
                 File baseDir = externalDir;
                 if (!baseDir.exists() && !baseDir.mkdirs()) {
                     postError("Open base dir failed");

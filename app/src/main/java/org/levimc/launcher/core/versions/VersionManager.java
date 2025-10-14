@@ -109,25 +109,21 @@ public class VersionManager {
     }
 
     private String inferAbiFromNativeLibDir(String nativeLibDir, GameVersion version) {
-        if (version != null && version.isExtractFalse) {
+        if (version != null && !version.isInstalled) {
             File libDir = new File(context.getDataDir(), "minecraft/" + version.directoryName + "/lib/");
             String[] abiDirs = {"arm64", "arm", "x86_64", "x86"};
             for (String abiDir : abiDirs) {
                 File soFile = new File(libDir, abiDir + "/libminecraftpe.so");
                 if (soFile.exists()) {
-                    switch (abiDir) {
-                        case "arm64":
-                            return "arm64-v8a";
-                        case "arm":
-                            return "armeabi-v7a";
-                        default:
-                            return abiDir;
-                    }
+                    return switch (abiDir) {
+                        case "arm64" -> "arm64-v8a";
+                        case "arm" -> "armeabi-v7a";
+                        default -> abiDir;
+                    };
                 }
             }
             return "unknown";
         }
-
         if (nativeLibDir == null) return "unknown";
         if (nativeLibDir.contains("arm64")) return "arm64-v8a";
         if (nativeLibDir.contains("armeabi")) return "armeabi-v7a";
@@ -177,6 +173,9 @@ public class VersionManager {
                 if (totalSize == 0) totalSize = 1;
 
                 File libDir = new File(dataDir, "lib");
+                if (libDir.exists()) {
+                    deleteDir(libDir);
+                }
                 long[] progress = {0};
                 int[] lastPercent = {-1};
 
@@ -226,11 +225,19 @@ public class VersionManager {
 
     private long getLibsTotalSize(File apkFile) throws IOException {
         long totalSize = 0;
-        try (ZipInputStream zis = new ZipInputStream(new BufferedInputStream(new FileInputStream(apkFile)))) {
-            ZipEntry entry;
-            while ((entry = zis.getNextEntry()) != null) {
-                if (entry.getName().startsWith("lib/") && !entry.isDirectory()) {
-                    totalSize += Math.max(0, entry.getSize());
+        try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(apkFile)) {
+            java.util.Enumeration<? extends java.util.zip.ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                java.util.zip.ZipEntry entry = entries.nextElement();
+                String name = entry.getName();
+                if (name != null && name.startsWith("lib/") && !entry.isDirectory()) {
+                    long size = entry.getSize();
+                    if (size < 0) {
+                        size = entry.getCompressedSize();
+                    }
+                    if (size > 0) {
+                        totalSize += size;
+                    }
                 }
             }
         }
@@ -457,14 +464,22 @@ public class VersionManager {
             @Override
             public void onRepairStarted() {
                 activity.runOnUiThread(() -> {
-                    repairDialog.setTitle(activity.getString(R.string.repair_libs_in_progress));
+                    repairDialog.setTitleText(activity.getString(R.string.repair_libs_in_progress));
+                    repairDialog.setStatusText(activity.getString(R.string.repair_preparing));
+                    repairDialog.setIndeterminate(true);
                     repairDialog.updateProgress(0);
                 });
             }
 
             @Override
             public void onRepairProgress(int progress) {
-                activity.runOnUiThread(() -> repairDialog.updateProgress(progress));
+                activity.runOnUiThread(() -> {
+                    if (progress > 0) {
+                        repairDialog.setStatusText(activity.getString(R.string.repair_processing));
+                        repairDialog.setIndeterminate(false);
+                    }
+                    repairDialog.updateProgress(progress);
+                });
             }
 
             @Override
@@ -590,7 +605,12 @@ public class VersionManager {
                     deleteDir(extDir);
                 }
 
-                File intDir = new File(context.getDataDir(), "minecraft/" + (extDir != null ? extDir.getName() : ""));
+                File intBaseDir = new File(context.getDataDir(), "minecraft");
+                File intDir = new File(intBaseDir, (extDir != null ? extDir.getName() : ""));
+                File intLibDir = new File(intDir, "lib");
+                if (intLibDir.exists()) {
+                    deleteDir(intLibDir);
+                }
                 if (intDir.exists()) {
                     deleteDir(intDir);
                 }

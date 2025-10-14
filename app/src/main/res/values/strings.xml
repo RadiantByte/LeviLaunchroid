@@ -124,6 +124,8 @@
     <string name="repair">Repair</string>
     <string name="repair_libs_dialog_title">Repairing Game Libraries</string>
     <string name="requires_repair">[Needs Repair]</string>
+    <string name="repair_preparing">Preparing…</string>
+    <string name="repair_processing">Extracting libraries…</string>
 
     <string name="theme_title">Theme Mode</string>
     <string name="theme_follow_system">Follow System</string>

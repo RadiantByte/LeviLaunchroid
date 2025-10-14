@@ -15,15 +15,28 @@
         android:textSize="18sp"
         android:textColor="@color/on_primary"
         android:gravity="center"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="14sp"
+        android:textColor="@color/on_primary"
+        android:gravity="center"
         android:layout_marginBottom="16dp"/>
         
     <ProgressBar
         android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="8dp"
+        android:layout_marginTop="4dp"
         android:max="100"
-        android:progress="0"/>
+        android:progress="0"
+        android:progressTint="@color/secondary"
+        android:progressBackgroundTint="@color/outline"/>
         
     <TextView
         android:id="@+id/progress_text"

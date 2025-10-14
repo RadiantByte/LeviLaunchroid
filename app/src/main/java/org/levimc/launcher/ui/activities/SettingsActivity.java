@@ -137,7 +137,7 @@ public class SettingsActivity extends BaseActivity {
         };
         String currentCode = languageManager.getCurrentLanguage();
         int defaultIdx = switch (currentCode) {
-            case "zh" -> 1;
+            case "zh", "zh-CN" -> 1;
             case "ru" -> 2;
             default -> 0; 
         };
@@ -146,7 +146,7 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String code = switch (position) {
-                    case 1 -> "zh";
+                    case 1 -> "zh-CN";
                     case 2 -> "ru";
                     default -> "en";
                 };

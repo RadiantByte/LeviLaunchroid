@@ -123,6 +123,8 @@
     <string name="repair">Восстановить</string>
     <string name="repair_libs_dialog_title">Восстановление библиотек игры</string>
     <string name="requires_repair">[Необходимо восстановление]</string>
+    <string name="repair_preparing">Подготовка…</string>
+    <string name="repair_processing">Извлечение библиотек…</string>
 
     <string name="theme_title">Тема</string>
     <string name="theme_follow_system">Как в системе</string>

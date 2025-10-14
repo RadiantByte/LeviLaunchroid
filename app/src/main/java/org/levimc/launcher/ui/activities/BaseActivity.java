@@ -1,5 +1,9 @@
 package org.levimc.launcher.ui.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 
@@ -8,13 +12,37 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.levimc.launcher.util.ThemeManager;
 
+import java.util.Locale;
+
 public class BaseActivity extends AppCompatActivity {
+    @Override
+    protected void attachBaseContext(Context newBase) {
+
+        SharedPreferences prefs = newBase.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        String languageCode = prefs.getString("language", Locale.getDefault().toLanguageTag());
+
+        Locale locale = Locale.forLanguageTag(languageCode);
+        Locale.setDefault(locale);
+
+        Resources res = newBase.getResources();
+        Configuration config = new Configuration(res.getConfiguration());
+        config.setLocale(locale);
+        Context localizedContext = newBase.createConfigurationContext(config);
+
+        super.attachBaseContext(localizedContext);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeManager themeManager = new ThemeManager(this);
         themeManager.setThemeMode(themeManager.getCurrentMode());
         super.onCreate(savedInstanceState);
         hideSystemUI();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private void hideSystemUI() {

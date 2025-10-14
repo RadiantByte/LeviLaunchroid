@@ -2,10 +2,11 @@ package org.levimc.launcher.util;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.view.View;
 import android.widget.PopupMenu;
+
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 
 import org.levimc.launcher.R;
 
@@ -23,8 +24,8 @@ public class LanguageManager {
 
     public void applySavedLanguage() {
         SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Activity.MODE_PRIVATE);
-        String language = prefs.getString(LANGUAGE_KEY, Locale.getDefault().getLanguage());
-        setLocale(language, false);
+        String tag = prefs.getString(LANGUAGE_KEY, Locale.getDefault().toLanguageTag());
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tag));
     }
 
     public void setAppLanguage(String languageCode) {
@@ -35,14 +36,9 @@ public class LanguageManager {
     }
 
     private void setLocale(String languageCode, boolean recreateActivity) {
-        Locale locale = new Locale(languageCode);
+        Locale locale = Locale.forLanguageTag(languageCode);
         Locale.setDefault(locale);
-
-        Configuration config = new Configuration();
-        config.setLocale(locale);
-        Resources resources = activity.getResources();
-        resources.updateConfiguration(config, resources.getDisplayMetrics());
-
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageCode));
         if (recreateActivity) {
             activity.recreate();
         }
@@ -58,7 +54,7 @@ public class LanguageManager {
             setAppLanguage("en");
             return true;
         } else if (itemId == R.id.action_chinese) {
-            setAppLanguage("zh");
+            setAppLanguage("zh-CN");
             return true;
         } else if (itemId == R.id.action_russian) {
             setAppLanguage("ru");
@@ -71,7 +67,12 @@ public class LanguageManager {
     }
 
     public String getCurrentLanguage() {
-        SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Activity.MODE_PRIVATE);
-        return prefs.getString(LANGUAGE_KEY, Locale.getDefault().getLanguage());
+        LocaleListCompat list = AppCompatDelegate.getApplicationLocales();
+        String tags = list.toLanguageTags();
+        if (tags == null || tags.isEmpty()) {
+            SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Activity.MODE_PRIVATE);
+            return prefs.getString(LANGUAGE_KEY, Locale.getDefault().toLanguageTag());
+        }
+        return tags;
     }
 }
