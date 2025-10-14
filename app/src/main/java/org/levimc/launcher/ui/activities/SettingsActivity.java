@@ -24,6 +24,7 @@ import org.levimc.launcher.settings.FeatureSettings;
 import org.levimc.launcher.ui.activities.BaseActivity;
 import org.levimc.launcher.ui.adapter.SettingsAdapter;
 import org.levimc.launcher.util.GithubReleaseUpdater;
+import org.levimc.launcher.util.LanguageManager;
 import org.levimc.launcher.util.PermissionsHandler;
 import org.levimc.launcher.util.ThemeManager;
 
@@ -60,8 +61,10 @@ public class SettingsActivity extends BaseActivity {
             settingsItemsContainer = container;
 
             ThemeManager themeManager = new ThemeManager(this);
+            LanguageManager languageManager = new LanguageManager(this);
             FeatureSettings fs = FeatureSettings.getInstance();
             addThemeSelectorItem(themeManager);
+            addLanguageSelectorItem(languageManager);
             addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled(), (btn, checked) -> fs.setDebugLogDialogEnabled(checked));
             addSwitchItem(getString(R.string.version_isolation), fs.isVersionIsolationEnabled(), (btn, checked) -> fs.setVersionIsolationEnabled(checked));
 
@@ -118,6 +121,38 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 themeManager.setThemeMode(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private void addLanguageSelectorItem(LanguageManager languageManager) {
+        String[] languageOptions = {
+                getString(R.string.english),
+                getString(R.string.chinese),
+                getString(R.string.russian)
+        };
+        String currentCode = languageManager.getCurrentLanguage();
+        int defaultIdx = switch (currentCode) {
+            case "zh" -> 1;
+            case "ru" -> 2;
+            default -> 0; 
+        };
+        Spinner spinner = addSpinnerItem(getString(R.string.language), languageOptions, defaultIdx);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String code = switch (position) {
+                    case 1 -> "zh";
+                    case 2 -> "ru";
+                    default -> "en";
+                };
+                if (!code.equals(languageManager.getCurrentLanguage())) {
+                    languageManager.setAppLanguage(code);
+                }
             }
 
             @Override

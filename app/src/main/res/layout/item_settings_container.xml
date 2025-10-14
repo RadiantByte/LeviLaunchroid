@@ -26,26 +26,26 @@
             android:text="@string/about_title"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:fontFamily="@font/misans"/>
+            />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/copyright"
             android:textSize="13sp"
-            android:fontFamily="@font/misans"/>
+            />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/font_license"
             android:textSize="13sp"
-            android:fontFamily="@font/misans"/>
+            />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/about_footer_github"
             android:autoLink="web"
             android:textSize="13sp"
-            android:fontFamily="@font/misans"/>
+            />
     </LinearLayout>
 
 </LinearLayout>

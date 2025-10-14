@@ -285,9 +285,6 @@ public class MainActivity extends BaseActivity {
     private void initListeners() {
         binding.launchButton.setOnClickListener(v -> launchGame());
         binding.launchButton.setOnTouchListener(this::animateLaunchButton);
-        binding.languageButton.setOnClickListener(v -> {
-            if (languageManager != null) languageManager.showLanguageMenu(v);
-        });
         binding.selectVersionButton.setOnClickListener(v -> showVersionSelectDialog());
         binding.addModButton.setOnClickListener(v -> startFilePicker("*/*", soImportResultLauncher));
         binding.settingsButton.setOnClickListener(v -> {

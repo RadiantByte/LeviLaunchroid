@@ -239,4 +239,8 @@
     <string name="mod_filename_format">文件：%s</string>
     <string name="mod_deleted">模组已成功删除</string>
     <string name="mod_enable_status">启用状态</string>
+
+    <!-- 版本选择对话框 -->
+    <string name="game_version_select_title">选择游戏版本</string>
+    <string name="back">返回</string>
 </resources>

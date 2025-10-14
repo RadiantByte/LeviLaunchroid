@@ -241,4 +241,8 @@
     <string name="mod_filename_format">File: %s</string>
     <string name="mod_deleted">Mod deleted successfully</string>
     <string name="mod_enable_status">Enable Status</string>
+
+    <!-- Game Version Select Dialog -->
+    <string name="game_version_select_title">Select Game Version</string>
+    <string name="back">Back</string>
 </resources>

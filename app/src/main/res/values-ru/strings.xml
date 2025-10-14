@@ -239,4 +239,8 @@
     <string name="mod_filename_format">Файл: %s</string>
     <string name="mod_deleted">Мод успешно удалён</string>
     <string name="mod_enable_status">Состояние включения</string>
+
+    <!-- Диалог выбора версии игры -->
+    <string name="game_version_select_title">Выбор версии игры</string>
+    <string name="back">Назад</string>
 </resources>

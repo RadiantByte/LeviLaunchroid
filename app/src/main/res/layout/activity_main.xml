@@ -59,6 +59,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_internet"
+            android:visibility="gone"
             app:tint="@color/on_surface" />
 
         <LinearLayout
@@ -275,7 +276,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:clipToPadding="false"
-                    android:paddingTop="8dp" />
+                    android:paddingTop="8dp"
+                    android:layoutAnimation="@anim/qa_layout_animation" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
