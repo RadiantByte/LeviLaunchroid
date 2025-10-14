@@ -4,6 +4,7 @@
     <string name="minecraft">Minecraft</string>
     <string name="version">Version</string>
     <string name="launch">Launch</string>
+    <string name="manage">Manage</string>
 
     <!-- Mods -->
     <string name="mods_title">🧩 Mods (%d)</string>
@@ -221,5 +222,18 @@
     <string name="minecraft_not_installed_message">Minecraft isn’t installed on your device. Please install it from the Google Play Store to use this launcher.</string>
     <string name="install_minecraft">Install Minecraft</string>
 
+    <string name="full_mods_title">🧩 Mods </string>
+    <string name="total_mods">Total Mods:</string>
+    <string name="enabled_mods">Enabled:</string>
+    <string name="add_mod">Add Mod</string>
 
+    <!-- Mod Detail -->
+    <string name="mod_detail_title">Mod Details</string>
+    <string name="mod_delete_confirmation">Are you sure you want to delete this mod?</string>
+    <string name="delete_mod">Delete Mod</string>
+    <string name="error_loading_mod">Error loading mod details</string>
+    <string name="mod_enabled">Mod enabled</string>
+    <string name="mod_disabled">Mod disabled</string>
+    <string name="mod_filename_format">File: %s</string>
+    <string name="mod_deleted">Mod deleted successfully</string>
 </resources>

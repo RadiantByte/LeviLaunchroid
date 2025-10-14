@@ -73,6 +73,18 @@
             tools:ignore="DiscouragedApi" />
 
         <activity
+            android:name=".ui.activities.ModsFullscreenActivity"
+            android:theme="@style/Base.Theme.FullScreen"
+            android:screenOrientation="sensorLandscape"
+            android:exported="false"
+            tools:ignore="DiscouragedApi" />
+        <activity
+            android:name=".ui.activities.ModDetailActivity"
+            android:theme="@style/Base.Theme.FullScreen"
+            android:screenOrientation="sensorLandscape"
+            android:exported="false"
+            tools:ignore="DiscouragedApi" />
+        <activity
             android:name=".ui.activities.IntentHandler"
             android:alwaysRetainTaskState="true"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"

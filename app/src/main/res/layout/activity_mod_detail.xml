@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="24dp">
+
+    <!-- 顶部标题栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/surface"
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp">
+
+        <TextView
+            android:id="@+id/mod_detail_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mod_detail_title"
+            android:fontFamily="@font/misans"
+            android:textColor="@color/on_surface"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/close_detail_button"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginHorizontal="5dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_arrow_back"
+            android:tint="@color/on_surface" />
+    </LinearLayout>
+
+    <!-- 模组详情卡片 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/card_background"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 模组名称 -->
+        <TextView
+            android:id="@+id/mod_name_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="模组名称"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface"
+            android:fontFamily="@font/misans" />
+
+        <!-- 模组文件名 -->
+        <TextView
+            android:id="@+id/mod_filename_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="文件名: mod.so"
+            android:textSize="14sp"
+            android:textColor="@color/on_surface"
+            android:fontFamily="@font/misans"
+            android:layout_marginTop="8dp" />
+
+        <!-- 模组加载顺序 -->
+        <TextView
+            android:id="@+id/mod_order_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="加载顺序: 1"
+            android:textSize="14sp"
+            android:textColor="@color/on_surface"
+            android:fontFamily="@font/misans"
+            android:layout_marginTop="4dp" />
+
+        <!-- 启用状态 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="启用状态"
+                android:textSize="16sp"
+                android:textColor="@color/on_surface"
+                android:fontFamily="@font/misans" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <Switch
+                android:id="@+id/mod_switch_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 操作按钮区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/card_background"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/delete_mod_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="删除模组"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/error"
+            android:fontFamily="@font/misans" />
+    </LinearLayout>
+
+</LinearLayout>

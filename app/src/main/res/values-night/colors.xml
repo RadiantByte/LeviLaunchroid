@@ -1,21 +1,23 @@
 <resources>
-    <!-- 色调深邃且对比明显的颜色板 -->
-    <color name="primary">#424242</color> <!-- 主色：深灰色 -->
-    <color name="on_primary">#FFFFFF</color> <!-- 在主色上的文本：白色 -->
+    <color name="primary">#424242</color>
+    <color name="on_primary">#FFFFFF</color>
 
-    <color name="secondary">#616161</color> <!-- 次级色：较浅的灰色 -->
-    <color name="on_secondary">#FFFFFF</color> <!-- 在次级色上的文本：白色 -->
+    <color name="secondary">#616161</color>
+    <color name="on_secondary">#FFFFFF</color>
 
-    <color name="tertiary">#757575</color> <!-- 第三色：中等灰色 -->
-    <color name="on_tertiary">#FFFFFF</color> <!-- 在第三色上的文本：白色 -->
+    <color name="tertiary">#757575</color>
+    <color name="on_tertiary">#FFFFFF</color>
 
-    <color name="error">#CF6679</color> <!-- 错误色：柔和的红色 -->
-    <color name="on_error">#000000</color> <!-- 在错误色上的文本：黑色 -->
+    <color name="error">#CF6679</color>
+    <color name="on_error">#000000</color>
 
-    <color name="background">#303030</color> <!-- 背景：深灰色 -->
-    <color name="surface">#353535</color> <!-- 表面：蓝灰色 -->
-    <color name="on_background">#E0E0E0</color> <!-- 在背景上的文本：浅灰色 -->
-    <color name="on_surface">#E0E0E0</color> <!-- 在表面上的文本：浅灰色 -->
+    <color name="background">#303030</color>
+    <color name="surface">#353535</color>
+    <color name="on_background">#E0E0E0</color>
+    <color name="on_surface">#E0E0E0</color>
 
-    <color name="outline">#BDBDBD</color> <!-- 轮廓：浅灰色 -->
+    <color name="outline">#BDBDBD</color>
+
+    <color name="surface_variant">#E8F5E9</color>
+    <color name="on_surface_variant">#616161</color>
 </resources>

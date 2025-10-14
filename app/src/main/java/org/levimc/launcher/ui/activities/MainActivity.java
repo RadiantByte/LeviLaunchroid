@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.PopupMenu;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -287,13 +288,41 @@ public class MainActivity extends BaseActivity {
             if (languageManager != null) languageManager.showLanguageMenu(v);
         });
         binding.selectVersionButton.setOnClickListener(v -> showVersionSelectDialog());
-        binding.contentManagementButton.setOnClickListener(v -> openContentManagement());
-        binding.importApkButton.setOnClickListener(v -> startFilePicker("application/vnd.android.package-archive", apkImportResultLauncher));
+        binding.manageButton.setOnClickListener(v -> {
+            PopupMenu menu = new PopupMenu(this, v);
+            menu.getMenu().add(R.string.content_management).setOnMenuItemClickListener(item -> {
+                openContentManagement();
+                return true;
+            });
+            menu.getMenu().add(R.string.import_apk).setOnMenuItemClickListener(item -> {
+                startFilePicker("application/vnd.android.package-archive", apkImportResultLauncher);
+                return true;
+            });
+            menu.show();
+        });
         binding.addModButton.setOnClickListener(v -> startFilePicker("*/*", soImportResultLauncher));
         binding.settingsButton.setOnClickListener(v -> showSettingsSafely());
         binding.githubIcon.setOnClickListener(v -> openGithub());
         binding.deleteVersionButton.setOnClickListener(v -> showDeleteVersionDialog());
+
+        binding.modCard.setOnClickListener(v -> openModsFullscreen());
+
         FeatureSettings.init(getApplicationContext());
+    }
+
+    private void openModsFullscreen() {
+        Intent intent = new Intent(this, ModsFullscreenActivity.class);
+        startActivityForResult(intent, 1001);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            if (data != null && "add_mod".equals(data.getStringExtra("action"))) {
+                startFilePicker("*/*", soImportResultLauncher);
+            }
+        }
     }
 
     private void launchGame() {

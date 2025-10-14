@@ -23,6 +23,7 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder>
     private OnDeleteListener onDeleteListener;
     private OnModEnableChangeListener onModEnableChangeListener;
     private OnModReorderListener onModReorderListener;
+    private OnModClickListener onModClickListener;
 
     public interface OnDeleteListener {
         void onDelete(Mod mod, int position);
@@ -34,6 +35,10 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder>
 
     public interface OnModReorderListener {
         void onModsReordered(List<Mod> reorderedMods);
+    }
+
+    public interface OnModClickListener {
+        void onModClick(Mod mod, int position);
     }
 
     public ModsAdapter(List<Mod> mods) {
@@ -50,6 +55,10 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder>
 
     public void setOnModReorderListener(OnModReorderListener listener) {
         this.onModReorderListener = listener;
+    }
+
+    public void setOnModClickListener(OnModClickListener listener) {
+        this.onModClickListener = listener;
     }
 
     @NonNull
@@ -79,6 +88,13 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder>
 
             if (onModEnableChangeListener != null) {
                 onModEnableChangeListener.onEnableChanged(mod, isChecked);
+            }
+        });
+
+        // 设置item点击监听器
+        holder.itemView.setOnClickListener(v -> {
+            if (onModClickListener != null) {
+                onModClickListener.onModClick(mod, position);
             }
         });
     }

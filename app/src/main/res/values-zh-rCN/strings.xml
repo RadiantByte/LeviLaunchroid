@@ -220,4 +220,19 @@
     <string name="minecraft_not_installed_message">您的设备上似乎没有安装 Minecraft。请先从 Google Play 商店安装以使用此启动器。</string>
     <string name="install_minecraft">安装 Minecraft</string>
 
+
+    <string name="full_mods_title">🧩 模组 </string>
+    <string name="total_mods">模组总数：</string>
+    <string name="enabled_mods">已启用：</string>
+    <string name="add_mod">添加模组</string>
+
+    <!-- Mod Detail -->
+    <string name="mod_detail_title">模组详情</string>
+    <string name="mod_delete_confirmation">确定要删除此模组吗？</string>
+    <string name="delete_mod">删除模组</string>
+    <string name="error_loading_mod">加载模组详情时出错</string>
+    <string name="mod_enabled">模组已启用</string>
+    <string name="mod_disabled">模组已禁用</string>
+    <string name="mod_filename_format">文件：%s</string>
+    <string name="mod_deleted">模组已成功删除</string>
 </resources>

@@ -117,26 +117,12 @@
                     android:background="@drawable/bg_abi_default"/>
 
                 <Button
-                    android:id="@+id/content_management_button"
+                    android:id="@+id/manage_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:minHeight="0dp"
                     android:backgroundTint="@color/primary"
-                    android:text="@string/content_management"
-                    android:textColor="@color/on_primary"
-                    android:paddingHorizontal="12dp"
-                    android:layout_marginStart="8dp"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:layout_gravity="center_vertical" />
-
-                <Button
-                    android:id="@+id/import_apk_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minHeight="0dp"
-                    android:backgroundTint="@color/primary"
-                    android:text="@string/import_apk"
+                    android:text="@string/manage"
                     android:textColor="@color/on_primary"
                     android:paddingHorizontal="12dp"
                     android:layout_marginStart="8dp"
@@ -225,6 +211,7 @@
             android:weightSum="2"
             android:paddingEnd="8dp">
             <!-- mods 卡片 -->
+            <!-- mods 卡片 -->
             <LinearLayout
                 android:id="@+id/mod_card"
                 android:layout_width="0dp"
@@ -233,7 +220,10 @@
                 android:layout_weight="1"
                 android:background="@drawable/card_background"
                 android:orientation="vertical"
-                android:paddingEnd="8dp">
+                android:paddingEnd="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"

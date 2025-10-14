@@ -7,7 +7,7 @@ namespace memory {
 
 FuncPtr resolveIdentifier(char const *identifier, char const *moduleName) {
   return reinterpret_cast<FuncPtr>(
-      pl::signature::resolveSignature(identifier, moduleName));
+      pl::signature::pl_resolve_signature(identifier, moduleName));
 }
 
 FuncPtr resolveIdentifier(std::initializer_list<const char *> identifiers,

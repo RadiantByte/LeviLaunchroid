@@ -221,4 +221,18 @@
     <string name="minecraft_not_installed_message">Похоже, что Minecraft не установлен на вашем устройстве. Пожалуйста, установите его из Google Play Маркета, чтобы использовать этот лаунчер.</string>
     <string name="install_minecraft">Установить Minecraft</string>
 
+    <string name="full_mods_title">🧩 Моды </string>
+    <string name="total_mods">Всего модов:</string>
+    <string name="enabled_mods">Включено:</string>
+    <string name="add_mod">Добавить мод</string>
+
+    <!-- Mod Detail -->
+    <string name="mod_detail_title">Детали мода</string>
+    <string name="mod_delete_confirmation">Вы уверены, что хотите удалить этот мод?</string>
+    <string name="delete_mod">Удалить мод</string>
+    <string name="error_loading_mod">Ошибка загрузки данных мода</string>
+    <string name="mod_enabled">Мод включен</string>
+    <string name="mod_disabled">Мод отключен</string>
+    <string name="mod_filename_format">Файл: %s</string>
+    <string name="mod_deleted">Мод успешно удалён</string>
 </resources>
