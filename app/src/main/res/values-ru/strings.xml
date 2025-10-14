@@ -2,7 +2,6 @@
     <!-- Важные -->
     <string name="app_name">LeviLauncher</string>
     <string name="minecraft">Minecraft</string>
-    <string name="version">Версия</string>
     <string name="launch">Запустить</string>
 
     <!-- Моды -->
@@ -43,8 +42,6 @@
     <string name="dialog_title_version_isolation">Требуется изоляция версии</string>
     <string name="dialog_message_version_isolation">Это импортированная версия. Пожалуйста, включите изоляцию версии в настройках, чтобы запустить эту версию.</string>
     <string name="dialog_positive_enable">Включить</string>
-    <string name="dialog_title_no_base_game">Требуется базовая игра</string>
-    <string name="dialog_message_no_base_game">Базовая установка Minecraft не найдена. Пожалуйста, установите Minecraft из Play Store, чтобы использовать изолированные версии.</string>
     <string name="dialog_title_launch_failed">Ошибка запуска</string>
     <string name="dialog_message_launch_failed">Не удалось запустить Minecraft: %1$s</string>
     <string name="dialog_title_disable_version_isolation">Отключить изоляцию версии</string>
@@ -60,13 +57,9 @@
 
     <!-- Обратная связь -->
     <string name="files_processed">Успешно добавлены файлы мода %d </string>
-    <string name="files_processing_error">Не удалось добавить файл: %s</string>
     <string name="user_cancelled">Импорт отменён пользователем</string>
 
-    <string name="error">Ошибка</string>
 
-    <string name="no_install_minecraft">Сначала установите Minecraft</string>
-    <string name="no_minecraft">Выйти</string>
     <string name="exit">Выйти</string>
 
     <string name="overlay_permission_message">Необходимо разрешение на отображение поверх других приложений</string>
@@ -122,7 +115,6 @@
     <string name="missing_libs_message">Необходимые файлы библиотек игры отсутствуют. Хотите восстановить их сейчас?</string>
     <string name="repair">Восстановить</string>
     <string name="repair_libs_dialog_title">Восстановление библиотек игры</string>
-    <string name="requires_repair">[Необходимо восстановление]</string>
     <string name="repair_preparing">Подготовка…</string>
     <string name="repair_processing">Извлечение библиотек…</string>
 
@@ -161,7 +153,6 @@
     <string name="russian">Русский</string>
 
     <!-- Переименовать версию -->
-    <string name="rename_version">Переименовать версию</string>
     <string name="rename_version_title">Переименовать версию</string>
     <string name="rename_version_message">Введите новое имя для этой версии:</string>
     <string name="new_version_name">Новое имя версии</string>
@@ -175,48 +166,23 @@
     <string name="worlds_title">🌍 Миры</string>
     <string name="resource_packs_title">📦 Наборы ресурсов</string>
     <string name="behavior_packs_title">⚙️ Наборы поведения</string>
-    <string name="no_worlds_found">Миры не найдены</string>
-    <string name="no_resource_packs_found">Наборы ресурсов не найдены</string>
-    <string name="no_behavior_packs_found">Наборы поведения не найдены</string>
 
     <!-- World Management -->
-    <string name="world_name">Название мира</string>
     <string name="world_size">Размер: %s</string>
     <string name="world_last_played">Последняя игра: %s</string>
     <string name="import_world">Импортировать мир</string>
     <string name="export_world">Экспортировать мир</string>
-    <string name="rename_world">Переименовать мир</string>
     <string name="delete_world">Удалить мир</string>
     <string name="backup_world">Создать резервную копию мира</string>
-    <string name="world_exported">Мир успешно экспортирован</string>
-    <string name="world_import_success">Мир успешно импортирован</string>
-    <string name="world_rename_success">Мир успешно переименован</string>
-    <string name="world_delete_success">Мир успешно удален</string>
-    <string name="world_backup_success">Резервная копия мира успешно создана</string>
 
     <!-- Resource Pack Management -->
-    <string name="resource_pack_name">Название набора ресурсов</string>
-    <string name="resource_pack_version">Версия: %s</string>
-    <string name="resource_pack_description">Описание: %s</string>
     <string name="import_resource_pack">Импортировать набор ресурсов</string>
     <string name="import_behavior_pack">Импортировать набор поведений</string>
-    <string name="enable_resource_pack">Включить</string>
-    <string name="disable_resource_pack">Отключить</string>
     <string name="delete_resource_pack">Удалить набор ресурсов</string>
-    <string name="resource_pack_enabled">Набор ресурсов включен</string>
-    <string name="resource_pack_disabled">Набор ресурсов отключен</string>
-    <string name="resource_pack_import_success">Набор ресурсов успешно импортирован</string>
-    <string name="resource_pack_delete_success">Набор ресурсов успешно удален</string>
 
     <!-- Content Operations -->
-    <string name="operation_in_progress">Выполняется операция…</string>
-    <string name="operation_failed">Ошибка операции: %s</string>
     <string name="confirm_delete_world">Вы уверены, что хотите удалить этот мир? Это действие необратимо.</string>
     <string name="confirm_delete_resource_pack">Вы уверены, что хотите удалить этот набор ресурсов? Это действие необратимо.</string>
-    <string name="backup_created">Резервная копия создана: %s</string>
-    <string name="select_export_location">Выберите место для экспорта</string>
-    <string name="invalid_world_file">Неверный файл мира</string>
-    <string name="invalid_resource_pack_file">Неверный файл набора ресурсов</string>
 
     <!-- Play Store Validation -->
     <string name="minecraft_playstore_required_title">Требуется версия из Play Маркета</string>
@@ -233,16 +199,17 @@
 
     <!-- Mod Detail -->
     <string name="mod_detail_title">Детали мода</string>
-    <string name="mod_delete_confirmation">Вы уверены, что хотите удалить этот мод?</string>
     <string name="delete_mod">Удалить мод</string>
     <string name="error_loading_mod">Ошибка загрузки данных мода</string>
     <string name="mod_enabled">Мод включен</string>
     <string name="mod_disabled">Мод отключен</string>
     <string name="mod_filename_format">Файл: %s</string>
-    <string name="mod_deleted">Мод успешно удалён</string>
     <string name="mod_enable_status">Состояние включения</string>
 
     <!-- Диалог выбора версии игры -->
     <string name="game_version_select_title">Выбор версии игры</string>
     <string name="back">Назад</string>
+
+        <!-- Заставка -->
+    <string name="splash_logo_desc">Логотип-лист</string>
 </resources>

@@ -17,7 +17,4 @@
     <color name="on_surface">#E0E0E0</color>
 
     <color name="outline">#BDBDBD</color>
-
-    <color name="surface_variant">#E8F5E9</color>
-    <color name="on_surface_variant">#616161</color>
 </resources>

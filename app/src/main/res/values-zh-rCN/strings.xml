@@ -2,7 +2,6 @@
     <!-- Common -->
     <string name="app_name">LeviLauncher</string>
     <string name="minecraft">Minecraft</string>
-    <string name="version">版本</string>
     <string name="launch">启动</string>
 
     <!-- Mods -->
@@ -48,13 +47,9 @@
 
     <!-- Feedback -->
     <string name="files_processed">成功处理 %d 个模组文件</string>
-    <string name="files_processing_error">文件处理失败：%s</string>
     <string name="user_cancelled">用户取消导入</string>
 
-    <string name="error">错误</string>
 
-    <string name="no_install_minecraft">请先安装Minecraft</string>
-    <string name="no_minecraft">未安装Minecraft</string>
     <string name="exit">退出</string>
 
     <string name="overlay_permission_message">请授予悬浮窗权限</string>
@@ -106,7 +101,6 @@
     <string name="missing_libs_message">检测到缺少必要的游戏库文件，是否立即修复？</string>
     <string name="repair">修复</string>
     <string name="repair_libs_dialog_title">修复游戏库文件</string>
-    <string name="requires_repair">[需要修复]</string>
     <string name="repair_preparing">准备中…</string>
     <string name="repair_processing">正在提取库文件…</string>
     
@@ -122,8 +116,6 @@
     <string name="dialog_title_version_isolation">需要版本隔离</string>
     <string name="dialog_message_version_isolation">这是一个导入的版本。请在设置中启用版本隔离以启动此版本。</string>
     <string name="dialog_positive_enable">启用</string>
-    <string name="dialog_title_no_base_game">需要基础游戏</string>
-    <string name="dialog_message_no_base_game">未找到Minecraft的基础安装。请从Play Store安装Minecraft以使用隔离版本。</string>
     <string name="dialog_title_launch_failed">启动失败</string>
     <string name="dialog_message_launch_failed">无法启动Minecraft：%1$s</string>
     <string name="dialog_title_disable_version_isolation">禁用版本隔离</string>
@@ -160,7 +152,6 @@
     <string name="russian">Русский</string>
 
     <!-- 版本重命名 -->
-    <string name="rename_version">重命名版本</string>
     <string name="rename_version_title">重命名版本</string>
     <string name="rename_version_message">为此版本输入一个新名称：</string>
     <string name="new_version_name">新版本名称</string>
@@ -174,48 +165,23 @@
     <string name="worlds_title">🌍 世界</string>
     <string name="resource_packs_title">📦 资源包</string>
     <string name="behavior_packs_title">⚙️ 行为包</string>
-    <string name="no_worlds_found">未找到世界</string>
-    <string name="no_resource_packs_found">未找到资源包</string>
-    <string name="no_behavior_packs_found">未找到行为包</string>
 
     <!-- World Management -->
-    <string name="world_name">世界名称</string>
     <string name="world_size">大小：%s</string>
     <string name="world_last_played">上次游玩：%s</string>
     <string name="import_world">导入世界</string>
     <string name="export_world">导出世界</string>
-    <string name="rename_world">重命名世界</string>
     <string name="delete_world">删除世界</string>
     <string name="backup_world">备份世界</string>
-    <string name="world_exported">世界已成功导出</string>
-    <string name="world_import_success">世界已成功导入</string>
-    <string name="world_rename_success">世界已成功重命名</string>
-    <string name="world_delete_success">世界已成功删除</string>
-    <string name="world_backup_success">世界已成功备份</string>
 
     <!-- Resource Pack Management -->
-    <string name="resource_pack_name">资源包名称</string>
-    <string name="resource_pack_version">版本：%s</string>
-    <string name="resource_pack_description">描述：%s</string>
     <string name="import_resource_pack">导入资源包</string>
     <string name="import_behavior_pack">导入行为包</string>
-    <string name="enable_resource_pack">启用</string>
-    <string name="disable_resource_pack">禁用</string>
     <string name="delete_resource_pack">删除资源包</string>
-    <string name="resource_pack_enabled">资源包已启用</string>
-    <string name="resource_pack_disabled">资源包已禁用</string>
-    <string name="resource_pack_import_success">资源包已成功导入</string>
-    <string name="resource_pack_delete_success">资源包已成功删除</string>
 
     <!-- Content Operations -->
-    <string name="operation_in_progress">操作正在进行中…</string>
-    <string name="operation_failed">操作失败：%s</string>
     <string name="confirm_delete_world">您确定要删除这个世界吗？此操作无法撤销。</string>
     <string name="confirm_delete_resource_pack">您确定要删除这个资源包吗？此操作无法撤销。</string>
-    <string name="backup_created">备份已创建：%s</string>
-    <string name="select_export_location">选择导出位置</string>
-    <string name="invalid_world_file">无效的世界文件</string>
-    <string name="invalid_resource_pack_file">无效的资源包文件</string>
 
     <!-- Play Store Validation -->
     <string name="minecraft_playstore_required_title">需要 Play 商店版本</string>
@@ -233,16 +199,17 @@
 
     <!-- Mod Detail -->
     <string name="mod_detail_title">模组详情</string>
-    <string name="mod_delete_confirmation">确定要删除此模组吗？</string>
     <string name="delete_mod">删除模组</string>
     <string name="error_loading_mod">加载模组详情时出错</string>
     <string name="mod_enabled">模组已启用</string>
     <string name="mod_disabled">模组已禁用</string>
     <string name="mod_filename_format">文件：%s</string>
-    <string name="mod_deleted">模组已成功删除</string>
     <string name="mod_enable_status">启用状态</string>
 
     <!-- 版本选择对话框 -->
     <string name="game_version_select_title">选择游戏版本</string>
     <string name="back">返回</string>
+    
+    <!-- 启动页 -->
+    <string name="splash_logo_desc">叶子标志</string>
 </resources>

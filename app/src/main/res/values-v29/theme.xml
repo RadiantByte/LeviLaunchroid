@@ -26,11 +26,5 @@
 
     </style>
 
-    <style name="AppTheme.Light" parent="Base.Theme.FullScreen">
-        <item name="android:forceDarkAllowed">false</item>
-    </style>
-
-    <style name="AppTheme.Dark" parent="Base.Theme.FullScreen">
-        <item name="android:forceDarkAllowed">true</item>
-    </style>
+    
 </resources>

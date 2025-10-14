@@ -8,44 +8,50 @@ import android.graphics.Shader;
 import android.os.Bundle;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.TranslateAnimation;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.levimc.launcher.R;
+import org.levimc.launcher.databinding.ActivitySplashBinding;
 
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends BaseActivity {
 
-    ImageView imgLeaf;
-    TextView tvAppName;
+    private ActivitySplashBinding binding;
+    private final Runnable navigateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Intent newIntent = new Intent(SplashActivity.this, MainActivity.class);
+            startActivity(newIntent);
+            finish();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        binding = ActivitySplashBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        imgLeaf = findViewById(R.id.imgLeaf);
-        tvAppName = findViewById(R.id.tvAppName);
-        applyTextGradient(tvAppName);
-
+        applyTextGradient(binding.tvAppName);
         startLeafAnimation();
         startAppNameAnimation();
 
-        tvAppName.postDelayed(() -> {
-            Intent newIntent = new Intent(this, MainActivity.class);
-            startActivity(newIntent);
-            finish();
-        }, 2000);
+        binding.getRoot().postDelayed(navigateRunnable, 2000);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (binding != null) {
+            binding.getRoot().removeCallbacks(navigateRunnable);
+        }
+    }
 
     private void startLeafAnimation() {
         TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, -600, 0);
         translateAnimation.setDuration(1500);
         translateAnimation.setFillAfter(true);
         translateAnimation.setInterpolator(this, android.R.anim.bounce_interpolator);
-
-        imgLeaf.startAnimation(translateAnimation);
+        binding.imgLeaf.startAnimation(translateAnimation);
     }
 
     private void applyTextGradient(TextView textView) {
@@ -62,6 +68,6 @@ public class SplashActivity extends BaseActivity {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0f, 1f);
         alphaAnimation.setDuration(2000);
         alphaAnimation.setFillAfter(true);
-        tvAppName.startAnimation(alphaAnimation);
+        binding.tvAppName.startAnimation(alphaAnimation);
     }
 }
