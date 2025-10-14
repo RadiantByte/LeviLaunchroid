@@ -156,8 +156,9 @@
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:excludeFromRecents="false"
             android:exported="false"
-            android:launchMode="singleTask"
+            android:launchMode="standard"
             android:screenOrientation="sensorLandscape"
+            android:taskAffinity="org.levimc.launcher.minecraft"
             android:theme="@style/AppFullScreenTheme"
             tools:ignore="DiscouragedApi">
             <meta-data
