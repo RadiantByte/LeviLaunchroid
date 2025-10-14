@@ -64,18 +64,21 @@
             android:name="org.levimc.launcher.ui.activities.MainActivity"
             android:exported="true"
             android:screenOrientation="sensorLandscape"
+            android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi" />
 
         <activity
             android:name="org.levimc.launcher.ui.activities.ContentManagementActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
+            android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi" />
 
         <activity
             android:name="org.levimc.launcher.ui.activities.SettingsActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape"
+            android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi"
             android:label="@string/settings_title" />
 
@@ -83,12 +86,14 @@
             android:name=".ui.activities.ModsFullscreenActivity"
             android:theme="@style/Base.Theme.FullScreen"
             android:screenOrientation="sensorLandscape"
+            android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:exported="false"
             tools:ignore="DiscouragedApi" />
         <activity
             android:name=".ui.activities.ModDetailActivity"
             android:theme="@style/Base.Theme.FullScreen"
             android:screenOrientation="sensorLandscape"
+            android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:exported="false"
             tools:ignore="DiscouragedApi" />
         <activity

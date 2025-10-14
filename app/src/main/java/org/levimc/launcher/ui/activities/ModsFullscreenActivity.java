@@ -9,7 +9,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,7 +23,7 @@ import org.levimc.launcher.ui.views.MainViewModelFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModsFullscreenActivity extends AppCompatActivity {
+public class ModsFullscreenActivity extends BaseActivity {
 
     private RecyclerView modsRecycler;
     private ModsAdapter modsAdapter;
@@ -32,6 +31,7 @@ public class ModsFullscreenActivity extends AppCompatActivity {
     private TextView totalModsCount;
     private TextView enabledModsCount;
     private ActivityResultLauncher<Intent> pickModLauncher;
+    private FileHandler fileHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +41,12 @@ public class ModsFullscreenActivity extends AppCompatActivity {
         setupViews();
         setupViewModel();
         setupRecyclerView();
+        fileHandler = new FileHandler(this, viewModel, VersionManager.get(this));
+        
         pickModLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        FileHandler fileHandler = new FileHandler(this, viewModel, VersionManager.get(this));
                         fileHandler.processIncomingFilesWithConfirmation(result.getData(), new FileHandler.FileOperationCallback() {
                             @Override
                             public void onSuccess(int processedFiles) {

@@ -7,7 +7,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.levimc.launcher.R;
@@ -16,7 +15,7 @@ import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.views.MainViewModel;
 import org.levimc.launcher.ui.views.MainViewModelFactory;
 
-public class ModDetailActivity extends AppCompatActivity {
+public class ModDetailActivity extends BaseActivity {
 
     private MainViewModel viewModel;
     private Mod currentMod;
