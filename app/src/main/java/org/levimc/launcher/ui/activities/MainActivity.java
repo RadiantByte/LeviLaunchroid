@@ -31,6 +31,7 @@ import org.levimc.launcher.databinding.ActivityMainBinding;
 import org.levimc.launcher.service.LogOverlay;
 import org.levimc.launcher.settings.FeatureSettings;
 import org.levimc.launcher.ui.adapter.ModsAdapter;
+import org.levimc.launcher.ui.adapter.QuickActionsAdapter;
 import org.levimc.launcher.ui.animation.AnimationHelper;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.dialogs.GameVersionSelectDialog;
@@ -289,15 +290,43 @@ public class MainActivity extends BaseActivity {
         });
         binding.selectVersionButton.setOnClickListener(v -> showVersionSelectDialog());
         binding.addModButton.setOnClickListener(v -> startFilePicker("*/*", soImportResultLauncher));
-        binding.settingsButton.setOnClickListener(v -> showSettingsSafely());
+        binding.settingsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        });
         binding.deleteVersionButton.setOnClickListener(v -> showDeleteVersionDialog());
 
-        binding.contentManagementButton.setOnClickListener(v -> openContentManagement());
-        binding.importApkButton.setOnClickListener(v -> startFilePicker("application/vnd.android.package-archive", apkImportResultLauncher));
+        initQuickActionsRecycler();
 
         binding.modCard.setOnClickListener(v -> openModsFullscreen());
 
         FeatureSettings.init(getApplicationContext());
+    }
+
+    private void initQuickActionsRecycler() {
+        QuickActionsAdapter adapter = new QuickActionsAdapter(new ArrayList<>());
+        binding.quickActionsRecycler.setLayoutManager(new LinearLayoutManager(this));
+        binding.quickActionsRecycler.setAdapter(adapter);
+
+        List<QuickActionsAdapter.QuickActionItem> items = new ArrayList<>();
+        items.add(new QuickActionsAdapter.QuickActionItem(
+                R.string.content_management,
+                R.string.content_management_subtitle,
+                1
+        ));
+        items.add(new QuickActionsAdapter.QuickActionItem(
+                R.string.import_apk,
+                R.string.import_apk_subtitle,
+                2
+        ));
+        adapter.updateItems(items);
+
+        adapter.setOnActionClickListener(actionId -> {
+            switch (actionId) {
+                case 1 -> openContentManagement();
+                case 2 -> startFilePicker("application/vnd.android.package-archive", apkImportResultLauncher);
+            }
+        });
     }
 
     private void openModsFullscreen() {

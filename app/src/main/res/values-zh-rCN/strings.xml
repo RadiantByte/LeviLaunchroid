@@ -238,4 +238,5 @@
     <string name="mod_disabled">模组已禁用</string>
     <string name="mod_filename_format">文件：%s</string>
     <string name="mod_deleted">模组已成功删除</string>
+    <string name="mod_enable_status">启用状态</string>
 </resources>

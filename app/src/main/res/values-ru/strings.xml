@@ -238,4 +238,5 @@
     <string name="mod_disabled">Мод отключен</string>
     <string name="mod_filename_format">Файл: %s</string>
     <string name="mod_deleted">Мод успешно удалён</string>
+    <string name="mod_enable_status">Состояние включения</string>
 </resources>

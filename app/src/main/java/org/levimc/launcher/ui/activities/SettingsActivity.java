@@ -1,0 +1,128 @@
+package org.levimc.launcher.ui.activities;
+
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.Switch;
+import android.widget.TextView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+import org.levimc.launcher.R;
+import org.levimc.launcher.settings.FeatureSettings;
+import org.levimc.launcher.ui.activities.BaseActivity;
+import org.levimc.launcher.ui.adapter.SettingsAdapter;
+import org.levimc.launcher.util.GithubReleaseUpdater;
+import org.levimc.launcher.util.PermissionsHandler;
+import org.levimc.launcher.util.ThemeManager;
+
+public class SettingsActivity extends BaseActivity {
+
+    private LinearLayout settingsItemsContainer;
+    private RecyclerView settingsRecyclerView;
+    private PermissionsHandler permissionsHandler;
+    private ActivityResultLauncher<Intent> permissionResultLauncher;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
+
+        ImageButton backButton = findViewById(R.id.back_button);
+        if (backButton != null) backButton.setOnClickListener(v -> finish());
+
+        settingsRecyclerView = findViewById(R.id.settings_recycler);
+        settingsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        permissionsHandler = PermissionsHandler.getInstance();
+        permissionResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (permissionsHandler != null) {
+                        permissionsHandler.onActivityResult(result.getResultCode(), result.getData());
+                    }
+                }
+        );
+        permissionsHandler.setActivity(this, permissionResultLauncher);
+
+        settingsRecyclerView.setAdapter(new SettingsAdapter(container -> {
+            settingsItemsContainer = container;
+
+            ThemeManager themeManager = new ThemeManager(this);
+            FeatureSettings fs = FeatureSettings.getInstance();
+            addThemeSelectorItem(themeManager);
+            addSwitchItem(getString(R.string.enable_debug_log), fs.isDebugLogDialogEnabled(), (btn, checked) -> fs.setDebugLogDialogEnabled(checked));
+            addSwitchItem(getString(R.string.version_isolation), fs.isVersionIsolationEnabled(), (btn, checked) -> fs.setVersionIsolationEnabled(checked));
+
+            try {
+                String localVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+                addActionButton(
+                        getString(R.string.version_prefix) + localVersion,
+                        getString(R.string.check_update),
+                        v -> new GithubReleaseUpdater(this, "LiteLDev", "LeviLaunchroid", permissionResultLauncher).checkUpdate()
+                );
+            } catch (PackageManager.NameNotFoundException ignored) {
+            }
+        }));
+    }
+
+    private void addSwitchItem(String label, boolean defChecked, Switch.OnCheckedChangeListener listener) {
+        View ll = LayoutInflater.from(this).inflate(R.layout.item_settings_switch, settingsItemsContainer, false);
+        ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
+        Switch sw = ll.findViewById(R.id.switch_value);
+        sw.setChecked(defChecked);
+        if (listener != null) sw.setOnCheckedChangeListener(listener);
+        settingsItemsContainer.addView(ll);
+    }
+
+    private Spinner addSpinnerItem(String label, String[] options, int defaultIdx) {
+        View ll = LayoutInflater.from(this).inflate(R.layout.item_settings_spinner, settingsItemsContainer, false);
+        ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
+        Spinner spinner = ll.findViewById(R.id.spinner_value);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, options);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(defaultIdx);
+        settingsItemsContainer.addView(ll);
+        return spinner;
+    }
+
+    private void addActionButton(String label, String buttonText, View.OnClickListener listener) {
+        View ll = LayoutInflater.from(this).inflate(R.layout.item_settings_button, settingsItemsContainer, false);
+        ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
+        Button btn = ll.findViewById(R.id.btn_action);
+        btn.setText(buttonText);
+        btn.setOnClickListener(listener);
+        settingsItemsContainer.addView(ll);
+    }
+
+    private void addThemeSelectorItem(ThemeManager themeManager) {
+        String[] themeOptions = {
+                getString(R.string.theme_follow_system),
+                getString(R.string.theme_light),
+                getString(R.string.theme_dark)
+        };
+        int currentMode = themeManager.getCurrentMode();
+        Spinner spinner = addSpinnerItem(getString(R.string.theme_title), themeOptions, currentMode);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                themeManager.setThemeMode(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+}

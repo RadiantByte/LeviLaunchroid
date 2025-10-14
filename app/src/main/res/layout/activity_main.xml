@@ -270,78 +270,12 @@
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
-                <ScrollView
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/quick_actions_recycler"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:fillViewport="true">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingTop="8dp">
-
-                    <LinearLayout
-                        android:id="@+id/content_management_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="10dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/content_management"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/on_surface"
-                            android:fontFamily="@font/misans" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/content_management_subtitle"
-                            android:textSize="12sp"
-                            android:textColor="@color/on_surface"
-                            android:alpha="0.8"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/misans" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/import_apk_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="10dp"
-                        android:layout_marginTop="6dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?attr/selectableItemBackground">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/import_apk"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/on_surface"
-                            android:fontFamily="@font/misans" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/import_apk_subtitle"
-                            android:textSize="12sp"
-                            android:textColor="@color/on_surface"
-                            android:alpha="0.8"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/misans" />
-                    </LinearLayout>
-                    </LinearLayout>
-                </ScrollView>
+                    android:clipToPadding="false"
+                    android:paddingTop="8dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

@@ -73,6 +73,13 @@
             tools:ignore="DiscouragedApi" />
 
         <activity
+            android:name="org.levimc.launcher.ui.activities.SettingsActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape"
+            tools:ignore="DiscouragedApi"
+            android:label="@string/settings_title" />
+
+        <activity
             android:name=".ui.activities.ModsFullscreenActivity"
             android:theme="@style/Base.Theme.FullScreen"
             android:screenOrientation="sensorLandscape"
