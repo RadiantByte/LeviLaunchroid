@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import org.levimc.launcher.core.versions.GameVersion;
 import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.ui.dialogs.gameversionselect.BigGroup;
 import org.levimc.launcher.ui.dialogs.gameversionselect.UltimateVersionAdapter;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class GameVersionSelectDialog extends Dialog {
         android.widget.ImageButton backBtn = findViewById(R.id.back_button);
         if (backBtn != null) {
             backBtn.setOnClickListener(v -> dismiss());
+            DynamicAnim.applyPressScale(backBtn);
         }
         RecyclerView recyclerView = findViewById(R.id.recycler_versions);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -62,6 +65,17 @@ public class GameVersionSelectDialog extends Dialog {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
         recyclerView.setAdapter(adapter);
+
+        // 对话框入场弹簧动画与列表交错入场
+        View root = findViewById(android.R.id.content);
+        if (root != null) {
+            float dy = getContext().getResources().getDisplayMetrics().density * 12f;
+            root.setAlpha(0f);
+            root.setTranslationY(dy);
+            DynamicAnim.springAlphaTo(root, 1f).start();
+            DynamicAnim.springTranslationYTo(root, 0f).start();
+        }
+        recyclerView.post(() -> DynamicAnim.staggerRecyclerChildren(recyclerView));
     }
 
     private void showRenameDialog(GameVersion version) {

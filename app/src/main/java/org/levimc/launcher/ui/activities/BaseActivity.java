@@ -5,16 +5,21 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.content.Intent;
 import android.view.View;
+ 
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+ 
 
 import org.levimc.launcher.util.ThemeManager;
+ 
 
 import java.util.Locale;
 
 public class BaseActivity extends AppCompatActivity {
+    private int appliedThemeGeneration = -1;
     @Override
     protected void attachBaseContext(Context newBase) {
 
@@ -35,7 +40,9 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         ThemeManager themeManager = new ThemeManager(this);
-        themeManager.setThemeMode(themeManager.getCurrentMode());
+        themeManager.applyTheme();
+
+        appliedThemeGeneration = ThemeManager.getThemeChangeGeneration();
         super.onCreate(savedInstanceState);
         hideSystemUI();
     }
@@ -43,6 +50,21 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        int currentGen = ThemeManager.getThemeChangeGeneration();
+        if (appliedThemeGeneration != currentGen) {
+            appliedThemeGeneration = currentGen;
+            recreate();
+            return;
+        }
+        getDelegate().applyDayNight();
+        hideSystemUI();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        getDelegate().applyDayNight();
+        hideSystemUI();
     }
 
     private void hideSystemUI() {
@@ -56,4 +78,27 @@ public class BaseActivity extends AppCompatActivity {
         );
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void startActivity(Intent intent, @Nullable Bundle options) {
+        super.startActivity(intent, options);
+        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void finishAfterTransition() {
+        super.finishAfterTransition();
+        overridePendingTransition(0, 0);
+    }
 }

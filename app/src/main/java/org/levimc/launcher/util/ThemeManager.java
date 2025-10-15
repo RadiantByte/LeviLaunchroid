@@ -12,19 +12,29 @@ public class ThemeManager {
 
     private static final String THEME_PREFS = "theme_prefs";
     private static final String THEME_MODE_KEY = "theme_mode";
+    private static int sThemeChangeGeneration = 0;
     private final SharedPreferences prefs;
+    private final Activity activity;
 
     public ThemeManager(Activity activity) {
+        this.activity = activity;
         prefs = activity.getSharedPreferences(THEME_PREFS, Activity.MODE_PRIVATE);
     }
 
     public void applyTheme() {
-        setThemeMode(prefs.getInt(THEME_MODE_KEY, MODE_FOLLOW_SYSTEM));
+        updateNightMode();
     }
 
     public void setThemeMode(int mode) {
+        int previous = prefs.getInt(THEME_MODE_KEY, MODE_FOLLOW_SYSTEM);
         prefs.edit().putInt(THEME_MODE_KEY, mode).apply();
         updateNightMode();
+        if (previous != mode) {
+            sThemeChangeGeneration++;
+        }
+        if (activity != null && previous != mode) {
+            activity.recreate();
+        }
     }
 
     private void updateNightMode() {
@@ -43,5 +53,9 @@ public class ThemeManager {
 
     public int getCurrentMode() {
         return prefs.getInt(THEME_MODE_KEY, MODE_FOLLOW_SYSTEM);
+    }
+
+    public static int getThemeChangeGeneration() {
+        return sThemeChangeGeneration;
     }
 }

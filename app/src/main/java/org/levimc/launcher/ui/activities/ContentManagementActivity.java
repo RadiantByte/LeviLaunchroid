@@ -23,6 +23,7 @@ import org.levimc.launcher.databinding.ActivityContentManagementBinding;
 import org.levimc.launcher.ui.adapter.ResourcePacksAdapter;
 import org.levimc.launcher.ui.adapter.WorldsAdapter;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 
 public class ContentManagementActivity extends BaseActivity {
     
@@ -45,6 +46,9 @@ public class ContentManagementActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityContentManagementBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // 全页面统一按压缩放反馈
+        DynamicAnim.applyPressScaleRecursively(binding.getRoot());
 
         initializeManagers();
         setupActivityResultLaunchers();
@@ -121,8 +125,11 @@ public class ContentManagementActivity extends BaseActivity {
 
         binding.importWorldButton.setOnClickListener(v -> startWorldImport());
         binding.importPackButton.setOnClickListener(v -> startPackImport());
+        DynamicAnim.applyPressScale(binding.importWorldButton);
+        DynamicAnim.applyPressScale(binding.importPackButton);
 
         binding.backButton.setOnClickListener(v -> finish());
+        DynamicAnim.applyPressScale(binding.backButton);
 
         showTabContent(0);
     }
@@ -148,6 +155,7 @@ public class ContentManagementActivity extends BaseActivity {
 
         binding.worldsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.worldsRecyclerView.setAdapter(worldsAdapter);
+        binding.worldsRecyclerView.post(() -> DynamicAnim.staggerRecyclerChildren(binding.worldsRecyclerView));
     }
 
     private void setupResourcePacksRecyclerView() {
@@ -161,6 +169,7 @@ public class ContentManagementActivity extends BaseActivity {
 
         binding.resourcePacksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.resourcePacksRecyclerView.setAdapter(resourcePacksAdapter);
+        binding.resourcePacksRecyclerView.post(() -> DynamicAnim.staggerRecyclerChildren(binding.resourcePacksRecyclerView));
     }
 
     private void setupBehaviorPacksRecyclerView() {
@@ -174,6 +183,7 @@ public class ContentManagementActivity extends BaseActivity {
 
         binding.behaviorPacksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.behaviorPacksRecyclerView.setAdapter(behaviorPacksAdapter);
+        binding.behaviorPacksRecyclerView.post(() -> DynamicAnim.staggerRecyclerChildren(binding.behaviorPacksRecyclerView));
     }
 
     private void setupObservers() {
@@ -220,18 +230,21 @@ public class ContentManagementActivity extends BaseActivity {
                 binding.worldsRecyclerView.setVisibility(android.view.View.VISIBLE);
                 binding.importWorldButton.setVisibility(android.view.View.VISIBLE);
                 binding.importPackButton.setVisibility(android.view.View.GONE);
+                DynamicAnim.staggerRecyclerChildren(binding.worldsRecyclerView);
                 break;
             case 1: // Resource Packs
                 binding.resourcePacksRecyclerView.setVisibility(android.view.View.VISIBLE);
                 binding.importWorldButton.setVisibility(android.view.View.GONE);
                 binding.importPackButton.setVisibility(android.view.View.VISIBLE);
                 binding.importPackButton.setText(getString(R.string.import_resource_pack));
+                DynamicAnim.staggerRecyclerChildren(binding.resourcePacksRecyclerView);
                 break;
             case 2: // Behavior Packs
                 binding.behaviorPacksRecyclerView.setVisibility(android.view.View.VISIBLE);
                 binding.importWorldButton.setVisibility(android.view.View.GONE);
                 binding.importPackButton.setVisibility(android.view.View.VISIBLE);
                 binding.importPackButton.setText(getString(R.string.import_behavior_pack));
+                DynamicAnim.staggerRecyclerChildren(binding.behaviorPacksRecyclerView);
                 break;
         }
     }

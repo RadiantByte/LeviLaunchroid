@@ -3,12 +3,12 @@ package org.levimc.launcher.ui.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.view.ViewCompat;
 
 import org.levimc.launcher.R;
 import org.levimc.launcher.core.mods.Mod;
@@ -20,14 +20,10 @@ import java.util.List;
 public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder> {
 
     private List<Mod> mods = new ArrayList<>();
-    private OnDeleteListener onDeleteListener;
     private OnModEnableChangeListener onModEnableChangeListener;
     private OnModReorderListener onModReorderListener;
     private OnModClickListener onModClickListener;
 
-    public interface OnDeleteListener {
-        void onDelete(Mod mod, int position);
-    }
 
     public interface OnModEnableChangeListener {
         void onEnableChanged(Mod mod, boolean enabled);
@@ -38,16 +34,13 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder>
     }
 
     public interface OnModClickListener {
-        void onModClick(Mod mod, int position);
+        void onModClick(Mod mod, int position, View sharedView);
     }
 
     public ModsAdapter(List<Mod> mods) {
         this.mods = mods;
     }
 
-    public void setOnDeleteListener(OnDeleteListener listener) {
-        this.onDeleteListener = listener;
-    }
 
     public void setOnModEnableChangeListener(OnModEnableChangeListener l) {
         this.onModEnableChangeListener = l;
@@ -91,10 +84,12 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder>
             }
         });
 
-        // 设置item点击监听器
+        // 设置稳定的过渡名称到整个条目，实现卡片共享元素过渡
+        ViewCompat.setTransitionName(holder.itemView, "mod_card_" + mod.getFileName());
+
         holder.itemView.setOnClickListener(v -> {
             if (onModClickListener != null) {
-                onModClickListener.onModClick(mod, position);
+                onModClickListener.onModClick(mod, position, holder.itemView);
             }
         });
     }
@@ -139,14 +134,13 @@ public class ModsAdapter extends RecyclerView.Adapter<ModsAdapter.ModViewHolder>
         TextView name;
         TextView orderText;
         Switch switchBtn;
-        ImageView dragHandle;
 
         public ModViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.mod_name);
             orderText = itemView.findViewById(R.id.mod_order);
             switchBtn = itemView.findViewById(R.id.mod_switch);
-            dragHandle = itemView.findViewById(R.id.drag_handle);
+            // drag handle exists in layout but not used in adapter logic
         }
     }
 }

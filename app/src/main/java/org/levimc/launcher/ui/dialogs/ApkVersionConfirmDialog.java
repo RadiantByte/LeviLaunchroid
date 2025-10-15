@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -84,14 +85,16 @@ public class ApkVersionConfirmDialog extends DialogFragment {
 
         btnCancel.setOnClickListener(v -> {
             if (callback != null) callback.onCancelled();
-            dialog.dismiss();
+            View content = dialog.findViewById(android.R.id.content);
+            DynamicAnim.animateDialogDismiss(content, dialog::dismiss);
         });
 
         btnInstall.setOnClickListener(v -> {
             String versionName = editVersionName.getText().toString();
             if (isValidVersionName(versionName) && !isVersionExist(versionName)) {
                 if (callback != null) callback.onInstallClicked(versionName);
-                dialog.dismiss();
+                View content = dialog.findViewById(android.R.id.content);
+                DynamicAnim.animateDialogDismiss(content, dialog::dismiss);
             } else {
                 textError.setVisibility(View.VISIBLE);
             }
@@ -101,6 +104,11 @@ public class ApkVersionConfirmDialog extends DialogFragment {
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
+
+        // 动态入场 & 按压反馈
+        DynamicAnim.animateDialogShow(dialog.findViewById(android.R.id.content));
+        DynamicAnim.applyPressScale(btnInstall);
+        DynamicAnim.applyPressScale(btnCancel);
 
         return dialog;
     }

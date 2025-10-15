@@ -16,9 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.view.View;
 
 import org.levimc.launcher.R;
 import org.levimc.launcher.util.ThemeManager;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,19 @@ public class SettingsDialog extends Dialog {
 
         setContentView(R.layout.dialog_settings);
         settingsItemsContainer = findViewById(R.id.settings_items);
+
+        // 对话框入场弹簧动画与统一按压反馈
+        View root = findViewById(android.R.id.content);
+        if (root != null) {
+            float dy = root.getResources().getDisplayMetrics().density * 12f;
+            root.setAlpha(0f);
+            root.setTranslationY(dy);
+            DynamicAnim.springAlphaTo(root, 1f).start();
+            DynamicAnim.springTranslationYTo(root, 0f).start();
+        }
+        if (settingsItemsContainer != null) {
+            DynamicAnim.applyPressScaleRecursively(settingsItemsContainer);
+        }
 
         for (Runnable r : itemAddQueue) r.run();
         itemAddQueue.clear();
@@ -113,6 +128,7 @@ public class SettingsDialog extends Dialog {
             Button btn = ll.findViewById(R.id.btn_action);
             btn.setText(buttonText);
             btn.setOnClickListener(listener);
+            DynamicAnim.applyPressScale(btn);
             settingsItemsContainer.addView(ll);
             out[0] = btn;
         };

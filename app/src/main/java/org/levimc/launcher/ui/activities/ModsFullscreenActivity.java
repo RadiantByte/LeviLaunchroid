@@ -2,6 +2,7 @@ package org.levimc.launcher.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -13,11 +14,15 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+import androidx.core.view.ViewCompat;
+import androidx.core.app.ActivityOptionsCompat;
 import org.levimc.launcher.R;
 import org.levimc.launcher.core.mods.FileHandler;
 import org.levimc.launcher.core.mods.Mod;
 import org.levimc.launcher.core.versions.VersionManager;
 import org.levimc.launcher.ui.adapter.ModsAdapter;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 import org.levimc.launcher.ui.views.MainViewModel;
 import org.levimc.launcher.ui.views.MainViewModelFactory;
 import java.util.ArrayList;
@@ -32,11 +37,17 @@ public class ModsFullscreenActivity extends BaseActivity {
     private TextView enabledModsCount;
     private ActivityResultLauncher<Intent> pickModLauncher;
     private FileHandler fileHandler;
+    private int lastModsCount = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mods_fullscreen);
+
+        View root = findViewById(android.R.id.content);
+        if (root != null) {
+            DynamicAnim.applyPressScaleRecursively(root);
+        }
 
         setupViews();
         setupViewModel();
@@ -69,11 +80,13 @@ public class ModsFullscreenActivity extends BaseActivity {
     private void setupViews() {
         ImageButton closeButton = findViewById(R.id.close_fullscreen_button);
         closeButton.setOnClickListener(v -> finish());
+        DynamicAnim.applyPressScale(closeButton);
 
         Button addModButton = findViewById(R.id.add_mod_fullscreen_button);
         addModButton.setOnClickListener(v -> {
             startFilePicker();
         });
+        DynamicAnim.applyPressScale(addModButton);
 
         totalModsCount = findViewById(R.id.total_mods_count);
         enabledModsCount = findViewById(R.id.enabled_mods_count);
@@ -97,12 +110,22 @@ public class ModsFullscreenActivity extends BaseActivity {
         modsAdapter = new ModsAdapter(new ArrayList<>());
         modsRecycler.setLayoutManager(new LinearLayoutManager(this));
         modsRecycler.setAdapter(modsAdapter);
+        if (modsRecycler.getItemAnimator() instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) modsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+        }
 
-        modsAdapter.setOnModClickListener((mod, position) -> {
+        modsRecycler.post(() -> DynamicAnim.staggerRecyclerChildren(modsRecycler));
+
+        modsAdapter.setOnModClickListener((mod, position, sharedView) -> {
             Intent intent = new Intent(this, ModDetailActivity.class);
             intent.putExtra("mod_filename", mod.getFileName());
             intent.putExtra("mod_position", position);
-            startActivity(intent);
+            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    this,
+                    sharedView,
+                    ViewCompat.getTransitionName(sharedView)
+            );
+            startActivity(intent, options.toBundle());
         });
 
         modsAdapter.setOnModEnableChangeListener((mod, enabled) -> {
@@ -140,6 +163,14 @@ public class ModsFullscreenActivity extends BaseActivity {
         if (modsAdapter != null) {
             modsAdapter.updateMods(mods);
             updateModsCount();
+            if (modsRecycler != null) {
+                int count = (mods != null) ? mods.size() : 0;
+                // 仅在首次或数量变化时触发整列动画，避免开关引发整个列表重动画
+                if (lastModsCount == -1 || count != lastModsCount) {
+                    modsRecycler.post(() -> DynamicAnim.staggerRecyclerChildren(modsRecycler));
+                }
+                lastModsCount = count;
+            }
         }
     }
 

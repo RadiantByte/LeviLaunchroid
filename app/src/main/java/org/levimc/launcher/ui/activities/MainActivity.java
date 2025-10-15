@@ -20,6 +20,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+import androidx.dynamicanimation.animation.SpringAnimation;
+import androidx.dynamicanimation.animation.SpringForce;
 import org.levimc.launcher.R;
 import org.levimc.launcher.core.minecraft.MinecraftLauncher;
 import org.levimc.launcher.core.mods.FileHandler;
@@ -31,6 +34,7 @@ import org.levimc.launcher.settings.FeatureSettings;
 import org.levimc.launcher.ui.adapter.ModsAdapter;
 import org.levimc.launcher.ui.adapter.QuickActionsAdapter;
 import org.levimc.launcher.ui.animation.AnimationHelper;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.dialogs.GameVersionSelectDialog;
 import org.levimc.launcher.ui.dialogs.PlayStoreValidationDialog;
@@ -52,7 +56,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends BaseActivity {
+ public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
     private MinecraftLauncher minecraftLauncher;
     private LanguageManager languageManager;
@@ -64,7 +68,8 @@ public class MainActivity extends BaseActivity {
     private ActivityResultLauncher<Intent> permissionResultLauncher;
     private ActivityResultLauncher<Intent> apkImportResultLauncher;
     private ActivityResultLauncher<Intent> soImportResultLauncher;
-    private ModsAdapter modsAdapter;
+     private ModsAdapter modsAdapter;
+     private int lastModsCount = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +145,10 @@ public class MainActivity extends BaseActivity {
         modsAdapter = new ModsAdapter(new ArrayList<>());
         binding.modsRecycler.setLayoutManager(new LinearLayoutManager(this));
         binding.modsRecycler.setAdapter(modsAdapter);
+        if (binding.modsRecycler.getItemAnimator() instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) binding.modsRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
+        }
+        DynamicAnim.staggerRecyclerChildren(binding.modsRecycler);
         modsAdapter.setOnModEnableChangeListener((mod, enabled) -> {
             if (viewModel != null) viewModel.setModEnabled(mod.getFileName(), enabled);
         });
@@ -266,8 +275,6 @@ public class MainActivity extends BaseActivity {
         abiLabel.setBackgroundResource(bgRes);
     }
 
-    // 已移除调试日志叠加层逻辑，无需初始化
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -279,14 +286,18 @@ public class MainActivity extends BaseActivity {
     @SuppressLint({"ClickableViewAccessibility", "UnsafeIntentLaunch"})
     private void initListeners() {
         binding.launchButton.setOnClickListener(v -> launchGame());
-        binding.launchButton.setOnTouchListener(this::animateLaunchButton);
+        DynamicAnim.applyPressScale(binding.launchButton);
         binding.selectVersionButton.setOnClickListener(v -> showVersionSelectDialog());
+        DynamicAnim.applyPressScale(binding.selectVersionButton);
         binding.addModButton.setOnClickListener(v -> startFilePicker("*/*", soImportResultLauncher));
+        DynamicAnim.applyPressScale(binding.addModButton);
         binding.settingsButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         });
+        DynamicAnim.applyPressScale(binding.settingsButton);
         binding.deleteVersionButton.setOnClickListener(v -> showDeleteVersionDialog());
+        DynamicAnim.applyPressScale(binding.deleteVersionButton);
 
         initQuickActionsRecycler();
 
@@ -299,6 +310,7 @@ public class MainActivity extends BaseActivity {
         QuickActionsAdapter adapter = new QuickActionsAdapter(new ArrayList<>());
         binding.quickActionsRecycler.setLayoutManager(new LinearLayoutManager(this));
         binding.quickActionsRecycler.setAdapter(adapter);
+        DynamicAnim.staggerRecyclerChildren(binding.quickActionsRecycler);
 
         List<QuickActionsAdapter.QuickActionItem> items = new ArrayList<>();
         items.add(new QuickActionsAdapter.QuickActionItem(
@@ -312,6 +324,7 @@ public class MainActivity extends BaseActivity {
                 2
         ));
         adapter.updateItems(items);
+        DynamicAnim.staggerRecyclerChildren(binding.quickActionsRecycler);
 
         adapter.setOnActionClickListener(actionId -> {
             switch (actionId) {
@@ -384,9 +397,25 @@ public class MainActivity extends BaseActivity {
 
     private boolean animateLaunchButton(View v, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            v.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).start();
+            SpringAnimation sx = new SpringAnimation(v, SpringAnimation.SCALE_X, 0.95f);
+            SpringAnimation sy = new SpringAnimation(v, SpringAnimation.SCALE_Y, 0.95f);
+            SpringForce spring = new SpringForce(0.95f)
+                    .setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY)
+                    .setStiffness(SpringForce.STIFFNESS_MEDIUM);
+            sx.setSpring(spring);
+            sy.setSpring(spring);
+            sx.start();
+            sy.start();
         } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
-            v.animate().scaleX(1f).scaleY(1f).setInterpolator(new OvershootInterpolator()).setDuration(200).start();
+            SpringAnimation sx = new SpringAnimation(v, SpringAnimation.SCALE_X, 1f);
+            SpringAnimation sy = new SpringAnimation(v, SpringAnimation.SCALE_Y, 1f);
+            SpringForce spring = new SpringForce(1f)
+                    .setDampingRatio(SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY)
+                    .setStiffness(SpringForce.STIFFNESS_LOW);
+            sx.setSpring(spring);
+            sy.setSpring(spring);
+            sx.start();
+            sy.start();
         }
         return false;
     }
@@ -472,7 +501,6 @@ public class MainActivity extends BaseActivity {
         ThemeManager themeManager = new ThemeManager(this);
         SettingsDialog dlg = new SettingsDialog(this);
         dlg.addThemeSelectorItem(themeManager);
-        // 已移除调试日志叠加层开关
         dlg.addSwitchItem(
                 getString(R.string.version_isolation),
                 fs.isVersionIsolationEnabled(),
@@ -516,11 +544,17 @@ public class MainActivity extends BaseActivity {
         }, false);
     }
 
-    private void updateModsUI(List<Mod> mods) {
-        modsAdapter.updateMods(mods != null ? mods : new ArrayList<>());
-        if (binding == null) return;
-        int modCount = (mods != null) ? mods.size() : 0;
-        binding.modsTitleText.setText(getString(R.string.mods_title, modCount));
+     private void updateModsUI(List<Mod> mods) {
+         modsAdapter.updateMods(mods != null ? mods : new ArrayList<>());
+         int count = (mods != null) ? mods.size() : 0;
+         // 仅在首次或数量变化时触发整列动画，避免开关引发整个列表重动画
+         if (lastModsCount == -1 || count != lastModsCount) {
+             DynamicAnim.staggerRecyclerChildren(binding.modsRecycler);
+         }
+         lastModsCount = count;
+         if (binding == null) return;
+         int modCount = (mods != null) ? mods.size() : 0;
+         binding.modsTitleText.setText(getString(R.string.mods_title, modCount));
         if (modCount == 0) {
             TextView tv = new TextView(this);
             tv.setText(R.string.no_mods_found);

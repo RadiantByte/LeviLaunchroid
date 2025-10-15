@@ -3,10 +3,12 @@ package org.levimc.launcher.ui.dialogs;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 
 public class InstallProgressDialog extends Dialog {
 
@@ -33,6 +35,22 @@ public class InstallProgressDialog extends Dialog {
             params.dimAmount = 0.5f;
             window.setAttributes(params);
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        }
+
+        // 入场动画
+        View content = findViewById(android.R.id.content);
+        if (content != null) {
+            DynamicAnim.animateDialogShow(content);
+        }
+    }
+
+    @Override
+    public void dismiss() {
+        View content = findViewById(android.R.id.content);
+        if (content != null) {
+            DynamicAnim.animateDialogDismiss(content, () -> InstallProgressDialog.super.dismiss());
+        } else {
+            super.dismiss();
         }
     }
 }

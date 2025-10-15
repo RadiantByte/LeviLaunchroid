@@ -99,6 +99,7 @@ dependencies {
     implementation(libs.conscrypt.android)
     implementation(libs.androidx.games.activity.v122)
     implementation libs.okhttp3.okhttp
+    implementation(libs.androidx.dynamicanimation)
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

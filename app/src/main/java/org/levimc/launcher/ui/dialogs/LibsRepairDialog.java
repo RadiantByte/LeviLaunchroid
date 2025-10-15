@@ -3,10 +3,12 @@ package org.levimc.launcher.ui.dialogs;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -34,6 +36,12 @@ public class LibsRepairDialog extends Dialog {
         setCancelable(false);
         Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
 
+        // 入场动画
+        View content = findViewById(android.R.id.content);
+        if (content != null) {
+            DynamicAnim.animateDialogShow(content);
+        }
+
     }
 
     public void updateProgress(int progress) {
@@ -51,5 +59,15 @@ public class LibsRepairDialog extends Dialog {
 
     public void setStatusText(String text) {
         if (statusText != null) statusText.setText(text);
+    }
+
+    @Override
+    public void dismiss() {
+        View content = findViewById(android.R.id.content);
+        if (content != null) {
+            DynamicAnim.animateDialogDismiss(content, () -> LibsRepairDialog.super.dismiss());
+        } else {
+            super.dismiss();
+        }
     }
 }

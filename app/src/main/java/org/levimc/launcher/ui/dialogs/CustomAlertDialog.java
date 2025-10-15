@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import org.levimc.launcher.R;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 
 public class CustomAlertDialog extends Dialog {
 
@@ -119,6 +120,25 @@ public class CustomAlertDialog extends Dialog {
         Window window = getWindow();
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        // 动态入场 & 按压反馈
+        View content = findViewById(android.R.id.content);
+        if (content != null) {
+            DynamicAnim.animateDialogShow(content);
+        }
+        DynamicAnim.applyPressScale(btnPositive);
+        DynamicAnim.applyPressScale(btnNegative);
+        DynamicAnim.applyPressScale(btnNeutral);
+    }
+
+    @Override
+    public void dismiss() {
+        View content = findViewById(android.R.id.content);
+        if (content != null) {
+            DynamicAnim.animateDialogDismiss(content, () -> CustomAlertDialog.super.dismiss());
+        } else {
+            super.dismiss();
         }
     }
 }

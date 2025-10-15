@@ -23,6 +23,7 @@ import org.levimc.launcher.R;
 import org.levimc.launcher.settings.FeatureSettings;
 import org.levimc.launcher.ui.activities.BaseActivity;
 import org.levimc.launcher.ui.adapter.SettingsAdapter;
+import org.levimc.launcher.ui.animation.DynamicAnim;
 import org.levimc.launcher.util.GithubReleaseUpdater;
 import org.levimc.launcher.util.LanguageManager;
 import org.levimc.launcher.util.PermissionsHandler;
@@ -39,6 +40,8 @@ public class SettingsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        DynamicAnim.applyPressScaleRecursively(findViewById(android.R.id.content));
 
         ImageButton backButton = findViewById(R.id.back_button);
         if (backButton != null) backButton.setOnClickListener(v -> finish());
@@ -77,6 +80,9 @@ public class SettingsActivity extends BaseActivity {
             } catch (PackageManager.NameNotFoundException ignored) {
             }
         }));
+
+        // 设置页列表入场动画（淡入+上滑阶梯）
+        settingsRecyclerView.post(() -> DynamicAnim.staggerRecyclerChildren(settingsRecyclerView));
     }
 
     private void addSwitchItem(String label, boolean defChecked, Switch.OnCheckedChangeListener listener) {

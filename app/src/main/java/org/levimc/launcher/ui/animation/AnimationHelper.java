@@ -1,45 +1,65 @@
 package org.levimc.launcher.ui.animation;
 
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.OvershootInterpolator;
 
-import org.levimc.launcher.R;
+import androidx.dynamicanimation.animation.DynamicAnimation;
+import androidx.dynamicanimation.animation.SpringAnimation;
+import androidx.dynamicanimation.animation.SpringForce;
+
 import org.levimc.launcher.databinding.ActivityMainBinding;
 
 public class AnimationHelper {
     public static void prepareInitialStates(ActivityMainBinding binding) {
-        binding.header.setVisibility(View.INVISIBLE);
-        setViewAnimationState(binding.mainCard, -50f);
-        setViewAnimationState(binding.modCard, -30f);
-        setViewAnimationState(binding.toolsCard, -20f);
-    }
+        float density = binding.getRoot().getResources().getDisplayMetrics().density;
+        float startOffsetX = -32f * density;
 
-    private static void setViewAnimationState(View view, float translationX) {
-        view.setAlpha(0f);
-        view.setTranslationX(translationX);
+        binding.header.setVisibility(View.INVISIBLE);
+        binding.header.setAlpha(0f);
+
+        binding.mainCard.setVisibility(View.INVISIBLE);
+        binding.mainCard.setAlpha(0f);
+        binding.mainCard.setTranslationX(startOffsetX);
+
+        binding.modCard.setVisibility(View.INVISIBLE);
+        binding.modCard.setAlpha(0f);
+        binding.modCard.setTranslationX(startOffsetX);
+
+        binding.toolsCard.setVisibility(View.INVISIBLE);
+        binding.toolsCard.setAlpha(0f);
+        binding.toolsCard.setTranslationX(startOffsetX);
     }
 
     public static void runInitializationSequence(ActivityMainBinding binding) {
-        binding.header.postDelayed(() -> startHeaderAnimation(binding.header), 300);
-        binding.mainCard.postDelayed(() -> animateView(binding.mainCard, 600, 1.2f), 500);
-        binding.modCard.postDelayed(() -> animateView(binding.modCard, 400, 1f), 700);
-        binding.toolsCard.postDelayed(() -> animateView(binding.toolsCard, 500, 1.05f), 650);
+        binding.header.postDelayed(() -> {
+            binding.header.setVisibility(View.VISIBLE);
+            SpringAnimation alphaAnim = new SpringAnimation(binding.header, DynamicAnimation.ALPHA, 1f);
+            alphaAnim.setSpring(new SpringForce(1f)
+                    .setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY)
+                    .setStiffness(SpringForce.STIFFNESS_LOW));
+            alphaAnim.start();
+        }, 200);
+
+        startCardEnter(binding.mainCard, 350);
+        startCardEnter(binding.modCard, 450);
+        startCardEnter(binding.toolsCard, 550);
     }
 
-    private static void startHeaderAnimation(View header) {
-        header.setVisibility(View.VISIBLE);
-        header.startAnimation(AnimationUtils.loadAnimation(header.getContext(), R.anim.slide_in_top));
-    }
+    private static void startCardEnter(View card, long delayMs) {
+        card.postDelayed(() -> {
+            card.setVisibility(View.VISIBLE);
 
-    private static void animateView(View view, int duration, float tension) {
-        view.animate().alpha(1f).translationX(0f)
-                .setInterpolator(new OvershootInterpolator(tension))
-                .setDuration(duration).start();
-    }
+            SpringAnimation txAnim = new SpringAnimation(card, DynamicAnimation.TRANSLATION_X, 0f);
+            txAnim.setSpring(new SpringForce(0f)
+                    .setDampingRatio(SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY)
+                    .setStiffness(SpringForce.STIFFNESS_LOW));
 
-    // Github icon animation removed along with About card.
+            SpringAnimation alphaAnim = new SpringAnimation(card, DynamicAnimation.ALPHA, 1f);
+            alphaAnim.setSpring(new SpringForce(1f)
+                    .setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY)
+                    .setStiffness(SpringForce.STIFFNESS_LOW));
+
+            txAnim.start();
+            alphaAnim.start();
+        }, delayMs);
+    }
 }
