@@ -49,6 +49,7 @@ import com.google.androidgamesdk.GameActivity;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.mojang.android.StringValue;
+import com.mojang.minecraftpe.platforms.Platform;
 
 import org.conscrypt.BuildConfig;
 import org.fmod.FMOD;
@@ -66,7 +67,6 @@ import java.util.*;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
 
 @SuppressWarnings("JavaJniMissingFunction")
 public class MainActivity extends GameActivity implements View.OnKeyListener, FilePickerManagerHandler {
@@ -115,6 +115,7 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
     private WifiManager.MulticastLock mMulticastLock = null;
     private AppExitInfoHelper mAppExitInfoHelper = null;
     private BrazeManager mBrazeManager = null;
+    Platform platform;
 
     Messenger mService = null;
     MessageConnectionStatus mBound = MessageConnectionStatus.NOTSET;
@@ -445,10 +446,12 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
                 mBrazeManager.requestPushPermission();
             }
         }
+        platform = Platform.createPlatform(true);
         setVolumeControlStream(3);
         FMOD.init(this);
         headsetConnectionReceiver = new HeadsetConnectionReceiver();
         mNetworkMonitor = new NetworkMonitor(getApplicationContext());
+        platform.onAppStart(getWindow().getDecorView());
         mHasStoragePermission = checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, Process.myPid(), Process.myUid()) == 0;
         mHasReadMediaImagesPermission = Build.VERSION.SDK_INT < 33 || checkPermission("android.permission.READ_MEDIA_IMAGES", Process.myPid(), Process.myUid()) == 0;
         nativeSetHeadphonesConnected(((AudioManager) getSystemService(Context.AUDIO_SERVICE)).isWiredHeadsetOn());
@@ -554,6 +557,7 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             View rootView = findViewById(android.R.id.content).getRootView();
             mCursorLocked = true;
+            rootView.setPointerIcon(PointerIcon.getSystemIcon(getApplicationContext(), 0));
             rootView.requestPointerCapture();
         }
     }
@@ -586,9 +590,14 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == 25 || keyCode == 24) {
-         //   platform.onVolumePressed();
+            platform.onVolumePressed();
         }
         return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public boolean onTrackballEvent(MotionEvent motionEvent) {
+        return dispatchGenericMotionEvent(motionEvent);
     }
 
     public void setTextToSpeechEnabled(boolean enabled) {
@@ -892,6 +901,7 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
             lockCursor();
         }
         super.onWindowFocusChanged(hasFocus);
+        platform.onViewFocusChanged(hasFocus);
     }
 
     @Override
