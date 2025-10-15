@@ -62,7 +62,6 @@ Before proceeding with LeviLauncher installation, ensure that you have the offic
 4. Locate the downloaded APK file using your file manager and tap to install
 5. Grant the necessary permissions when prompted during installation
 6. Once installed, open LeviLauncher from your application drawer
-7. Follow the in-app setup wizard to configure your game versions and settings
 
 > **Important:** LeviLauncher requires a legitimate, licensed copy of Minecraft Bedrock Edition. Do not use this launcher with pirated or unauthorized versions of the game. Ensure your Minecraft license is valid and properly linked to your Microsoft account.
 
@@ -76,7 +75,7 @@ If you want to build LeviLauncher from source or contribute to development, foll
 
 - Git installed on your system
 - Android Studio (latest version recommended)
-- Java Development Kit (JDK) 11 or higher
+- Java Development Kit (JDK) 21 or higher
 - Android SDK with API level 24 or higher
 
 ### Setup Instructions
