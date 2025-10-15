@@ -99,8 +99,10 @@ public class MinecraftLauncher {
     private void fillIntentWithMcPath(Intent sourceIntent, GameVersion version) {
         if (FeatureSettings.getInstance().isVersionIsolationEnabled()) {
             sourceIntent.putExtra("MC_PATH", version.versionDir.getAbsolutePath());
+            sourceIntent.putExtra("IS_INSTALLED", version.isInstalled);
         } else {
             sourceIntent.putExtra("MC_PATH", "");
+            sourceIntent.putExtra("IS_INSTALLED", false);
         }
     }
 

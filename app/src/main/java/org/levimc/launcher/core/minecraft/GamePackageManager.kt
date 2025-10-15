@@ -37,19 +37,20 @@ class GamePackageManager private constructor(private val context: Context, priva
     )
 
     init {
-        if (version == null || version.isInstalled) {
-            val packageName = detectGamePackage() ?: throw IllegalStateException("Minecraft not found")
-            packageContext = context.createPackageContext(
-                packageName,
-                Context.CONTEXT_IGNORE_SECURITY or Context.CONTEXT_INCLUDE_CODE
-            )
-            applicationInfo = packageContext.applicationInfo
-            nativeLibDir = resolveNativeLibDir()
-        } else {
-            packageContext = context
+        val packageName = detectGamePackage() ?: throw IllegalStateException("Minecraft not found")
+        packageContext = context.createPackageContext(
+            packageName,
+            Context.CONTEXT_IGNORE_SECURITY or Context.CONTEXT_INCLUDE_CODE
+        )
+        
+        if (version != null && !version.isInstalled) {
             applicationInfo = MinecraftLauncher(context).createFakeApplicationInfo(version, MinecraftLauncher.MC_PACKAGE_NAME)
             nativeLibDir = applicationInfo.nativeLibraryDir
+        } else {
+            applicationInfo = packageContext.applicationInfo
+            nativeLibDir = resolveNativeLibDir()
         }
+        
         extractLibraries()
         assetManager = createAssetManager()
         setupSecurityProvider()
@@ -69,17 +70,13 @@ class GamePackageManager private constructor(private val context: Context, priva
     }
 
     private fun resolveNativeLibDir(): String {
-        return if (version == null || version.isInstalled) {
-            val appInfo = packageContext.applicationInfo
-            if (appInfo.splitPublicSourceDirs?.isNotEmpty() == true) {
-                val cacheLibDir = File(context.cacheDir, "lib/${getDeviceAbi()}")
-                cacheLibDir.mkdirs()
-                cacheLibDir.absolutePath
-            } else {
-                appInfo.nativeLibraryDir
-            }
+        val appInfo = packageContext.applicationInfo
+        return if (appInfo.splitPublicSourceDirs?.isNotEmpty() == true) {
+            val cacheLibDir = File(context.cacheDir, "lib/${getDeviceAbi()}")
+            cacheLibDir.mkdirs()
+            cacheLibDir.absolutePath
         } else {
-            applicationInfo.nativeLibraryDir
+            appInfo.nativeLibraryDir
         }
     }
 
@@ -97,16 +94,7 @@ class GamePackageManager private constructor(private val context: Context, priva
             outputDir.mkdirs()
         }
 
-        if (version == null || version.isInstalled) {
-            val appInfo = packageContext.applicationInfo
-            if (File(appInfo.nativeLibraryDir).exists()) {
-                copyFromNativeDir(appInfo.nativeLibraryDir, outputDir)
-            }
-            val apkPaths = mutableListOf<String>()
-            appInfo.sourceDir?.let { apkPaths.add(it) }
-            appInfo.splitPublicSourceDirs?.let { apkPaths.addAll(it) }
-            apkPaths.forEach { extractFromApk(it, outputDir, getDeviceAbi()) }
-        } else {
+        if (version != null && !version.isInstalled) {
             val apkPaths = mutableListOf<String>()
             val baseApk = File(applicationInfo.sourceDir)
             if (baseApk.exists()) {
@@ -129,6 +117,15 @@ class GamePackageManager private constructor(private val context: Context, priva
                     apkPaths.forEach { extractFromApk(it, outputDir, abi) }
                 }
             }
+        } else {
+            val appInfo = packageContext.applicationInfo
+            if (File(appInfo.nativeLibraryDir).exists()) {
+                copyFromNativeDir(appInfo.nativeLibraryDir, outputDir)
+            }
+            val apkPaths = mutableListOf<String>()
+            appInfo.sourceDir?.let { apkPaths.add(it) }
+            appInfo.splitPublicSourceDirs?.let { apkPaths.addAll(it) }
+            apkPaths.forEach { extractFromApk(it, outputDir, getDeviceAbi()) }
         }
         verifyLibraries(outputDir)
     }
@@ -219,11 +216,8 @@ class GamePackageManager private constructor(private val context: Context, priva
         val addAssetPathMethod = AssetManager::class.java.getMethod("addAssetPath", String::class.java)
 
         val paths = mutableListOf<String>()
-        if (version == null || version.isInstalled) {
-            paths.add(packageContext.packageResourcePath)
-            val splitPath = packageContext.packageResourcePath.replace("base.apk", "split_install_pack.apk")
-            if (File(splitPath).exists()) paths.add(splitPath)
-        } else {
+        
+        if (version != null && !version.isInstalled) {
             val baseApk = File(applicationInfo.sourceDir)
             if (baseApk.exists()) {
                 paths.add(applicationInfo.sourceDir)
@@ -238,7 +232,12 @@ class GamePackageManager private constructor(private val context: Context, priva
                     Log.w(TAG, "Split APK for assets not found: $it")
                 }
             }
+        } else {
+            paths.add(packageContext.packageResourcePath)
+            val splitPath = packageContext.packageResourcePath.replace("base.apk", "split_install_pack.apk")
+            if (File(splitPath).exists()) paths.add(splitPath)
         }
+        
         paths.add(context.packageResourcePath)
 
         paths.forEach { path ->

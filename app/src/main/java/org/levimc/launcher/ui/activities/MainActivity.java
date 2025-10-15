@@ -333,7 +333,6 @@ public class MainActivity extends BaseActivity {
 
         GameVersion version = versionManager != null ? versionManager.getSelectedVersion() : null;
 
-        // Check if no version is selected
         if (version == null) {
             binding.launchButton.setEnabled(true);
             new CustomAlertDialog(this)
@@ -344,22 +343,6 @@ public class MainActivity extends BaseActivity {
             return;
         }
 
-        // Check if trying to load installed version with version isolation enabled
-        if (version.isInstalled && FeatureSettings.getInstance().isVersionIsolationEnabled()) {
-            binding.launchButton.setEnabled(true);
-            new CustomAlertDialog(this)
-                    .setTitleText(getString(R.string.dialog_title_disable_version_isolation))
-                    .setMessage(getString(R.string.dialog_message_disable_version_isolation))
-                    .setPositiveButton(getString(R.string.dialog_positive_disable), v -> {
-                        FeatureSettings.getInstance().setVersionIsolationEnabled(false);
-                        launchGame(); // Retry launch after disabling version isolation
-                    })
-                    .setNegativeButton(getString(R.string.dialog_negative_cancel), null)
-                    .show();
-            return;
-        }
-
-        // Check if trying to load imported version without version isolation
         if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
             binding.launchButton.setEnabled(true);
             new CustomAlertDialog(this)
@@ -367,14 +350,13 @@ public class MainActivity extends BaseActivity {
                     .setMessage(getString(R.string.dialog_message_version_isolation))
                     .setPositiveButton(getString(R.string.dialog_positive_enable), v -> {
                         FeatureSettings.getInstance().setVersionIsolationEnabled(true);
-                        launchGame(); // Retry launch after enabling version isolation
+                        launchGame();
                     })
                     .setNegativeButton(getString(R.string.dialog_negative_cancel), null)
                     .show();
             return;
         }
 
-        // Check if license is verified or Minecraft is from Play Store
         if (!PlayStoreValidator.isMinecraftFromPlayStore(this)) {
             binding.launchButton.setEnabled(true);
             PlayStoreValidationDialog.showNotFromPlayStoreDialog(this);

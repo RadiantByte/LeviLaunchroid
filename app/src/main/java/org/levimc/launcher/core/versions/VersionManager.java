@@ -255,6 +255,9 @@ public class VersionManager {
 
             File versionDir = getVersionDirForPackage(pi.packageName);
             if (!versionDir.exists()) versionDir.mkdirs();
+            
+            File gamesDir = new File(versionDir, "games/com.mojang");
+            if (!gamesDir.exists()) gamesDir.mkdirs();
 
             String displayName = pi.applicationInfo.loadLabel(pm) + " (" + pi.versionName + ")";
             boolean hasSoFiles = hasSoFilesInDir(new File(pi.applicationInfo.nativeLibraryDir));
