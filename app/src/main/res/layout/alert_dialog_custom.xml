@@ -1,52 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:background="@drawable/bg_rounded_card"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minWidth="450dp"
-    android:minHeight="200dp">
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/tv_title"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <ScrollView
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@drawable/bg_rounded_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:fillViewport="true">
+        android:minWidth="400dp"
+        android:maxWidth="600dp">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
         <TextView
             android:id="@+id/tv_message"
             android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:minHeight="40dp" />
-    </ScrollView>
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:fillViewport="true"
-        android:scrollbars="none">
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:gravity="end">
 
             <Button
                 android:id="@+id/btn_negative"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="80dp"
+                android:minWidth="100dp"
                 android:textSize="16sp"/>
 
             <View
@@ -58,7 +51,7 @@
                 android:id="@+id/btn_neutral"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="80dp"
+                android:minWidth="100dp"
                 android:textSize="16sp"
                 android:visibility="gone" />
 
@@ -71,8 +64,8 @@
                 android:id="@+id/btn_positive"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="80dp"
+                android:minWidth="100dp"
                 android:textSize="16sp" />
         </LinearLayout>
-    </HorizontalScrollView>
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>
