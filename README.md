@@ -9,7 +9,7 @@
 **A lightweight Android launcher for Minecraft: Bedrock Edition**
 
 [![GitHub Release](https://img.shields.io/github/v/release/LiteLDev/LeviLaunchroid?style=flat-square&color=blue)](https://github.com/LiteLDev/LeviLaunchroid/releases)
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/lgpl-3.0)
+[![License: LGPL v3](https://img.shields.io/github/license/LiteLDev/LeviLaunchroid)](https://github.com/LiteLDev/LeviLaunchroid/blob/main/LICENSE)
 [![Issues](https://img.shields.io/github/issues/LiteLDev/LeviLaunchroid?style=flat-square&color=red)](https://github.com/LiteLDev/LeviLaunchroid/issues)
 [![Stars](https://img.shields.io/github/stars/LiteLDev/LeviLaunchroid?style=flat-square&color=yellow)](https://github.com/LiteLDev/LeviLaunchroid)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-green?style=flat-square&logo=android)](https://www.android.com/)
@@ -39,7 +39,7 @@ LeviLauncher enables you to import your official Minecraft APK and run it direct
 Before installing LeviLauncher, ensure your device meets the following minimum specifications:
 
 - **Operating System:** Android 7.0 (API 24) or higher
-- **Device Architecture:** ARM64 (v8a) or ARM32 (v7a)
+- **Device Architecture:** ARM64 (v8a)
 - **RAM:** Minimum 1 GB available RAM (2 GB or more recommended)
 - **Storage:** At least 2 GB of available storage for Minecraft and game data
 - **License Requirement:** You must own a licensed copy of Minecraft Bedrock Edition purchased from Google Play
@@ -81,6 +81,7 @@ If you want to build LeviLauncher from source or contribute to development, foll
 ### Setup Instructions
 
 1. Clone the LeviLauncher repository:
+
    ```bash
    git clone https://github.com/LiteLDev/LeviLaunchroid.git
    ```
