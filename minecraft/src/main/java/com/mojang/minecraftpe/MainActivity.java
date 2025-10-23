@@ -1457,8 +1457,6 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
         }
     }
 
-
-
     public String getTextBoxBackend() {
         return cachedText;
     }

@@ -41,7 +41,6 @@ android {
             //noinspection ChromeOsAbiSupport
             abiFilters 'arm64-v8a'
         }
-
     }
 
     buildFeatures {
