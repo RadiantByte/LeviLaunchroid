@@ -21,7 +21,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 
 import org.levimc.launcher.R;
 import org.levimc.launcher.settings.FeatureSettings;
-import org.levimc.launcher.ui.activities.BaseActivity;
 import org.levimc.launcher.ui.adapter.SettingsAdapter;
 import org.levimc.launcher.ui.animation.DynamicAnim;
 import org.levimc.launcher.util.GithubReleaseUpdater;
@@ -69,6 +68,7 @@ public class SettingsActivity extends BaseActivity {
             addThemeSelectorItem(themeManager);
             addLanguageSelectorItem(languageManager);
             addSwitchItem(getString(R.string.version_isolation), fs.isVersionIsolationEnabled(), (btn, checked) -> fs.setVersionIsolationEnabled(checked));
+            addSwitchItem(getString(R.string.launcher_managed_mc_login), fs.isLauncherManagedMcLoginEnabled(), (btn, checked) -> fs.setLauncherManagedMcLoginEnabled(checked));
 
             try {
                 String localVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -81,7 +81,6 @@ public class SettingsActivity extends BaseActivity {
             }
         }));
 
-        // 设置页列表入场动画（淡入+上滑阶梯）
         settingsRecyclerView.post(() -> DynamicAnim.staggerRecyclerChildren(settingsRecyclerView));
     }
 
@@ -98,8 +97,11 @@ public class SettingsActivity extends BaseActivity {
         View ll = LayoutInflater.from(this).inflate(R.layout.item_settings_spinner, settingsItemsContainer, false);
         ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
         Spinner spinner = ll.findViewById(R.id.spinner_value);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, options);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, options);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setPopupBackgroundResource(R.drawable.bg_popup_menu_rounded);
+        DynamicAnim.applyPressScale(spinner);
         spinner.setSelection(defaultIdx);
         settingsItemsContainer.addView(ll);
         return spinner;

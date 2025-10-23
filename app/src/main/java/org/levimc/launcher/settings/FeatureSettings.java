@@ -6,6 +6,7 @@ public class FeatureSettings {
     private static volatile FeatureSettings INSTANCE;
     private static Context appContext;
     private boolean versionIsolationEnabled = false;
+    private boolean launcherManagedMcLoginEnabled = false;
 
     public static void init(Context context) {
         appContext = context.getApplicationContext();
@@ -31,6 +32,16 @@ public class FeatureSettings {
 
     public void setVersionIsolationEnabled(boolean enabled) {
         this.versionIsolationEnabled = enabled;
+        autoSave();
+    }
+
+    // 新增：开关的访问器
+    public boolean isLauncherManagedMcLoginEnabled() {
+        return launcherManagedMcLoginEnabled;
+    }
+
+    public void setLauncherManagedMcLoginEnabled(boolean enabled) {
+        this.launcherManagedMcLoginEnabled = enabled;
         autoSave();
     }
 

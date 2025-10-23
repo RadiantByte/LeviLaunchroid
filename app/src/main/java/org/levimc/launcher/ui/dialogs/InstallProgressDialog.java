@@ -37,7 +37,6 @@ public class InstallProgressDialog extends Dialog {
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
 
-        // 入场动画
         View content = findViewById(android.R.id.content);
         if (content != null) {
             DynamicAnim.animateDialogShow(content);
@@ -46,6 +45,13 @@ public class InstallProgressDialog extends Dialog {
 
     @Override
     public void dismiss() {
+        Window window = getWindow();
+        if (window != null) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.dimAmount = 0f;
+            window.setAttributes(params);
+        }
         View content = findViewById(android.R.id.content);
         if (content != null) {
             DynamicAnim.animateDialogDismiss(content, () -> InstallProgressDialog.super.dismiss());

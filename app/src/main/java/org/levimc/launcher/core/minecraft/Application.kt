@@ -13,6 +13,7 @@ class LauncherApplication : Application() {
         context = applicationContext
         FeatureSettings.init(applicationContext)
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
+
     }
 
     companion object {

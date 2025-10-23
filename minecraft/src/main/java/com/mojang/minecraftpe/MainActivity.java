@@ -691,8 +691,6 @@ public class MainActivity extends GameActivity implements View.OnKeyListener, Fi
         return getResources().getConfiguration().keyboard == Configuration.KEYBOARD_QWERTY;
     }
 
-
-
     public static class CustomEditText extends androidx.appcompat.widget.AppCompatEditText {
 
         MainActivity activity;

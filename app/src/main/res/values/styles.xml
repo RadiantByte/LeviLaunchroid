@@ -7,4 +7,14 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:fontFamily">@font/misans</item>
     </style>
+
+    <style name="AppPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/bg_popup_menu_square</item>
+        <item name="android:listDivider">@drawable/divider_menu_item</item>
+    </style>
+
+    <style name="PopupAccountSwitch_Animation">
+        <item name="android:windowEnterAnimation">@anim/popup_in</item>
+        <item name="android:windowExitAnimation">@anim/popup_out</item>
+    </style>
 </resources>

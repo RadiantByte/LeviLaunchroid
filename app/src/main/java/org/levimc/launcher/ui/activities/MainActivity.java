@@ -1,25 +1,21 @@
 package org.levimc.launcher.ui.activities;
 
 import android.annotation.SuppressLint;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
@@ -38,7 +34,6 @@ import org.levimc.launcher.ui.animation.DynamicAnim;
 import org.levimc.launcher.ui.dialogs.CustomAlertDialog;
 import org.levimc.launcher.ui.dialogs.GameVersionSelectDialog;
 import org.levimc.launcher.ui.dialogs.PlayStoreValidationDialog;
-import org.levimc.launcher.ui.dialogs.SettingsDialog;
 import org.levimc.launcher.ui.dialogs.gameversionselect.BigGroup;
 import org.levimc.launcher.ui.dialogs.gameversionselect.VersionUtil;
 import org.levimc.launcher.ui.views.MainViewModel;
@@ -49,12 +44,34 @@ import org.levimc.launcher.util.LanguageManager;
 import org.levimc.launcher.util.PermissionsHandler;
 import org.levimc.launcher.util.PlayStoreValidator;
 import org.levimc.launcher.util.ResourcepackHandler;
-import org.levimc.launcher.util.ThemeManager;
 import org.levimc.launcher.util.UIHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+
+ import android.widget.Button;
+ import android.widget.ProgressBar;
+ import android.graphics.Bitmap;
+ import android.view.Gravity;
+ import android.widget.PopupWindow;
+ import android.view.LayoutInflater;
+ import android.graphics.drawable.ColorDrawable;
+ import android.util.TypedValue;
+ import android.view.ViewGroup;
+ import androidx.core.content.ContextCompat;
+
+import coelho.msftauth.api.oauth20.OAuth20Token;
+import okhttp3.OkHttpClient;
+ import okhttp3.Request;
+ import okhttp3.Response;
+ 
+ import org.levimc.launcher.core.auth.MsftAccountStore;
+ import org.levimc.launcher.core.auth.MsftAuthManager;
+ import org.levimc.launcher.ui.dialogs.LoadingDialog;
+ import org.levimc.launcher.util.AccountTextUtils;
+ import org.levimc.launcher.util.DialogUtils;
 
  public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
@@ -68,14 +85,26 @@ import java.util.concurrent.Executors;
     private ActivityResultLauncher<Intent> permissionResultLauncher;
     private ActivityResultLauncher<Intent> apkImportResultLauncher;
     private ActivityResultLauncher<Intent> soImportResultLauncher;
-     private ModsAdapter modsAdapter;
-     private int lastModsCount = -1;
+    private ModsAdapter modsAdapter;
+    private int lastModsCount = -1;
+
+    private com.microsoft.xbox.idp.toolkit.CircleImageView accountAvatar;
+    private View accountAvatarContainer;
+    private ProgressBar avatarProgress;
+    private Button signInButton;
+    private String lastAvatarXuid;
+    private final OkHttpClient avatarClient = new OkHttpClient();
+    private ExecutorService accountExecutor = Executors.newSingleThreadExecutor();
+    private LoadingDialog accountLoadingDialog;
+    private ActivityResultLauncher<Intent> accountLoginLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        updateBetaBadge();
+        updateDebugBadge();
         setupManagersAndHandlers();
         AnimationHelper.prepareInitialStates(binding);
         AnimationHelper.runInitializationSequence(binding);
@@ -88,6 +117,317 @@ import java.util.concurrent.Executors;
         requestBasicPermissions();
         showEulaIfNeeded();
         initModsRecycler();
+        
+        accountLoginLauncher = registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                String code = result.getData().getStringExtra("ms_auth_code");
+                String codeVerifier = result.getData().getStringExtra("ms_code_verifier");
+                if (code != null && codeVerifier != null) {
+                    accountLoadingDialog = org.levimc.launcher.util.DialogUtils.ensure(this, accountLoadingDialog);
+                    org.levimc.launcher.util.DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_exchanging));
+
+                    accountExecutor.execute(() -> {
+                        okhttp3.OkHttpClient client = new okhttp3.OkHttpClient();
+                        try {
+                            OAuth20Token token =MsftAuthManager.exchangeCodeForToken(client, org.levimc.launcher.core.auth.MsftAuthManager.DEFAULT_CLIENT_ID, code, codeVerifier, org.levimc.launcher.core.auth.MsftAuthManager.DEFAULT_SCOPE + " offline_access");
+
+                            runOnUiThread(() -> DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_auth_xbox_device)));
+                            MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.performXboxAuth(client, token, this);
+
+                            runOnUiThread(() -> DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_fetch_minecraft_identity)));
+                            android.util.Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken());
+                            String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
+                            String xuid = nameAndXuid != null ? nameAndXuid.second : null;
+                            MsftAuthManager.saveAccount(this, token, xbox.gamertag(), minecraftUsername, xuid, xbox.avatarUrl());
+
+                            runOnUiThread(() -> {
+                                DialogUtils.dismissQuietly(accountLoadingDialog);
+                               Toast.makeText(this, getString(R.string.ms_login_success, (minecraftUsername != null ? minecraftUsername : getString(R.string.not_signed_in))), android.widget.Toast.LENGTH_SHORT).show();
+                                refreshAccountHeaderUI();
+                            });
+                        } catch (Exception e) {
+                            runOnUiThread(() -> {
+                                DialogUtils.dismissQuietly(accountLoadingDialog);
+                                Toast.makeText(this, getString(R.string.ms_login_failed_detail, e.getMessage()), android.widget.Toast.LENGTH_LONG).show();
+                                refreshAccountHeaderUI();
+                            });
+                        }
+                    });
+                    return;
+                }
+            }
+            refreshAccountHeaderUI();
+        });
+
+        initAccountHeader();
+    }
+
+
+    private void initAccountHeader() {
+        signInButton = binding.signInButton;
+        accountAvatar = binding.accountAvatar;
+        accountAvatarContainer = binding.accountAvatarContainer;
+        avatarProgress = binding.avatarProgress;
+
+        if (signInButton != null) {
+            signInButton.setOnClickListener(v -> {
+                Intent intent = new Intent(this, MsftLoginActivity.class);
+                accountLoginLauncher.launch(intent);
+            });
+            DynamicAnim.applyPressScale(signInButton);
+        }
+        if (accountAvatarContainer != null) {
+            accountAvatarContainer.setOnClickListener(this::showAccountSwitchPopup);
+            DynamicAnim.applyPressScale(accountAvatarContainer);
+        }
+
+        refreshAccountHeaderUI();
+    }
+
+    private MsftAccountStore.MsftAccount getActiveAccount() {
+        java.util.List<MsftAccountStore.MsftAccount> list = MsftAccountStore.list(this);
+        for (MsftAccountStore.MsftAccount a : list) if (a.active) return a;
+        return null;
+    }
+
+    private void refreshAccountHeaderUI() {
+        MsftAccountStore.MsftAccount active = getActiveAccount();
+        if (active == null) {
+            if (signInButton != null) signInButton.setVisibility(View.VISIBLE);
+            if (accountAvatarContainer != null) accountAvatarContainer.setVisibility(View.GONE);
+            if (accountAvatar != null) accountAvatar.setImageDrawable(null);
+            lastAvatarXuid = null;
+            if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+        } else {
+            if (signInButton != null) signInButton.setVisibility(View.GONE);
+            if (accountAvatarContainer != null) accountAvatarContainer.setVisibility(View.VISIBLE);
+            loadXboxAvatar(active);
+        }
+    }
+
+    private void loadXboxAvatar(MsftAccountStore.MsftAccount active) {
+        if (accountAvatar == null) return;
+        String url = AccountTextUtils.sanitizeUrl(active != null ? active.xboxAvatarUrl : null);
+        if (url == null) {
+            if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+            accountAvatar.setImageDrawable(null);
+            lastAvatarXuid = null;
+            return;
+        }
+        accountAvatar.setImageDrawable(null);
+        if (avatarProgress != null) avatarProgress.setVisibility(View.VISIBLE);
+        accountExecutor.execute(() -> {
+            try {
+                try (Response imgResp = avatarClient.newCall(new Request.Builder().url(url).build()).execute()) {
+                    Bitmap bmp = (imgResp.isSuccessful() && imgResp.body() != null) ? android.graphics.BitmapFactory.decodeStream(imgResp.body().byteStream()) : null;
+                    runOnUiThread(() -> {
+                        if (bmp != null) {
+                            accountAvatar.setImageBitmap(bmp);
+                        }
+                        if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+                    });
+                }
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+                });
+            }
+        });
+    }
+
+    private void showAccountSwitchPopup(View anchor) {
+        java.util.List<MsftAccountStore.MsftAccount> list = MsftAccountStore.list(this);
+
+        View content = LayoutInflater.from(this).inflate(R.layout.popup_account_switch, null);
+        androidx.recyclerview.widget.RecyclerView recyclerAccounts = content.findViewById(R.id.recycler_accounts);
+        TextView manageAction = content.findViewById(R.id.manage_action);
+        com.microsoft.xbox.idp.toolkit.CircleImageView headerAvatar = content.findViewById(R.id.header_avatar);
+        View headerContainer = content.findViewById(R.id.header_container);
+        TextView headerName = content.findViewById(R.id.header_name);
+
+        TypedValue outValue = new TypedValue();
+        getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+        int selectableRes = outValue.resourceId;
+
+        int paddingH = (int) (16 * getResources().getDisplayMetrics().density);
+        int paddingV = (int) (12 * getResources().getDisplayMetrics().density);
+        int paddingR = (int) (12 * getResources().getDisplayMetrics().density);
+
+        MsftAccountStore.MsftAccount active = getActiveAccount();
+        headerName.setText(AccountTextUtils.displayNameOrNotSigned(this, active));
+        if (accountAvatar != null && accountAvatar.getDrawable() != null) {
+            headerAvatar.setImageDrawable(accountAvatar.getDrawable());
+        } else if (active != null) {
+            final String url = AccountTextUtils.sanitizeUrl(active.xboxAvatarUrl);
+            if (url != null) {
+                accountExecutor.execute(() -> {
+                    try {
+                        okhttp3.OkHttpClient client = new okhttp3.OkHttpClient();
+                        okhttp3.Response imgResp = client.newCall(new okhttp3.Request.Builder().url(url).build()).execute();
+                        final android.graphics.Bitmap bmp = (imgResp.isSuccessful() && imgResp.body() != null) ? android.graphics.BitmapFactory.decodeStream(imgResp.body().byteStream()) : null;
+                        runOnUiThread(() -> { if (bmp != null) headerAvatar.setImageBitmap(bmp); });
+                    } catch (Exception ignored) {}
+                });
+            }
+        }
+
+        final PopupWindow popup = new PopupWindow(content, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        content.setAlpha(0f);
+        content.setTranslationY(24f);
+        float dens = getResources().getDisplayMetrics().density;
+        if (headerContainer != null) {
+            headerContainer.setAlpha(0f);
+            headerContainer.setTranslationY(8f * dens);
+        }
+        if (headerAvatar != null) {
+            headerAvatar.setAlpha(0f);
+            headerAvatar.setScaleX(0.94f);
+            headerAvatar.setScaleY(0.94f);
+        }
+        if (headerName != null) {
+            headerName.setAlpha(0f);
+            headerName.setTranslationY(6f * dens);
+        }
+        if (manageAction != null) {
+            manageAction.setAlpha(0f);
+            manageAction.setTranslationX(6f * dens);
+        }
+        popup.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        popup.setOutsideTouchable(true);
+        if (android.os.Build.VERSION.SDK_INT >= 21) popup.setElevation(8f);
+
+        final ViewGroup root = findViewById(android.R.id.content);
+        final View scrim = new View(this);
+        scrim.setBackgroundColor(ContextCompat.getColor(this, R.color.scrim));
+        scrim.setClickable(true);
+        scrim.setOnClickListener(v -> popup.dismiss());
+        root.addView(scrim, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        scrim.setAlpha(0f);
+        scrim.animate().alpha(1f).setDuration(120).start();
+
+         final java.util.List<MsftAccountStore.MsftAccount> displayList = new java.util.ArrayList<>();
+        for (MsftAccountStore.MsftAccount a : list) {
+            if (active == null || !android.text.TextUtils.equals(a.id, active.id)) displayList.add(a);
+        }
+ 
+         class AccountRowViewHolder extends androidx.recyclerview.widget.RecyclerView.ViewHolder {
+             TextView tv;
+             AccountRowViewHolder(TextView t) { super(t); this.tv = t; }
+         }
+ 
+         recyclerAccounts.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
+         recyclerAccounts.setAdapter(new androidx.recyclerview.widget.RecyclerView.Adapter<AccountRowViewHolder>() {
+             @Override
+             public AccountRowViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                 TextView row = new TextView(parent.getContext());
+                 row.setLayoutParams(new androidx.recyclerview.widget.RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                 row.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.on_surface));
+                 row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                 row.setPadding(paddingH, paddingV, paddingR, paddingV);
+                 row.setBackgroundResource(selectableRes);
+                 return new AccountRowViewHolder(row);
+             }
+ 
+             @Override
+             public void onBindViewHolder(AccountRowViewHolder holder, int position) {
+                 MsftAccountStore.MsftAccount account = displayList.get(position);
+                 holder.tv.setText(AccountTextUtils.titleOrUnknown(account));
+                 holder.tv.setOnClickListener(v -> {
+                     popup.dismiss();
+ 
+                     MsftAccountStore.setActive(MainActivity.this, account.id);
+                     boolean withinSevenDays = AccountTextUtils.isRecentlyUpdated(account, 7);
+ 
+                     if (withinSevenDays) {
+                         runOnUiThread(() -> {
+                             DialogUtils.dismissQuietly(accountLoadingDialog);
+                             String statusName = AccountTextUtils.displayNameOrNotSigned(MainActivity.this, account);
+                             Toast.makeText(MainActivity.this, getString(R.string.ms_login_success, statusName), Toast.LENGTH_SHORT).show();
+                             refreshAccountHeaderUI();
+                         });
+                         return;
+                     }
+ 
+                     accountLoadingDialog = DialogUtils.ensure(MainActivity.this, accountLoadingDialog);
+                     DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_auth_xbox_device));
+ 
+                     accountExecutor.execute(() -> {
+                         OkHttpClient client = new OkHttpClient();
+                         try {
+                             MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, account, MainActivity.this);
+ 
+                             android.util.Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken());
+                             String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
+                             String xuid = nameAndXuid != null ? nameAndXuid.second : null;
+                             MsftAccountStore.addOrUpdate(MainActivity.this, account.msUserId, account.refreshToken, xbox.gamertag(), minecraftUsername, xuid, xbox.avatarUrl());
+                             MsftAccountStore.setActive(MainActivity.this, account.id);
+ 
+                             runOnUiThread(() -> {
+                                 DialogUtils.dismissQuietly(accountLoadingDialog);
+                                 String statusName = minecraftUsername != null ? minecraftUsername : getString(R.string.not_signed_in);
+                                 Toast.makeText(MainActivity.this, getString(R.string.ms_login_success, statusName), Toast.LENGTH_SHORT).show();
+                                 refreshAccountHeaderUI();
+                             });
+                         } catch (Exception e) {
+                             runOnUiThread(() -> {
+                                 DialogUtils.dismissQuietly(accountLoadingDialog);
+                                 Toast.makeText(MainActivity.this, getString(R.string.ms_login_failed_detail, e.getMessage()), Toast.LENGTH_LONG).show();
+                                 refreshAccountHeaderUI();
+                             });
+                         }
+                     });
+                 });
+             }
+ 
+             @Override
+             public int getItemCount() { return displayList.size(); }
+         });
+ 
+         float density = getResources().getDisplayMetrics().density;
+         if (displayList.size() > 2) {
+             int limitHeight = (int) ((48 * 2 + 16) * density);
+             recyclerAccounts.getLayoutParams().height = limitHeight;
+         } else {
+             recyclerAccounts.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+         }
+
+        manageAction.setOnClickListener(v -> {
+            popup.dismiss();
+            startActivity(new Intent(this, AccountsActivity.class));
+        });
+        DynamicAnim.applyPressScale(manageAction);
+
+        popup.setOnDismissListener(() -> {
+            if (root != null && scrim != null) {
+                scrim.animate().alpha(0f).setDuration(120).withEndAction(() -> {
+                    try { root.removeView(scrim); } catch (Exception ignored) {}
+                }).start();
+            }
+        });
+
+        int edgeMargin = (int) (4 * getResources().getDisplayMetrics().density);
+        popup.showAsDropDown(anchor, -edgeMargin, edgeMargin / 4, Gravity.END);
+
+        DynamicAnim.springAlphaTo(content, 1f).start();
+        DynamicAnim.springTranslationYTo(content, 0f).start();
+        recyclerAccounts.post(() -> DynamicAnim.staggerRecyclerChildren(recyclerAccounts));
+        if (headerContainer != null) {
+            DynamicAnim.springAlphaTo(headerContainer, 1f).start();
+            DynamicAnim.springTranslationYTo(headerContainer, 0f).start();
+        }
+        if (headerAvatar != null) {
+            DynamicAnim.springAlphaTo(headerAvatar, 1f).start();
+            DynamicAnim.springScaleXTo(headerAvatar, 1f).start();
+            DynamicAnim.springScaleYTo(headerAvatar, 1f).start();
+        }
+        if (headerName != null) {
+            DynamicAnim.springAlphaTo(headerName, 1f).start();
+            DynamicAnim.springTranslationYTo(headerName, 0f).start();
+        }
+        if (manageAction != null) {
+            DynamicAnim.springAlphaTo(manageAction, 1f).start();
+            DynamicAnim.springTranslationXTo(manageAction, 0f).start();
+        }
     }
 
     private void setupManagersAndHandlers() {
@@ -254,6 +594,10 @@ import java.util.concurrent.Executors;
         super.onResume();
         setTextMinecraftVersion();
         updateAbiLabel();
+        updateGenuineBadge();
+        refreshAccountHeaderUI();
+        updateBetaBadge();
+        updateDebugBadge();
     }
 
     private void updateAbiLabel() {
@@ -273,6 +617,28 @@ import java.util.concurrent.Executors;
             default -> R.drawable.bg_abi_default;
         };
         abiLabel.setBackgroundResource(bgRes);
+    }
+
+    private void updateGenuineBadge() {
+        if (binding == null) return;
+        boolean verified = PlayStoreValidator.isMinecraftFromPlayStore(this);
+        binding.genuineLabel.setVisibility(verified ? View.GONE : View.VISIBLE);
+    }
+
+    private void updateBetaBadge() {
+        if (binding == null) return;
+        View beta = binding.betaLabel;
+        if (beta != null) {
+            beta.setVisibility(org.levimc.launcher.BuildConfig.IS_BETA ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void updateDebugBadge() {
+        if (binding == null) return;
+        View debug = binding.debugLabel;
+        if (debug != null) {
+            debug.setVisibility(org.levimc.launcher.BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override
@@ -299,6 +665,11 @@ import java.util.concurrent.Executors;
         binding.deleteVersionButton.setOnClickListener(v -> showDeleteVersionDialog());
         DynamicAnim.applyPressScale(binding.deleteVersionButton);
 
+        binding.genuineLabel.setOnClickListener(v -> {
+            PlayStoreValidationDialog.showNotFromPlayStoreDialog(this);
+        });
+        DynamicAnim.applyPressScale(binding.genuineLabel);
+
         initQuickActionsRecycler();
 
         binding.modCard.setOnClickListener(v -> openModsFullscreen());
@@ -323,6 +694,12 @@ import java.util.concurrent.Executors;
                 R.string.import_apk_subtitle,
                 2
         ));
+
+        items.add(new QuickActionsAdapter.QuickActionItem(
+                R.string.microsoft_accounts,
+                R.string.manage_accounts,
+                3
+        ));
         adapter.updateItems(items);
         DynamicAnim.staggerRecyclerChildren(binding.quickActionsRecycler);
 
@@ -330,6 +707,10 @@ import java.util.concurrent.Executors;
             switch (actionId) {
                 case 1 -> openContentManagement();
                 case 2 -> startFilePicker("application/vnd.android.package-archive", apkImportResultLauncher);
+                case 3 -> {
+                    Intent intent = new Intent(this, AccountsActivity.class);
+                    startActivity(intent);
+                }
             }
         });
     }
@@ -338,8 +719,6 @@ import java.util.concurrent.Executors;
         Intent intent = new Intent(this, ModsFullscreenActivity.class);
         startActivity(intent);
     }
-
-    
 
     private void launchGame() {
         binding.launchButton.setEnabled(false);
@@ -354,6 +733,23 @@ import java.util.concurrent.Executors;
                     .setPositiveButton(getString(R.string.dialog_positive_ok), null)
                     .show();
             return;
+        }
+
+        if (FeatureSettings.getInstance().isLauncherManagedMcLoginEnabled()) {
+            MsftAccountStore.MsftAccount active = getActiveAccount();
+            boolean loggedIn = active != null && active.minecraftUsername != null && !active.minecraftUsername.isEmpty();
+            if (!loggedIn) {
+                binding.launchButton.setEnabled(true);
+                new CustomAlertDialog(this)
+                        .setTitleText(getString(R.string.dialog_title_login_required))
+                        .setMessage(getString(R.string.dialog_message_login_required))
+                        .setPositiveButton(getString(R.string.go_to_accounts), v -> {
+                            startActivity(new Intent(this, AccountsActivity.class));
+                        })
+                        .setNegativeButton(getString(R.string.disable_launcher_login_and_continue), null)
+                        .show();
+                return;
+            }
         }
 
         if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
@@ -443,14 +839,6 @@ import java.util.concurrent.Executors;
         launcher.launch(intent);
     }
 
-    private void showSettingsSafely() {
-        try {
-            showSettingsDialog();
-        } catch (PackageManager.NameNotFoundException e) {
-            //Toast.makeText(this, R.string.error_load_setting, Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void openContentManagement() {
         GameVersion currentVersion = versionManager != null ? versionManager.getSelectedVersion() : null;
         if (currentVersion == null) {
@@ -459,16 +847,6 @@ import java.util.concurrent.Executors;
         }
         Intent intent = new Intent(this, ContentManagementActivity.class);
         startActivity(intent);
-    }
-
-    private void openGithub() {
-        Uri uri = Uri.parse("https://github.com/LiteLDev/LeviLaunchroid");
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        try {
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, R.string.error_no_browser, Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void showDeleteVersionDialog() {
@@ -495,28 +873,6 @@ import java.util.concurrent.Executors;
                 .setNegativeButton(getString(R.string.dialog_negative_cancel), null)
                 .show();
     }
-
-    private void showSettingsDialog() throws PackageManager.NameNotFoundException {
-        FeatureSettings fs = FeatureSettings.getInstance();
-        ThemeManager themeManager = new ThemeManager(this);
-        SettingsDialog dlg = new SettingsDialog(this);
-        dlg.addThemeSelectorItem(themeManager);
-        dlg.addSwitchItem(
-                getString(R.string.version_isolation),
-                fs.isVersionIsolationEnabled(),
-                (btn, check) -> fs.setVersionIsolationEnabled(check)
-        );
-        String localVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        dlg.addActionButton(
-                getString(R.string.version_prefix) + localVersion,
-                getString(R.string.check_update),
-                v -> new GithubReleaseUpdater(
-                        this, "LiteLDev", "LeviLaunchroid", permissionResultLauncher
-                ).checkUpdate()
-        );
-        dlg.show();
-    }
-
     public void setTextMinecraftVersion() {
         if (binding == null) return;
         String display = versionManager.getSelectedVersion() != null ? versionManager.getSelectedVersion().displayName : getString(R.string.not_found_version);
@@ -547,7 +903,6 @@ import java.util.concurrent.Executors;
      private void updateModsUI(List<Mod> mods) {
          modsAdapter.updateMods(mods != null ? mods : new ArrayList<>());
          int count = (mods != null) ? mods.size() : 0;
-         // 仅在首次或数量变化时触发整列动画，避免开关引发整个列表重动画
          if (lastModsCount == -1 || count != lastModsCount) {
              DynamicAnim.staggerRecyclerChildren(binding.modsRecycler);
          }

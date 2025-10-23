@@ -134,6 +134,7 @@ public class MinecraftLauncher {
                     gameManager.loadLibrary("fmod");
                     gameManager.loadLibrary("MediaDecoders_Android");
                     gameManager.loadLibrary("minecraftpe");
+                    gameManager.loadLibrary("gxcore");
                 }
                 ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
 

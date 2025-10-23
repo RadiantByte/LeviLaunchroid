@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -85,6 +86,13 @@ public class ApkVersionConfirmDialog extends DialogFragment {
 
         btnCancel.setOnClickListener(v -> {
             if (callback != null) callback.onCancelled();
+            Window w = dialog.getWindow();
+            if (w != null) {
+                w.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                WindowManager.LayoutParams p = w.getAttributes();
+                p.dimAmount = 0f;
+                w.setAttributes(p);
+            }
             View content = dialog.findViewById(android.R.id.content);
             DynamicAnim.animateDialogDismiss(content, dialog::dismiss);
         });
@@ -93,6 +101,13 @@ public class ApkVersionConfirmDialog extends DialogFragment {
             String versionName = editVersionName.getText().toString();
             if (isValidVersionName(versionName) && !isVersionExist(versionName)) {
                 if (callback != null) callback.onInstallClicked(versionName);
+                Window w = dialog.getWindow();
+                if (w != null) {
+                    w.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    WindowManager.LayoutParams p = w.getAttributes();
+                    p.dimAmount = 0f;
+                    w.setAttributes(p);
+                }
                 View content = dialog.findViewById(android.R.id.content);
                 DynamicAnim.animateDialogDismiss(content, dialog::dismiss);
             } else {
@@ -105,7 +120,7 @@ public class ApkVersionConfirmDialog extends DialogFragment {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // 动态入场 & 按压反馈
+
         DynamicAnim.animateDialogShow(dialog.findViewById(android.R.id.content));
         DynamicAnim.applyPressScale(btnInstall);
         DynamicAnim.applyPressScale(btnCancel);

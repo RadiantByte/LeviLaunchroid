@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
+import android.widget.TextView;
 
 import org.levimc.launcher.R;
 
 public class LoadingDialog extends Dialog {
+    private TextView messageView;
     public LoadingDialog(Context context) {
         super(context);
     }
@@ -22,5 +24,13 @@ public class LoadingDialog extends Dialog {
         setContentView(view);
         setCancelable(false);
         getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        messageView = view.findViewById(R.id.tv_message);
+    }
+
+    public void setMessage(CharSequence message) {
+        if (messageView != null) {
+            messageView.setText(message);
+        }
     }
 }

@@ -191,6 +191,8 @@
     <string name="minecraft_not_installed_title">Minecraft не установлен</string>
     <string name="minecraft_not_installed_message">Похоже, что Minecraft не установлен на вашем устройстве. Пожалуйста, установите его из Google Play Маркета, чтобы использовать этот лаунчер.</string>
     <string name="install_minecraft">Установить Minecraft</string>
+    <string name="genuine_badge_label">Лицензия не подтверждена</string>
+    <string name="invalid_license_detected_toast">Обнаружена нелицензионная версия Minecraft. Убедитесь, что Minecraft установлен из Google Play Маркета</string>
 
     <string name="full_mods_title">🧩 Моды </string>
     <string name="total_mods">Всего модов:</string>
@@ -212,4 +214,33 @@
 
         <!-- Заставка -->
     <string name="splash_logo_desc">Логотип-лист</string>
+    <string name="launcher_managed_mc_login">Войти в Minecraft с помощью LeviLauncher</string>
+    <string name="accounts_title">Аккаунты</string>
+    <string name="microsoft_accounts">Аккаунты Microsoft</string>
+    <string name="manage_accounts">Управлять</string>
+    <string name="not_signed_in">Не выполнен вход</string>
+    <string name="xuid">XUID</string>
+    <string name="sign_in">Войти</string>
+    <string name="sign_out">Выйти</string>
+    <string name="accounts_active_privilege">Выполнен вход</string>
+    <string name="ms_login_title">Вход Microsoft</string>
+    <string name="ms_login_starting">Начинается вход в Microsoft…</string>
+    <string name="ms_login_exchanging">Обмен токена…</string>
+    <string name="ms_login_auth_xbox_device">Аутентификация устройства Xbox…</string>
+    <string name="ms_login_fetch_minecraft_identity">Получение идентификатора Minecraft…</string>
+    <string name="ms_login_success">Выполнен вход как %1$s</string>
+    <string name="ms_login_failed">Сбой входа Microsoft</string>
+    <string name="ms_login_failed_detail">Сбой входа: %1$s</string>
+    <string name="ms_set_active">Сделать активным</string>
+    <string name="ms_delete">Удалить</string>
+    <string name="ms_active_badge">Активный</string>
+    <string name="ms_account_subtitle_format">ID пользователя: %1$s • Обновлено: %2$s</string>
+    <string name="xbox_avatar">Аватар Xbox</string>
+
+    <string name="label_current_account">Текущий счет</string>
+    <string name="label_other_accounts">Другие счета</string>
+    <string name="dialog_title_login_required">Требуется вход</string>
+    <string name="dialog_message_login_required">Включён вход через лаунчер, но ни один аккаунт не авторизован. Перейдите в «Аккаунты», чтобы войти.</string>
+    <string name="go_to_accounts">Аккаунты</string>
+    <string name="disable_launcher_login_and_continue">Закрыть</string>
 </resources>

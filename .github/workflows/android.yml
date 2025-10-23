@@ -49,14 +49,14 @@ jobs:
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r27
+          ndk-version: r27c
           link-to-sdk: true
 
       - name: Grant Execute Permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: Build Debug and Unsigned Release APKs
-        run: ./gradlew assembleDebug assembleRelease
+      - name: Build Debug, Beta and Unsigned Release APKs
+        run: ./gradlew assembleDebug assembleBeta assembleRelease
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4.6.2
@@ -69,6 +69,12 @@ jobs:
         with:
           name: LeviLauncher-release-unsigned-apk
           path: app/build/outputs/apk/release/*-unsigned.apk
+
+      - name: Upload Beta APK
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: LeviLauncher-beta-apk
+          path: app/build/outputs/apk/beta/*.apk
 
       - name: Sign Release APK
         if: startsWith(github.ref, 'refs/tags/')

@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -36,7 +38,6 @@ public class LibsRepairDialog extends Dialog {
         setCancelable(false);
         Objects.requireNonNull(getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
 
-        // 入场动画
         View content = findViewById(android.R.id.content);
         if (content != null) {
             DynamicAnim.animateDialogShow(content);
@@ -63,6 +64,13 @@ public class LibsRepairDialog extends Dialog {
 
     @Override
     public void dismiss() {
+        Window window = getWindow();
+        if (window != null) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.dimAmount = 0f;
+            window.setAttributes(params);
+        }
         View content = findViewById(android.R.id.content);
         if (content != null) {
             DynamicAnim.animateDialogDismiss(content, () -> LibsRepairDialog.super.dismiss());

@@ -16,9 +16,12 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven{url "https://repo.opencollab.dev/maven-snapshots"}
+        maven{url "https://repo.opencollab.dev/maven-releases"}
     }
 }
 
 rootProject.name = "levilauncher"
 include ':app'
 include ':minecraft'
+include ':minecraft-msftauth'

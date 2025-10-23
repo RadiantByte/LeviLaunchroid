@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -83,7 +84,6 @@ public class CustomAlertDialog extends Dialog {
             if (spacingNegativeNeutral != null) spacingNegativeNeutral.setVisibility(View.GONE);
         }
 
-        // Neutral
         if (mNeutralText != null) {
             btnNeutral.setText(mNeutralText);
             btnNeutral.setVisibility(View.VISIBLE);
@@ -94,7 +94,6 @@ public class CustomAlertDialog extends Dialog {
             if (spacingNeutralPositive != null) spacingNeutralPositive.setVisibility(View.GONE);
         }
 
-        // Positive
         if (mPositiveText != null) {
             btnPositive.setText(mPositiveText);
             btnPositive.setVisibility(View.VISIBLE);
@@ -122,7 +121,6 @@ public class CustomAlertDialog extends Dialog {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
 
-        // 动态入场 & 按压反馈
         View content = findViewById(android.R.id.content);
         if (content != null) {
             DynamicAnim.animateDialogShow(content);
@@ -134,6 +132,13 @@ public class CustomAlertDialog extends Dialog {
 
     @Override
     public void dismiss() {
+        Window window = getWindow();
+        if (window != null) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.dimAmount = 0f;
+            window.setAttributes(params);
+        }
         View content = findViewById(android.R.id.content);
         if (content != null) {
             DynamicAnim.animateDialogDismiss(content, () -> CustomAlertDialog.super.dismiss());

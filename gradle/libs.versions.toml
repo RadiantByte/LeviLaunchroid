@@ -1,8 +1,9 @@
 [versions]
 agp = "8.13.0"
-coreKtx = "1.10.1"
-espressoCore = "3.5.1"
-appcompat = "1.7.0"
+bcprovJdk15on = "1.70"
+bedrockConnection = "3.0.0.Beta10-SNAPSHOT"
+espressoCore = "3.7.0"
+appcompat = "1.7.1"
 annotation = "1.9.1"
 activityKtx = "1.11.0"
 apkParser = "2.6.10"
@@ -17,32 +18,23 @@ fragmentKtx = "1.8.9"
 gamesActivity = "4.0.0"
 gamesActivityVersion = "4.0.0"
 gson = "2.13.2"
+guava = "33.5.0-jre"
 httpclient = "4.5.14"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 kotlin = "2.2.20"
 lifecycle = "2.9.4"
 material = "1.13.0"
-okhttp = "5.1.0"
-okhttpVersion = "5.1.0"
+okhttp = "5.2.1"
 pkix = "1.54.0.0"
 preference-ktx = "1.2.1"
-roomRuntime = "2.8.1"
-shadowhook = "2.0.0"
+roomRuntime = "2.8.2"
 simpleXml = "2.7.1"
 billing = "8.0.0"
 sqliteFramework = "2.6.1"
-activityCompose = "1.10.1"
-composeBom = "2024.09.00"
-materialIconsExtended = "1.7.8"
-lifecycleProcess = "2.9.3"
 dynamicanimation = "1.1.0"
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-games-activity-v122 = { module = "androidx.games:games-activity", version.ref = "gamesActivityVersion" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
@@ -61,6 +53,8 @@ androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifec
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preference-ktx" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 apk-parser = { module = "net.dongliu:apk-parser", version.ref = "apkParser" }
+bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprovJdk15on" }
+bedrock-connection = { module = "org.cloudburstmc.protocol:bedrock-connection", version.ref = "bedrockConnection" }
 conscrypt-android = { module = "org.conscrypt:conscrypt-android", version.ref = "conscryptAndroid" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 core = { module = "com.madgag.spongycastle:core", version.ref = "core" }
@@ -70,34 +64,19 @@ ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitV
 firebase-iid = { module = "com.google.firebase:firebase-iid", version.ref = "firebase-iid" }
 firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebase-messaging" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 httpclient = { module = "org.apache.httpcomponents:httpclient", version.ref = "httpclient" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
-okhttp = { module = "com.squareup.okhttp3:okhttp" }
-okhttp-v510 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
-okhttp3-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 pkix = { module = "com.madgag.spongycastle:pkix", version.ref = "pkix" }
 prov = { module = "com.madgag.spongycastle:prov", version.ref = "core" }
-shadowhook = { module = "com.bytedance.android:shadowhook", version.ref = "shadowhook" }
 simple-xml = { group = "org.simpleframework", name = "simple-xml", version.ref = "simpleXml" }
 billing = { group = "com.android.billingclient", name = "billing", version.ref = "billing" }
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
-androidx-ui = { group = "androidx.compose.ui", name = "ui" }
-androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
-androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-dynamicanimation = { module = "androidx.dynamicanimation:dynamicanimation", version.ref = "dynamicanimation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
