@@ -9,7 +9,7 @@
 **A lightweight Android launcher for Minecraft: Bedrock Edition**
 
 [![GitHub Release](https://img.shields.io/github/v/release/LiteLDev/LeviLaunchroid?style=flat-square&color=blue)](https://github.com/LiteLDev/LeviLaunchroid/releases)
-[![License: LGPL v3](https://img.shields.io/github/license/LiteLDev/LeviLaunchroid)](https://github.com/LiteLDev/LeviLaunchroid/blob/main/LICENSE)
+[![License: Apache 2.0](https://img.shields.io/github/license/LiteLDev/LeviLaunchroid)](https://github.com/LiteLDev/LeviLaunchroid/blob/main/LICENSE)
 [![Issues](https://img.shields.io/github/issues/LiteLDev/LeviLaunchroid?style=flat-square&color=red)](https://github.com/LiteLDev/LeviLaunchroid/issues)
 [![Stars](https://img.shields.io/github/stars/LiteLDev/LeviLaunchroid?style=flat-square&color=yellow)](https://github.com/LiteLDev/LeviLaunchroid)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-green?style=flat-square&logo=android)](https://www.android.com/)
@@ -29,8 +29,8 @@ LeviLauncher enables you to import your official Minecraft APK and run it direct
 - **APK Import & Installation-Free Launching** – Import your official Minecraft APK and run it directly without system installation
 - **SO Module Loading** – Load external native SO modules to extend or enhance Minecraft features and performance
 - **Multi-Version Management & Version Isolation** – Manage multiple Minecraft versions independently, with separated configurations and data
+- **Multiple Xbox Account Management** – Manage multiple Xbox accounts inside the launcher and switch between them seamlessly
 - **Resource Pack & World Management** – Import, export, and back up your resource packs and worlds with the built-in manager
-- **Multi-Architecture Support** – Compatible with ARM64 (v8a) and ARM32 (v7a) device architectures
 
 ---
 
@@ -56,7 +56,7 @@ Before proceeding with LeviLauncher installation, ensure that you have the offic
 
 ### Installation Steps
 
-1. Visit the [Releases Page](https://github.com/LiteLDev/LeviLaunchroid/releases) and download the latest APK build for your device architecture
+1. Visit the [Releases Page](https://github.com/LiteLDev/LeviLaunchroid/releases) and download the latest APK build
 2. Open your device Settings and navigate to Security or Applications
 3. Enable "Unknown Sources" or "Allow installation from unknown sources" to permit APK installation
 4. Locate the downloaded APK file using your file manager and tap to install
@@ -124,7 +124,7 @@ Optimize all additions to maintain low latency and smooth performance. Test your
 
 ### Testing
 
-Test all changes on multiple devices and Android versions to ensure compatibility and stability. Verify that your modifications work correctly on both ARM64 and ARM32 architectures when applicable.
+Test all changes on multiple devices and Android versions to ensure compatibility and stability.
 
 ### Pull Requests
 
@@ -146,15 +146,12 @@ LeviLauncher is designed for legitimate players of Minecraft Bedrock Edition. Pl
 
 - Modify LeviLauncher for personal gameplay and to test new features
 - Create educational content (videos, tutorials, blog posts) showcasing LeviLauncher's capabilities
-- Fork the repository for learning purposes or to create derivative projects, provided you comply with the GNU LGPL v3.0
-- Share your modified versions with others as long as you comply with the LGPL license terms
+- Fork the repository for learning purposes or to create derivative projects, provided you comply with the Apache License 2.0
+- Share your modified versions with others as long as you comply with the Apache License 2.0 terms
 
 ### Prohibited Uses
 
-- Do not distribute modified versions without sharing the source code, as required by the LGPL
 - Do not claim LeviLauncher as your own without crediting the LeviMC team and its contributors
-- Selling LeviLauncher or derivatives without adhering to the LGPL is strictly prohibited
-- Do not distribute LeviLauncher as closed-source or under a non-LGPL license
 - Do not use LeviLauncher to violate Mojang or Microsoft's user agreements
 
 > **Disclaimer:** The authors and contributors of LeviLauncher are not responsible for bans, damages, or issues arising from the use of this software. Use it at your own risk and in accordance with Minecraft's terms of service.
@@ -192,7 +189,7 @@ LeviLauncher would not be possible without the contributions and support of many
 <div align="center">
 
 [![GitHub Release](https://img.shields.io/github/v/release/LiteLDev/LeviLaunchroid?style=flat-square&color=blue)](https://github.com/LiteLDev/LeviLaunchroid/releases)
-[![License: LGPL v3](https://img.shields.io/badge/License-LGPLv3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/lgpl-3.0)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Issues](https://img.shields.io/github/issues/LiteLDev/LeviLaunchroid?style=flat-square&color=red)](https://github.com/LiteLDev/LeviLaunchroid/issues)
 [![Stars](https://img.shields.io/github/stars/LiteLDev/LeviLaunchroid?style=flat-square&color=yellow)](https://github.com/LiteLDev/LeviLaunchroid)
 [![Android](https://img.shields.io/badge/Android-7.0%2B-green?style=flat-square&logo=android)](https://www.android.com/)
