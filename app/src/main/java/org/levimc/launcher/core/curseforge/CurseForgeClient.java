@@ -18,7 +18,7 @@ import okhttp3.Response;
 public class CurseForgeClient {
     private static final String TAG = "CurseForgeClient";
     private static final String BASE_URL = "https://api.curseforge.com";
-    private static final String API_KEY = "";
+    private static final String API_KEY = "REDACTED";
 
     public static final int GAME_ID_MINECRAFT = 78022;
 
