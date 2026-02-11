@@ -1,5 +1,6 @@
 package org.levimc.launcher.core.curseforge;
 
+import org.levimc.launcher.BuildConfig;
 import com.google.gson.Gson;
 
 import org.levimc.launcher.core.curseforge.models.ContentSearchResponse;
@@ -19,7 +20,7 @@ import okhttp3.Response;
 public class CurseForgeClient {
     private static final String TAG = "CurseForgeClient";
     private static final String BASE_URL = "https://api.curseforge.com";
-    private static final String API_KEY = "REDACTED";
+    private static final String API_KEY = BuildConfig.CURSEFORGE_API_KEY;
 
     public static final int GAME_ID_MINECRAFT = 78022;
 

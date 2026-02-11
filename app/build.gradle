@@ -3,6 +3,12 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localProperties.load(new FileInputStream(localPropertiesFile))
+}
+
 def getGitTag() {
     def tag = "unknown"
     try {
@@ -37,6 +43,7 @@ android {
         versionCode getVersionCodeByTimestamp()
         versionName getGitTag()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "CURSEFORGE_API_KEY", "\"${localProperties.getProperty('curseforge.api_key', '')}\""
         ndk {
             //noinspection ChromeOsAbiSupport
             abiFilters 'arm64-v8a'

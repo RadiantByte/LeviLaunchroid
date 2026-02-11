@@ -14,7 +14,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.Switch;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -121,7 +121,6 @@ public class SettingsActivity extends BaseActivity {
 
     private void triggerEasterEgg() {
         try {
-            // Base64 encoded: https://youtu.be/FtutLA63Cp8?si=BHLDXvK96OgP45B8
             String encoded = "aHR0cHM6Ly95b3V0dS5iZS9GdHV0TEE2M0NwOD9zaT1CSExEWHZLOTZPZ1A0NUI4";
             String url = new String(Base64.decode(encoded, Base64.DEFAULT));
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -131,10 +130,10 @@ public class SettingsActivity extends BaseActivity {
         }
     }
 
-    private void addSwitchItem(String label, boolean defChecked, Switch.OnCheckedChangeListener listener) {
+    private void addSwitchItem(String label, boolean defChecked, SwitchMaterial.OnCheckedChangeListener listener) {
         View ll = LayoutInflater.from(this).inflate(R.layout.item_settings_switch, settingsItemsContainer, false);
         ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
-        Switch sw = ll.findViewById(R.id.switch_value);
+        SwitchMaterial sw = ll.findViewById(R.id.switch_value);
         sw.setChecked(defChecked);
         if (listener != null) sw.setOnCheckedChangeListener(listener);
         settingsItemsContainer.addView(ll);
@@ -143,7 +142,7 @@ public class SettingsActivity extends BaseActivity {
     private void addMemoryEditorSwitchItem(FeatureSettings fs) {
         View ll = LayoutInflater.from(this).inflate(R.layout.item_settings_switch, settingsItemsContainer, false);
         ((TextView) ll.findViewById(R.id.tv_title)).setText(getString(R.string.memory_editor_enable));
-        Switch sw = ll.findViewById(R.id.switch_value);
+        SwitchMaterial sw = ll.findViewById(R.id.switch_value);
         sw.setChecked(fs.isMemoryEditorEnabled());
         
         sw.setOnCheckedChangeListener((btn, checked) -> {
@@ -157,7 +156,7 @@ public class SettingsActivity extends BaseActivity {
         settingsItemsContainer.addView(ll);
     }
 
-    private void showMemoryEditorWarningDialog(Switch sw, FeatureSettings fs) {
+    private void showMemoryEditorWarningDialog(SwitchMaterial sw, FeatureSettings fs) {
         CustomAlertDialog dialog = new CustomAlertDialog(this);
         final int[] countdown = {5};
         final String confirmText = getString(R.string.confirm);

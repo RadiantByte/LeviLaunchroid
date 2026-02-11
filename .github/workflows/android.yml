@@ -55,6 +55,9 @@ jobs:
       - name: Grant Execute Permission to gradlew
         run: chmod +x ./gradlew
 
+      - name: Inject API Keys
+        run: echo "curseforge.api_key=${{ secrets.CURSEFORGE_API_KEY }}" >> local.properties
+
       - name: Build Debug, Beta and Unsigned Release APKs
         run: ./gradlew assembleDebug assembleBeta assembleRelease
 
