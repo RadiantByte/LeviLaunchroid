@@ -220,10 +220,13 @@
     <string name="import_skin_pack">Impor Paket Kulit(skin)</string>
     <string name="delete_resource_pack">Hapus Paket Sumber Daya</string>
     <string name="delete_skin_pack">Hapus Paket Kulit(skin)</string>
+    <string name="delete_behavior_pack">Hapus Paket Perilaku</string>
 
     <!-- Content Operations -->
     <string name="confirm_delete_world">Apakah Anda yakin ingin menghapus dunia ini? Tindakan ini tidak dapat dibatalkan.</string>
     <string name="confirm_delete_resource_pack">Apakah Anda yakin ingin menghapus paket sumber daya ini? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="confirm_delete_behavior_pack">Apakah Anda yakin ingin menghapus paket perilaku ini? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="confirm_delete_skin_pack">Apakah Anda yakin ingin menghapus paket kulit(skin) ini? Tindakan ini tidak dapat dibatalkan.</string>
 
     <!-- World Editor -->
     <string name="edit_world">Edit Dunia</string>

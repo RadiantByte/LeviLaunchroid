@@ -475,9 +475,23 @@ public class ContentListActivity extends BaseActivity {
     }
 
     private void showDeletePackDialog(ResourcePackItem pack) {
+        int titleResId;
+        int messageResId;
+
+        if (contentType == TYPE_BEHAVIOR_PACKS) {
+            titleResId = R.string.delete_behavior_pack;
+            messageResId = R.string.confirm_delete_behavior_pack;
+        } else if (contentType == TYPE_SKIN_PACKS) {
+            titleResId = R.string.delete_skin_pack;
+            messageResId = R.string.confirm_delete_skin_pack;
+        } else {
+            titleResId = R.string.delete_resource_pack;
+            messageResId = R.string.confirm_delete_resource_pack;
+        }
+
         new CustomAlertDialog(this)
-            .setTitleText(getString(R.string.delete_resource_pack))
-            .setMessage(getString(R.string.confirm_delete_resource_pack))
+            .setTitleText(getString(titleResId))
+            .setMessage(getString(messageResId))
             .setPositiveButton(getString(R.string.dialog_positive_delete), v -> deletePack(pack))
             .setNegativeButton(getString(R.string.cancel), null)
             .show();

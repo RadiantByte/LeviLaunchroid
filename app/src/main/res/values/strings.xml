@@ -220,10 +220,13 @@
     <string name="import_skin_pack">Import Skin Pack</string>
     <string name="delete_resource_pack">Delete Resource Pack</string>
     <string name="delete_skin_pack">Delete Skin Pack</string>
+    <string name="delete_behavior_pack">Delete Behavior Pack</string>
 
     <!-- Content Operations -->
     <string name="confirm_delete_world">Are you sure you want to delete this world? This action cannot be undone.</string>
     <string name="confirm_delete_resource_pack">Are you sure you want to delete this resource pack? This action cannot be undone.</string>
+    <string name="confirm_delete_behavior_pack">Are you sure you want to delete this behavior pack? This action cannot be undone.</string>
+    <string name="confirm_delete_skin_pack">Are you sure you want to delete this skin pack? This action cannot be undone.</string>
 
     <!-- World Editor -->
     <string name="edit_world">Edit World</string>

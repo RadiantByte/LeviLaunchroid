@@ -213,10 +213,13 @@
     <string name="delete_resource_pack">删除资源包</string>
     <string name="import_skin_pack">导入皮肤包</string>
     <string name="delete_skin_pack">删除皮肤包</string>
+    <string name="delete_behavior_pack">删除行为包</string>
 
     <!-- Content Operations -->
     <string name="confirm_delete_world">您确定要删除这个世界吗？此操作无法撤销。</string>
     <string name="confirm_delete_resource_pack">您确定要删除这个资源包吗？此操作无法撤销。</string>
+    <string name="confirm_delete_behavior_pack">您确定要删除这个行为包吗？此操作无法撤销。</string>
+    <string name="confirm_delete_skin_pack">您确定要删除这个皮肤包吗？此操作无法撤销。</string>
 
     <!-- World Editor -->
     <string name="edit_world">编辑世界</string>

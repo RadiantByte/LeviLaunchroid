@@ -215,10 +215,13 @@
     <string name="delete_resource_pack">Удалить набор ресурсов</string>
     <string name="import_skin_pack">Импортировать скин-пак</string>
     <string name="delete_skin_pack">Удалить скин-пак</string>
+    <string name="delete_behavior_pack">Удалить набор поведений</string>
 
     <!-- Content Operations -->
     <string name="confirm_delete_world">Вы уверены, что хотите удалить этот мир? Это действие необратимо.</string>
     <string name="confirm_delete_resource_pack">Вы уверены, что хотите удалить этот набор ресурсов? Это действие необратимо.</string>
+    <string name="confirm_delete_behavior_pack">Вы уверены, что хотите удалить этот набор поведений? Это действие необратимо.</string>
+    <string name="confirm_delete_skin_pack">Вы уверены, что хотите удалить этот скин-пак? Это действие необратимо.</string>
 
     <!-- World Editor -->
     <string name="edit_world">Редактировать мир</string>
