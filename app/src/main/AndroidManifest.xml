@@ -54,7 +54,7 @@
         <activity
             android:name="org.levimc.launcher.ui.activities.SplashActivity"
             android:exported="true"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi">
             <intent-filter>
@@ -66,28 +66,28 @@
         <activity
             android:name="org.levimc.launcher.ui.activities.MainActivity"
             android:exported="true"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi" />
 
         <activity
             android:name="org.levimc.launcher.ui.activities.ContentManagementActivity"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi" />
 
         <activity
             android:name="org.levimc.launcher.ui.activities.ContentListActivity"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi" />
 
         <activity
             android:name="org.levimc.launcher.ui.activities.WorldEditorActivity"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi"
             android:label="@string/edit_world" />
@@ -95,7 +95,7 @@
         <activity
             android:name="org.levimc.launcher.ui.activities.OptionsEditorActivity"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi"
             android:label="@string/edit_options" />
@@ -103,7 +103,7 @@
         <activity
             android:name="org.levimc.launcher.ui.activities.CustomFlatWorldActivity"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi"
             android:label="@string/custom_flat_world" />
@@ -111,7 +111,7 @@
         <activity
             android:name="org.levimc.launcher.ui.activities.SettingsActivity"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi"
             android:label="@string/settings_title" />
@@ -120,7 +120,7 @@
         <activity
             android:name="org.levimc.launcher.ui.activities.AccountsActivity"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             tools:ignore="DiscouragedApi"
             android:label="@string/accounts_title" />
@@ -128,7 +128,7 @@
         <activity
             android:name="org.levimc.launcher.ui.activities.MsftLoginActivity"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:windowSoftInputMode="adjustResize"
             tools:ignore="DiscouragedApi" />
@@ -136,7 +136,7 @@
         <activity
             android:name=".ui.activities.ModsFullscreenActivity"
             android:theme="@style/Base.Theme.FullScreen"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:exported="false"
             tools:ignore="DiscouragedApi" />
@@ -144,7 +144,7 @@
         <activity
             android:name=".ui.activities.ModDetailActivity"
             android:theme="@style/Base.Theme.FullScreen"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:exported="false"
             tools:ignore="DiscouragedApi" />
@@ -152,7 +152,7 @@
         <activity
             android:name=".ui.activities.InbuiltModsActivity"
             android:theme="@style/Base.Theme.FullScreen"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:exported="false"
             tools:ignore="DiscouragedApi" />
@@ -160,7 +160,7 @@
         <activity
             android:name="org.levimc.launcher.ui.activities.CurseForgeActivity"
             android:theme="@style/Base.Theme.FullScreen"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:exported="false"
             tools:ignore="DiscouragedApi" />
@@ -168,7 +168,7 @@
         <activity
             android:name=".ui.activities.ContentDetailsActivity"
             android:theme="@style/Base.Theme.FullScreen"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:exported="false"
             tools:ignore="DiscouragedApi" />
@@ -176,7 +176,7 @@
         <activity
             android:name=".ui.activities.QuickLaunchActivity"
             android:theme="@style/Base.Theme.FullScreen"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
             android:exported="false"
             android:label="@string/quick_launch_title"
@@ -189,7 +189,7 @@
             android:excludeFromRecents="false"
             android:exported="true"
             android:launchMode="singleTask"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi">
             <meta-data
                 android:name="android.app.lib_name"
@@ -256,7 +256,7 @@
             android:excludeFromRecents="false"
             android:exported="false"
             android:launchMode="standard"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:taskAffinity="org.levimc.launcher.minecraft"
             android:theme="@style/AppFullScreenTheme"
             tools:ignore="DiscouragedApi">
@@ -301,7 +301,7 @@
         <activity
             android:name="org.levimc.launcher.ui.activities.CrashActivity"
             android:exported="false"
-            android:screenOrientation="sensorLandscape"
+            android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.FullScreen"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc" />
 
